@@ -132,16 +132,16 @@ function StudentFormModal({
     if (mode === "create") {
       if (!formData.password) {
         newErrors.password = "Senha é obrigatória";
-      } else if (formData.password.length < 6) {
-        newErrors.password = "Senha deve ter no mínimo 6 caracteres";
+      } else if (formData.password.length < 8) {
+        newErrors.password = "Senha deve ter no mínimo 8 caracteres";
       }
 
       if (formData.password !== formData.password_confirmation) {
         newErrors.password_confirmation = "As senhas não coincidem";
       }
     } else if (mode === "edit" && formData.password) {
-      if (formData.password.length < 6) {
-        newErrors.password = "Senha deve ter no mínimo 6 caracteres";
+      if (formData.password.length < 8) {
+        newErrors.password = "Senha deve ter no mínimo 8 caracteres";
       }
 
       if (formData.password !== formData.password_confirmation) {
