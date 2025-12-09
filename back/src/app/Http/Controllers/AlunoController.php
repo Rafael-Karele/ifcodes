@@ -162,7 +162,7 @@ class AlunoController extends Controller
             'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($aluno->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'curso_id' => 'sometimes|required|exists:cursos,id',
-            'matricula' => ['sometimes', 'nullable', 'string', 'max:255', Rule::unique('alunos')->ignore($alunoRecord->user_id, 'user_id')],
+            'matricula' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('alunos')->ignore($alunoRecord->user_id, 'user_id')],
         ]);
 
         DB::transaction(function () use ($aluno, $alunoRecord, $validated, $request) {
