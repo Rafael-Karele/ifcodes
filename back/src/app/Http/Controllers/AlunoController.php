@@ -61,7 +61,7 @@ class AlunoController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'curso_id' => 'required|exists:cursos,id',
-            'matricula' => 'nullable|string|max:255|unique:alunos,matricula',
+            'matricula' => 'required|string|max:255|unique:alunos,matricula',
         ]);
 
         $user = DB::transaction(function () use ($validated) {
@@ -78,7 +78,7 @@ class AlunoController extends Controller
             Aluno::create([
                 'user_id' => $user->id,
                 'curso_id' => $validated['curso_id'],
-                'matricula' => $validated['matricula'] ?? null,
+                'matricula' => $validated['matricula'],
             ]);
 
             // Retorna o usuário com os relacionamentos carregados
