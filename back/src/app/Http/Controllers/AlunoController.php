@@ -61,7 +61,9 @@ class AlunoController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'curso_id' => 'required|exists:cursos,id',
-            'matricula' => 'required|string|max:255|unique:alunos,matricula',
+            'matricula' => ['required', 'string', 'regex:/^\d+$/', 'max:255', 'unique:alunos,matricula'],
+        ], [
+            'matricula.regex' => 'A matrícula deve conter apenas números.',
         ]);
 
         $user = DB::transaction(function () use ($validated) {
@@ -162,7 +164,9 @@ class AlunoController extends Controller
             'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($aluno->id)],
             'password' => 'nullable|string|min:8|confirmed',
             'curso_id' => 'sometimes|required|exists:cursos,id',
-            'matricula' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('alunos')->ignore($alunoRecord->user_id, 'user_id')],
+            'matricula' => ['sometimes', 'required', 'string', 'regex:/^\d+$/', 'max:255', Rule::unique('alunos')->ignore($alunoRecord->user_id, 'user_id')],
+        ], [
+            'matricula.regex' => 'A matrícula deve conter apenas números.',
         ]);
 
         DB::transaction(function () use ($aluno, $alunoRecord, $validated, $request) {
