@@ -313,6 +313,10 @@ export default function ActivitiesDetails() {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex-1">
+            <div className="flex items-center gap-2 text-blue-100 mb-2">
+              <FileText className="w-5 h-5" />
+              <span className="font-medium">Detalhes da Atividade</span>
+            </div>
             <h1 className="text-3xl font-bold mb-2">{selectedProblem.title}</h1>
             <div className="flex items-center gap-4 text-blue-100 mt-2">
               <div className="flex items-center gap-2">
