@@ -7,6 +7,7 @@ use App\Models\Problema;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ProblemaService
 {
@@ -95,9 +96,18 @@ class ProblemaService
         return $this->_problema;
     }
 
+
+
     public static function listarTodos($user_id = null, $filtrarPorCriador = false)
     {
-        $query = Problema::with('casosTeste')->withCount('atividades');
+        $user = Auth::user();
+        $canViewPrivate = $user && ($user->hasRole('admin') || $user->hasRole('professor'));
+
+        $query = Problema::with(['casosTeste' => function ($query) use ($canViewPrivate) {
+            if (!$canViewPrivate) {
+                $query->where('privado', false);
+            }
+        }])->withCount('atividades');
 
         // Apenas filtra por criador se explicitamente solicitado
         if ($user_id && $filtrarPorCriador) {
@@ -109,7 +119,14 @@ class ProblemaService
 
     public static function buscarPorId($id)
     {
-        return Problema::with('casosTeste')->withCount('atividades')->find($id);
+        $user = Auth::user();
+        $canViewPrivate = $user && ($user->hasRole('admin') || $user->hasRole('professor'));
+
+        return Problema::with(['casosTeste' => function ($query) use ($canViewPrivate) {
+            if (!$canViewPrivate) {
+                $query->where('privado', false);
+            }
+        }])->withCount('atividades')->find($id);
     }
 
     public static function excluir($id)
