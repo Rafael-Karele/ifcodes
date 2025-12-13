@@ -18,7 +18,7 @@ interface DateTimePickerProps {
 
 const applyDateTimeMask = (value: string): string => {
   const numbers = value.replace(/\D/g, "");
-  
+
   let masked = "";
   for (let i = 0; i < numbers.length && i < 12; i++) {
     if (i === 2 || i === 4) {
@@ -48,7 +48,7 @@ const parseInputDate = (value: string | undefined): Date | null => {
 };
 
 const CustomInput = forwardRef<HTMLInputElement, any>(
-  ({ value, onClick, onChange, placeholderText, onChangeRaw, onBlur }, ref) => {
+  ({ value, onClick, onChange, placeholderText, onChangeRaw, onBlur, onDateChange }, ref) => {
     const [inputValue, setInputValue] = useState(value || "");
 
     useEffect(() => {
@@ -60,6 +60,11 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
       const maskedValue = applyDateTimeMask(newValue);
       
       setInputValue(maskedValue);
+
+      const parsed = parseInputDate(maskedValue);
+      if (parsed && isValid(parsed) && onDateChange) {
+        onDateChange(parsed);
+      }
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -137,7 +142,7 @@ export function DateTimePicker({
         dateFormat="dd/MM/yyyy HH:mm"
         minDate={minDate}
         placeholderText={placeholderText}
-        customInput={<CustomInput placeholderText={placeholderText} />}
+        customInput={<CustomInput placeholderText={placeholderText} onDateChange={handleChange} />}
         required={required}
         locale="pt-BR"
         calendarClassName="shadow-xl border border-gray-200 rounded-lg"
@@ -161,20 +166,20 @@ export function DateTimePicker({
             "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
           ];
           const years = Array.from({ length: 126 }, (_, i) => 1900 + i);
-          
+
           const handleGoToToday = () => {
             const today = new Date();
             changeYear(today.getFullYear());
             changeMonth(today.getMonth());
             setCurrentMonth(today);
           };
-          
+
           const checkIsCurrentMonth = () => {
             const today = new Date();
-            return date.getMonth() === today.getMonth() && 
-                   date.getFullYear() === today.getFullYear();
+            return date.getMonth() === today.getMonth() &&
+              date.getFullYear() === today.getFullYear();
           };
-          
+
           return (
             <div style={{ padding: '10px 12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
               <select

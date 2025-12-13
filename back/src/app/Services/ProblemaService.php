@@ -7,6 +7,7 @@ use App\Models\Problema;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class ProblemaService
 {
@@ -48,18 +49,39 @@ class ProblemaService
                 return false;
             }
 
-            if ($this->_is_update) {
-                CasoTeste::where('problema_id', $this->_problema->id)->delete();
-            }
-
-            foreach ($this->_casos_teste as $caso_teste) {
-                $caso_teste->problema_id = $this->_problema->id;
-
-                if (!$caso_teste->save()) {
-                    DB::rollback();
-                    return false;
+            $existingTestCases = CasoTeste::where('problema_id', $this->_problema->id)->orderBy('id')->get();
+            $newTestCasesData = $this->_casos_teste; 
+            $countExisting = $existingTestCases->count();
+            $countNew = count($newTestCasesData);
+            
+            foreach ($newTestCasesData as $index => $newCase) {
+                if ($index < $countExisting) {
+                    $existingCase = $existingTestCases[$index];
+                    $existingCase->entrada = $newCase->entrada;
+                    $existingCase->saida = $newCase->saida;
+                    $existingCase->privado = $newCase->privado;
+                    if (!$existingCase->save()) {
+                        DB::rollback();
+                        return false;
+                    }
+                } else {
+                    $newCase->problema_id = $this->_problema->id;
+                    if (!$newCase->save()) {
+                        DB::rollback();
+                        return false;
+                    }
                 }
             }
+
+            if ($countExisting > $countNew) {
+                for ($i = $countNew; $i < $countExisting; $i++) {
+                    try {
+                        $existingTestCases[$i]->delete();
+                    } catch (Exception $e) {
+                    }
+                }
+            }
+
         } catch (Exception $e) {
             DB::rollBack();
             return false;
@@ -74,9 +96,18 @@ class ProblemaService
         return $this->_problema;
     }
 
+
+
     public static function listarTodos($user_id = null, $filtrarPorCriador = false)
     {
-        $query = Problema::with('casosTeste');
+        $user = Auth::user();
+        $canViewPrivate = $user && ($user->hasRole('admin') || $user->hasRole('professor'));
+
+        $query = Problema::with(['casosTeste' => function ($query) use ($canViewPrivate) {
+            if (!$canViewPrivate) {
+                $query->where('privado', false);
+            }
+        }])->withCount('atividades');
 
         // Apenas filtra por criador se explicitamente solicitado
         if ($user_id && $filtrarPorCriador) {
@@ -88,7 +119,14 @@ class ProblemaService
 
     public static function buscarPorId($id)
     {
-        return Problema::with('casosTeste')->find($id);
+        $user = Auth::user();
+        $canViewPrivate = $user && ($user->hasRole('admin') || $user->hasRole('professor'));
+
+        return Problema::with(['casosTeste' => function ($query) use ($canViewPrivate) {
+            if (!$canViewPrivate) {
+                $query->where('privado', false);
+            }
+        }])->withCount('atividades')->find($id);
     }
 
     public static function excluir($id)
@@ -103,10 +141,24 @@ class ProblemaService
                 return false;
             }
 
-            // Remove casos de teste associados
+            $atividadeIds = \App\Models\Atividade::where('problema_id', $id)->pluck('id');
+            
+            if ($atividadeIds->isNotEmpty()) {
+                $submissaoIds = \App\Models\Submissao::whereIn('atividade_id', $atividadeIds)->pluck('id');
+                
+                if ($submissaoIds->isNotEmpty()) {
+                    \App\Models\Correcao::whereIn('submissao_id', $submissaoIds)->delete();
+                    \App\Models\Submissao::whereIn('id', $submissaoIds)->delete();
+                }
+
+                \App\Models\Atividade::whereIn('id', $atividadeIds)->delete();
+            }
+
+            $casoTesteIds = CasoTeste::where('problema_id', $id)->pluck('id');
+            \App\Models\Correcao::whereIn('caso_teste_id', $casoTesteIds)->delete();
+            
             CasoTeste::where('problema_id', $id)->delete();
 
-            // Remove o problema
             $problema->delete();
 
             DB::commit();
