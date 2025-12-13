@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import Loading from "@/components/Loading";
 import Notification from "@/components/Notification";
-import { ArrowLeft, UserPlus, UserMinus, Users, Search, BookOpen, Plus, X, Codesandbox, Clock, HardDrive, Calendar, MoreVertical, Pencil, Trash2, CheckCircle2, AlertCircle, XCircle, Loader2, Eye, EyeOff, Copy, Hash, Terminal, Target as TargetIcon, TestTube } from "lucide-react";
+import { ArrowLeft, UserPlus, UserMinus, Users, Search, BookOpen, Plus, X, Codesandbox, Clock, HardDrive, Calendar, MoreVertical, Pencil, Trash2, CheckCircle2, AlertCircle, XCircle, Loader2, Eye, EyeOff, Copy, Hash, Terminal, Target as TargetIcon, TestTube, FileText } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProblemViewModal from "@/components/ProblemViewModal";
@@ -407,42 +407,33 @@ export default function ClassDetails() {
 
                       {/* Botões de ação */}
                       <div className="absolute bottom-3 left-3 flex gap-2">
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('', {
-                              activity,
-                              allProblemsLength: allProblems.length,
-                              foundProblem: allProblems.find(p => p.id === activity.problemId)
-                            });
                             setViewActivity(activity);
                           }}
-                          className={`px-3 py-1.5 text-xs font-medium text-gray-700 rounded-full transition-colors ${isOverdue
-                            ? "hover:bg-red-100"
-                            : isPending
-                              ? "hover:bg-yellow-100"
-                              : "hover:bg-green-100"
-                            }`}
+                          className="h-8 text-xs gap-2"
                         >
+                          <Eye className="w-3.5 h-3.5" />
                           Ver Problema
-                        </button>
+                        </Button>
                         {hasAnyRole(["professor", "admin"]) && (
-                          <button
+                          <Button
                             type="button"
+                            variant="outline"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               setViewSubmissionsActivity(activity);
                             }}
-                            className={`px-3 py-1.5 text-xs font-medium text-gray-700 rounded-full transition-colors ${isOverdue
-                              ? "hover:bg-red-100"
-                              : isPending
-                                ? "hover:bg-yellow-100"
-                                : "hover:bg-green-100"
-                              }`}
+                            className="h-8 text-xs gap-2"
                           >
+                            <FileText className="w-3.5 h-3.5" />
                             Ver Submissões
-                          </button>
+                          </Button>
                         )}
                       </div>
 

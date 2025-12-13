@@ -30,10 +30,12 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  Hash,
 } from "lucide-react";
 import { CodeSubmissionComponent } from "../../components/CodeSubmission";
 import { useData } from "@/context/DataContext";
 import Loading from "@/components/Loading";
+import { RichTextViewer } from "@/components/RichTextEditor";
 
 // Configuração dos possíveis status das submissões (exibição e estilização)
 const statusConfig = {
@@ -120,11 +122,11 @@ function formatDate(dateString: string) {
   const diffTime = date.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-const formatted = date.toLocaleDateString("pt-BR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
+  const formatted = date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
   let relative = "";
   let isOverdue = false;
@@ -181,7 +183,7 @@ export default function ActivitiesDetails() {
     const problemFromMap = selectedActivity
       ? mapProblems.get(selectedActivity.problemId)
       : undefined;
-    
+
     // Se não encontrou no mapa, usa o problema buscado da API
     return problemFromMap || fetchedProblem;
   }, [selectedActivity, mapProblems, fetchedProblem]);
@@ -191,13 +193,13 @@ export default function ActivitiesDetails() {
     try {
       setLocalLoading(true);
       const data = await getSubmissionsByActivityId(String(activity.id));
-      
+
       // Busca o problema se não estiver no cache
       if (!mapProblems.get(activity.problemId)) {
         const problem = await getProblemById(`${activity.problemId}`);
         setFetchedProblem(problem);
       }
-      
+
       setActivitySubmissions(data);
     } catch (error) {
       console.error("Erro ao buscar submissões da atividade:", error);
@@ -312,7 +314,12 @@ export default function ActivitiesDetails() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">{selectedProblem.title}</h1>
-            <p className="text-blue-100 text-lg">{selectedProblem.statement}</p>
+            <div className="flex items-center gap-4 text-blue-100 mt-2">
+              <div className="flex items-center gap-2">
+                <Hash className="w-5 h-5 opacity-70" />
+                <span className="font-medium">ID: {selectedActivity.id}</span>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
@@ -321,9 +328,8 @@ export default function ActivitiesDetails() {
               <div className="text-sm font-medium">Prazo</div>
               <div className="text-lg font-bold">{dueDate.formatted}</div>
               <div
-                className={`text-xs ${
-                  dueDate.isOverdue ? "text-red-200" : "text-blue-200"
-                }`}
+                className={`text-xs ${dueDate.isOverdue ? "text-red-200" : "text-blue-200"
+                  }`}
               >
                 {dueDate.relative}
               </div>
@@ -360,11 +366,10 @@ export default function ActivitiesDetails() {
         </div>
 
         <div className="p-6">
-          <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {selectedProblem.statement}
-            </p>
-          </div>
+          <RichTextViewer
+            value={selectedProblem.statement}
+            className="text-gray-700 leading-relaxed"
+          />
         </div>
       </div>
 
