@@ -119,51 +119,51 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
     } else if (plainText.length > 10000) {
       newErrors.enunciado = "O enunciado não pode ter mais de 10000 caracteres";
     }
-    
+
     // Validar tempo limite
     if (!formData.tempo_limite || formData.tempo_limite < 100) {
       newErrors.tempo_limite = "O tempo limite deve ser no mínimo 100ms";
     } else if (formData.tempo_limite > 30000) {
       newErrors.tempo_limite = "O tempo limite não pode ser maior que 30000ms (30s)";
     }
-    
+
     // Validar memória limite
     if (!formData.memoria_limite || formData.memoria_limite < 128) {
       newErrors.memoria_limite = "A memória limite deve ser no mínimo 128KB";
     } else if (formData.memoria_limite > 1048576) {
       newErrors.memoria_limite = "A memória limite não pode ser maior que 1048576KB (1GB)";
     }
-    
+
     // Validar casos de teste
     for (let i = 0; i < formData.casos_teste.length; i++) {
       const tc = formData.casos_teste[i];
       if (!tc.entrada.trim() || !tc.saida.trim()) {
-        setNotification({ 
-          type: 'error', 
-          message: `Caso de teste ${i + 1}: entrada e saída são obrigatórias` 
+        setNotification({
+          type: 'error',
+          message: `Caso de teste ${i + 1}: entrada e saída são obrigatórias`
         });
         return false;
       }
     }
-    
+
     setErrors(newErrors);
-    
+
     if (Object.keys(newErrors).length > 0) {
       const firstError = Object.values(newErrors)[0];
       setNotification({ type: 'error', message: firstError });
       return false;
     }
-    
+
     return true;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setErrors({});
     setNotification(null);
     onSave(formData);
@@ -186,7 +186,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
   const updateTestCase = (index: number, field: keyof TestCase, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
-      casos_teste: prev.casos_teste.map((tc, i) => 
+      casos_teste: prev.casos_teste.map((tc, i) =>
         i === index ? { ...tc, [field]: value } : tc
       )
     }));
@@ -227,7 +227,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                 <p className="text-sm text-red-600 mt-1">{errors.titulo}</p>
               )}
             </div>
-            
+
             <div>
               <Label htmlFor="enunciado">Enunciado *</Label>
               <RichTextEditor
@@ -246,7 +246,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                 error={errors.enunciado}
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="tempo_limite">Tempo Limite (ms) *</Label>
@@ -267,7 +267,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                   <p className="text-sm text-red-600 mt-1">{errors.tempo_limite}</p>
                 )}
               </div>
-              
+
               <div>
                 <Label htmlFor="memoria_limite">Memória Limite (KB) *</Label>
                 <Input
@@ -297,7 +297,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                   Adicionar Caso
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 {formData.casos_teste.map((testCase, index) => (
                   <div key={index} className="border rounded-lg p-4">
@@ -347,7 +347,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                 ))}
               </div>
             </div>
-            
+
             <div className="flex gap-3 pt-4">
               <button
                 type="button"
@@ -364,7 +364,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
               </button>
             </div>
           </form>
-          
+
           {notification && (
             <Notification
               type={notification.type}
@@ -386,9 +386,10 @@ interface DeleteConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   problemTitle: string;
+  activitiesCount?: number;
 }
 
-function DeleteConfirmModal({ isOpen, onClose, onConfirm, problemTitle }: DeleteConfirmModalProps) {
+function DeleteConfirmModal({ isOpen, onClose, onConfirm, problemTitle, activitiesCount }: DeleteConfirmModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -405,6 +406,19 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, problemTitle }: Delete
           <span className="font-semibold text-gray-900">"{problemTitle}"</span>?
           Esta ação não pode ser desfeita.
         </p>
+
+        {activitiesCount !== undefined && activitiesCount > 0 && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h4 className="text-sm font-semibold text-yellow-800 mb-1 flex items-center">
+              <span className="mr-2">⚠️</span> Atenção: Problema em uso
+            </h4>
+            <p className="text-sm text-yellow-700">
+              Este problema está atribuído a <strong>{activitiesCount}</strong> atividade{activitiesCount > 1 ? 's' : ''}.
+              Excluí-lo removerá todas as atividades, submissões e correções associadas.
+            </p>
+          </div>
+        )}
+
         <div className="flex gap-3">
           <button
             onClick={onClose}
@@ -472,7 +486,7 @@ export default function Problems() {
           setNotification({ type: 'error', message: 'Erro ao criar problema' });
         }
       }
-      
+
       setIsFormModalOpen(false);
       setEditingProblem(null);
     } catch (error) {
@@ -662,6 +676,7 @@ export default function Problems() {
         }}
         onConfirm={handleDeleteConfirm}
         problemTitle={deletingProblem?.title || ""}
+        activitiesCount={deletingProblem?.atividades_count}
       />
     </div>
   );

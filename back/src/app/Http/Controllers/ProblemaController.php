@@ -114,7 +114,7 @@ class ProblemaController extends Controller
      */
     public function show(Problema $problema)
     {
-        $problemaComCasos = Problema::with('casosTeste')->find($problema->id);
+        $problemaComCasos = ProblemaService::buscarPorId($problema->id);
         return response()->json($problemaComCasos);
     }
 
