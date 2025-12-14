@@ -11,7 +11,13 @@ import axios from "axios";
 export default function ResetPassword() {
     console.log("ResetPassword component rendering");
     const params = useParams();
+    // Fallback to params["*"] is used to support routes defined as /reset-password/*, where the token is captured as a wildcard.
+    // Prefer defining your route as /reset-password/:token to avoid this workaround.
+    // If you must use a catch-all route, params["*"] will contain the token.
     const token = params.token || params["*"];
+    if (!params.token && params["*"]) {
+        console.warn("Token not found in params.token, using params['*'] as fallback. Check your route definition.");
+    }
     const [searchParams] = useSearchParams();
     const email = searchParams.get("email");
     
