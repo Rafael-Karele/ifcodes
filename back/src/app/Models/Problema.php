@@ -60,6 +60,10 @@ class Problema extends Model
     public function casosTeste(){
         return $this->hasMany(CasoTeste::class, 'problema_id');
     }
+
+    public function atividades() {
+        return $this->hasMany(Atividade::class, 'problema_id');
+    }
     
     protected function serializeDate(\DateTimeInterface $date)
     {

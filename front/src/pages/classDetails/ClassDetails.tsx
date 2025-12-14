@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import Loading from "@/components/Loading";
 import Notification from "@/components/Notification";
-import { ArrowLeft, UserPlus, UserMinus, Users, Search, BookOpen, Plus, X, Codesandbox, Clock, HardDrive, Calendar, MoreVertical, Pencil, Trash2, CheckCircle2, AlertCircle, XCircle, Loader2, Eye, EyeOff, Copy, Hash, Terminal, Target as TargetIcon, TestTube } from "lucide-react";
+import { ArrowLeft, UserPlus, UserMinus, Users, Search, BookOpen, Plus, X, Codesandbox, Clock, HardDrive, Calendar, MoreVertical, Pencil, Trash2, CheckCircle2, AlertCircle, XCircle, Loader2, Eye, EyeOff, Copy, Hash, Terminal, Target as TargetIcon, TestTube, FileText } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProblemViewModal from "@/components/ProblemViewModal";
@@ -209,7 +209,7 @@ export default function ClassDetails() {
 
   const handleUpdateActivity = async (formData: { problema_id: number; data_entrega: string }) => {
     if (!editingActivity) return;
-    
+
     try {
       const result = await updateActivity(editingActivity.id, {
         ...formData,
@@ -334,17 +334,16 @@ export default function ClassDetails() {
                   const isOverdue = dueDate < now;
                   const isPending = !isOverdue;
                   const problem = allProblems.find(p => p.id === activity.problemId);
-                  
+
                   return (
                     <div
                       key={activity.id}
-                      className={`p-4 pb-14 rounded-lg border-l-4 transition-colors hover:shadow-md relative ${
-                        isOverdue
-                          ? "bg-red-50 border-red-500"
-                          : isPending
+                      className={`p-4 pb-14 rounded-lg border-l-4 transition-colors hover:shadow-md relative ${isOverdue
+                        ? "bg-red-50 border-red-500"
+                        : isPending
                           ? "bg-yellow-50 border-yellow-500"
                           : "bg-green-50 border-green-500"
-                      }`}
+                        }`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
@@ -405,64 +404,52 @@ export default function ClassDetails() {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Botões de ação */}
                       <div className="absolute bottom-3 left-3 flex gap-2">
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            console.log('', {
-                              activity,
-                              allProblemsLength: allProblems.length,
-                              foundProblem: allProblems.find(p => p.id === activity.problemId)
-                            });
                             setViewActivity(activity);
                           }}
-                          className={`px-3 py-1.5 text-xs font-medium text-gray-700 rounded-full transition-colors ${
-                            isOverdue
-                              ? "hover:bg-red-100"
-                              : isPending
-                              ? "hover:bg-yellow-100"
-                              : "hover:bg-green-100"
-                          }`}
+                          className="h-8 text-xs gap-2"
                         >
+                          <Eye className="w-3.5 h-3.5" />
                           Ver Problema
-                        </button>
+                        </Button>
                         {hasAnyRole(["professor", "admin"]) && (
-                          <button
+                          <Button
                             type="button"
+                            variant="outline"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               setViewSubmissionsActivity(activity);
                             }}
-                            className={`px-3 py-1.5 text-xs font-medium text-gray-700 rounded-full transition-colors ${
-                              isOverdue
-                                ? "hover:bg-red-100"
-                                : isPending
-                                ? "hover:bg-yellow-100"
-                                : "hover:bg-green-100"
-                            }`}
+                            className="h-8 text-xs gap-2"
                           >
+                            <FileText className="w-3.5 h-3.5" />
                             Ver Submissões
-                          </button>
+                          </Button>
                         )}
                       </div>
 
                       <span
-                        className={`absolute bottom-3 right-10 px-2 py-1 rounded text-xs font-medium ${
-                          isOverdue
-                            ? "bg-red-100 text-red-700"
-                            : isPending
+                        className={`absolute bottom-3 right-10 px-2 py-1 rounded text-xs font-medium ${isOverdue
+                          ? "bg-red-100 text-red-700"
+                          : isPending
                             ? "bg-yellow-100 text-yellow-700"
                             : "bg-green-100 text-green-700"
-                        }`}
+                          }`}
                       >
                         {isOverdue
                           ? "Atrasada"
                           : isPending
-                          ? "Pendente"
-                          : "Concluída"}
+                            ? "Pendente"
+                            : "Concluída"}
                       </span>
                     </div>
                   );
@@ -633,7 +620,7 @@ export default function ClassDetails() {
         activity={viewSubmissionsActivity}
         classId={Number(id)}
       />
-      
+
     </div>
   );
 }
@@ -651,7 +638,7 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredProblems = problems.filter(problem => 
+  const filteredProblems = problems.filter(problem =>
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -706,7 +693,7 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
                   className="pl-10"
                 />
               </div>
-              
+
               <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
                 {filteredProblems.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">Nenhum problema encontrado</p>
@@ -714,9 +701,8 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
                   filteredProblems.map((problem) => (
                     <div
                       key={problem.id}
-                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
-                      }`}
+                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
+                        }`}
                       onClick={() => setSelectedProblemId(problem.id)}
                     >
                       <div className="flex justify-between items-start">
@@ -801,6 +787,7 @@ interface ActivityViewModalProps {
 }
 
 function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewModalProps) {
+  const { hasAnyRole } = useUserRole();
   if (!isOpen || !problem) return null;
 
   const dueDate = new Date(activity.dueDate);
@@ -846,7 +833,7 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
                 <RichTextViewer value={problem.statement} />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="font-semibold mb-2">Tempo Limite</h3>
@@ -863,37 +850,39 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
                 </div>
               </div>
             </div>
-            
+
             {problem.testCases && problem.testCases.length > 0 && (
               <div>
                 <h3 className="font-semibold mb-4">Casos de Teste</h3>
                 <div className="space-y-4">
-                  {problem.testCases.map((testCase, index) => (
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-3">
-                        <h4 className="font-medium">Caso {index + 1}</h4>
-                        {testCase.private && (
-                          <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
-                            Privado
-                          </span>
-                        )}
-                      </div>
-                      <div className="space-y-3">
-                        <div>
-                          <Label className="text-xs font-medium">Entrada</Label>
-                          <div className="bg-gray-50 p-3 rounded mt-1">
-                            <pre className="text-sm">{testCase.input}</pre>
+                  {problem.testCases
+                    .filter(testCase => !testCase.private || hasAnyRole(['professor', 'admin']))
+                    .map((testCase, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-3">
+                          <h4 className="font-medium">Caso {index + 1}</h4>
+                          {testCase.private && (
+                            <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
+                              Privado
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-3">
+                          <div>
+                            <Label className="text-xs font-medium">Entrada</Label>
+                            <div className="bg-gray-50 p-3 rounded mt-1">
+                              <pre className="text-sm">{testCase.input}</pre>
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-xs font-medium">Saída Esperada</Label>
+                            <div className="bg-gray-50 p-3 rounded mt-1">
+                              <pre className="text-sm">{testCase.expectedOutput}</pre>
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <Label className="text-xs font-medium">Saída Esperada</Label>
-                          <div className="bg-gray-50 p-3 rounded mt-1">
-                            <pre className="text-sm">{testCase.expectedOutput}</pre>
-                          </div>
-                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}
@@ -925,7 +914,7 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
     setSearchTerm("");
   }, [activity, isOpen]);
 
-  const filteredProblems = problems.filter(problem => 
+  const filteredProblems = problems.filter(problem =>
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -978,7 +967,7 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
                   className="pl-10"
                 />
               </div>
-              
+
               <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
                 {filteredProblems.length === 0 ? (
                   <p className="text-center text-gray-500 py-8">Nenhum problema encontrado</p>
@@ -986,9 +975,8 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
                   filteredProblems.map((problem) => (
                     <div
                       key={problem.id}
-                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${
-                        selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
-                      }`}
+                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
+                        }`}
                       onClick={() => setSelectedProblemId(problem.id)}
                     >
                       <div className="flex justify-between items-start">
@@ -1224,7 +1212,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
 
   const loadProblem = async () => {
     if (!activity) return;
-    
+
     try {
       const problemData = await getProblemById(String(activity.problemId));
       setProblem(problemData);
@@ -1235,18 +1223,18 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
 
   const loadSubmissions = async () => {
     if (!activity) return;
-    
+
     setLoading(true);
     try {
       const data = await getActivitySubmissions(classId, activity.id);
-      
+
       // Agrupar submissões por usuário e aplicar lógica de priorização
       const submissionsByUser = new Map<number, any>();
-      
+
       data.forEach((item: any) => {
         const userId = item.user_id;
         const existing = submissionsByUser.get(userId);
-        
+
         if (!existing) {
           // Se não existe submissão deste usuário, adiciona
           submissionsByUser.set(userId, item);
@@ -1255,13 +1243,13 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
           const isExistingAccepted = existing.status === "Aceita";
           const currentDate = new Date(item.created_at);
           const existingDate = new Date(existing.created_at);
-          
+
           // Lógica de priorização:
           // 1. Se a atual é Aceita e a existente não é → substitui
           // 2. Se ambas são Aceita → pega a mais recente
           // 3. Se nenhuma é Aceita → pega a mais recente
           // 4. Se a existente é Aceita e a atual não é → mantém a existente
-          
+
           if (isCurrentAccepted && !isExistingAccepted) {
             submissionsByUser.set(userId, item);
           } else if (isCurrentAccepted && isExistingAccepted && currentDate > existingDate) {
@@ -1272,7 +1260,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
           // Caso contrário, mantém a existente (não faz nada)
         }
       });
-      
+
       // Mapear os dados da API para o formato esperado pelo componente
       const mappedSubmissions: StudentSubmission[] = Array.from(submissionsByUser.values()).map((item: any) => ({
         studentId: item.user_id,
@@ -1283,9 +1271,9 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
         code: item.codigo, // Adicionar código da submissão
         language: item.linguagem === 50 ? 'c' : 'c', // Mapear linguagem (50 = C)
       }));
-      
+
       mappedSubmissions.sort((a, b) => a.studentName.localeCompare(b.studentName));
-      
+
       setSubmissions(mappedSubmissions);
     } catch (error) {
       console.error("Erro ao carregar submissões:", error);
@@ -1307,13 +1295,13 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
       "Processando": "processing",
       "Pendente": "pending",
     };
-    
+
     return statusMap[status] || "unknown";
   };
 
   const handleRowClick = async (submission: StudentSubmission & { submissionId?: number }) => {
     if (!submission.submissionId || !submission.code) return;
-    
+
     setLoadingDetails(true);
     try {
       // Usar o código que já está armazenado na submissão
@@ -1329,7 +1317,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
         },
         studentName: submission.studentName,
       });
-      
+
       // Carregar resultados dos testes
       const results = await getResultBySubmissionId(submission.submissionId);
       setTestResults(results);
@@ -1545,7 +1533,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
               </Table>
             </div>
           )}
-          
+
           {loadingDetails && (
             <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-6 shadow-xl">
@@ -1569,7 +1557,7 @@ interface TestCaseRowProps {
 
 function TestCaseRow({ testCase, result, index }: TestCaseRowProps) {
   const [showOutput, setShowOutput] = useState(false);
-  
+
   const actualOutput = result?.stdout || result?.stderr || "Sem saída";
   const expectedOutput = testCase.expectedOutput || "Sem saída esperada";
 

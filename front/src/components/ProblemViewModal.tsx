@@ -1,4 +1,5 @@
 import type { Problem } from "@/types";
+import { useUserRole } from "@/hooks/useUserRole";
 import { X, Clock, HardDrive, Codesandbox } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { RichTextViewer } from "@/components/RichTextEditor";
@@ -12,6 +13,7 @@ interface ProblemViewModalProps {
 }
 
 export default function ProblemViewModal({ isOpen, onClose, problem }: ProblemViewModalProps) {
+  const { hasAnyRole } = useUserRole();
   if (!isOpen || !problem) return null;
 
   return (

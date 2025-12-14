@@ -49,7 +49,7 @@ export async function getProblemById(id: string): Promise<Problem | undefined> {
     return {
       id: problema.id,
       title: problema.titulo,
-      statement: extractTextFromDraftJs(problema.enunciado),
+      statement: problema.enunciado,
       timeLimitMs: problema.tempo_limite,
       memoryLimitKb: problema.memoria_limite,
       testCases: problema.casos_teste?.map((caso: any) => ({
@@ -76,11 +76,11 @@ export async function getAllProblems(): Promise<Problem[]> {
     });
 
     const problemas = Array.isArray(response.data) ? response.data : response.data[0] || [];
-    
+
     return problemas.map((problema: any) => ({
       id: problema.id,
       title: problema.titulo,
-      statement: extractTextFromDraftJs(problema.enunciado),
+      statement: problema.enunciado,
       timeLimitMs: problema.tempo_limite,
       memoryLimitKb: problema.memoria_limite,
       testCases: problema.casos_teste?.map((caso: any) => ({
@@ -123,7 +123,7 @@ export async function createProblem(problemData: {
     return {
       id: problema.id,
       title: problema.titulo,
-      statement: extractTextFromDraftJs(problema.enunciado),
+      statement: problema.enunciado,
       timeLimitMs: problema.tempo_limite,
       memoryLimitKb: problema.memoria_limite,
     };
@@ -157,7 +157,7 @@ export async function updateProblem(id: number, problemData: {
     return {
       id: problema.id,
       title: problema.titulo,
-      statement: extractTextFromDraftJs(problema.enunciado),
+      statement: problema.enunciado,
       timeLimitMs: problema.tempo_limite,
       memoryLimitKb: problema.memoria_limite,
     };

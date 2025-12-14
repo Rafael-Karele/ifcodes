@@ -17,6 +17,7 @@ import SubmissionsDetails from "@/pages/submissionsDetails/SubmissionsDetails";
 import Problems from "@/pages/problems/Problems";
 import RequireAuth from "@/pages/RequireAuth";
 import RequireRole from "@/pages/RequireRole";
+import ProfileView from "@/pages/perfil/ProfileView";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
 function LocationLogger() {
@@ -51,6 +52,7 @@ export default function AppRouter() {
             <Route path="home" element={<Home />} />
             <Route element={<RequireRole allowedRoles={["student", "professor", "admin"]} />}>
               <Route path="change-password" element={<ChangePassword />} />
+              <Route path="perfil" element={<ProfileView />} />
               <Route path="activities">
                 <Route index element={<Activities />} />
                 <Route path=":id" element={<ActivitiesDetails />} />

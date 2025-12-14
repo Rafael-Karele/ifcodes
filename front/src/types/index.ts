@@ -26,6 +26,7 @@ export type Problem = {
   timeLimitMs: number;
   memoryLimitKb: number;
   testCases?: TestCase[];
+  atividades_count?: number;
 };
 
 export type Submission = {

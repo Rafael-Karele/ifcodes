@@ -1,0 +1,100 @@
+x-logging:
+  &default-logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 100M
+
+services:
+
+  # --- SERVIÇOS DO JUDGE0 ---
+  judge0_server:
+    image: judge0/judge0:1.13.1
+    container_name: judge0_server
+    depends_on:
+      - postgres
+      - judge0_redis
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    ports:
+      - "2358:2358"
+    privileged: true
+    <<: *default-logging
+    restart: always
+
+  judge0_workers:
+    image: judge0/judge0:1.13.1
+    command: ["./scripts/workers"]
+    container_name: judge0_workers
+    depends_on:
+      - postgres
+      - judge0_redis
+    volumes:
+      - ./judge0.conf:/judge0.conf:ro
+    privileged: true
+    <<: *default-logging
+    restart: always
+
+  judge0_redis:
+    image: redis:7.2.4
+    container_name: judge0_redis
+    command: [
+      "bash", "-c",
+      'docker-entrypoint.sh --appendonly no --requirepass "$$REDIS_PASSWORD"'
+    ]
+    env_file: judge0.conf
+    <<: *default-logging
+    restart: always
+
+  # --- SERVIÇOS DO BANCO DE DADOS DO BACKEND E JUDGE0 ---
+  postgres:
+    image: postgres:16.2
+    container_name: postgres
+    env_file: judge0.conf
+    environment:
+      - POSTGRES_DB_BACKEND=ifcodes
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./init-backend-db.sh:/docker-entrypoint-initdb.d/init-backend-db.sh
+    <<: *default-logging
+    restart: always
+    ports:
+      - "5432:5432"
+
+  # --- SERVIÇOS DO BACKEND (LARAVEL) ---
+  backend_app:
+    build:
+      context: ./back
+      dockerfile: src/docker/php/Dockerfile
+    container_name: laravel_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./back/src/:/var/www/html:z
+      - /var/www/html/vendor
+    ports:
+      - "8000:8000"
+    command: "php artisan serve --host=0.0.0.0 --port=8000"
+    depends_on:
+      - postgres
+      - judge0_server
+
+  # --- SERVIÇOS DO FRONTEND (REACT) ---
+  frontend_app:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: react_app
+    restart: unless-stopped
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend_app
+
+volumes:
+  postgres_data:
