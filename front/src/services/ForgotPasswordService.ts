@@ -17,8 +17,6 @@ export async function sendForgotPasswordEmail(email: string): Promise<void> {
                 'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
             }
         });
-    } catch (error) {
-        throw error;
     }
 }
 
