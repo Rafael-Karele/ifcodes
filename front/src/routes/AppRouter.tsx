@@ -25,8 +25,12 @@ function NotFound() {
   return (
     <div className="flex h-screen flex-col items-center justify-center">
       <h1 className="text-2xl font-bold">Página não encontrada</h1>
-      <p>Rota: {location.pathname}</p>
-      <p>Search: {location.search}</p>
+      {process.env.NODE_ENV === "development" && (
+        <>
+          <p>Rota: {location.pathname}</p>
+          <p>Search: {location.search}</p>
+        </>
+      )}
     </div>
   );
 }
