@@ -22,7 +22,7 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 if ($request->expectsJson()) {
-                    return response()->json(['message' => 'Você já está autenticado.'], 403);
+                    return response()->json(['message' => 'Você já está autenticado.'], 409);
                 }
                 return redirect(RouteServiceProvider::HOME);
             }
