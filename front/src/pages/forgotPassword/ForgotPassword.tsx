@@ -34,7 +34,7 @@ export default function ForgotPassword() {
 
         try {
             await sendForgotPasswordEmail(email);
-            setSuccess("Se o e-mail estiver cadastrado, você receberá uma senha temporária em breve.");
+            setSuccess("Se o e-mail estiver cadastrado, você receberá um link para redefinir sua senha.");
             setEmail("");
         } catch (error) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
@@ -75,7 +75,7 @@ export default function ForgotPassword() {
                     <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Recuperar Senha</h2>
                     
                     <p className="text-gray-600 text-center mb-6">
-                        Digite seu e-mail abaixo e enviaremos uma senha temporária para você.
+                        Digite seu e-mail abaixo e enviaremos um link para redefinir sua senha.
                     </p>
 
                     <div className="mb-6">
@@ -107,7 +107,7 @@ export default function ForgotPassword() {
                             }
                         `}
                     >
-                        {loading ? "Enviando..." : "Enviar Senha Temporária"}
+                        {loading ? "Enviando..." : "Enviar Link de Recuperação"}
                     </button>
                 </form>
             </div>
