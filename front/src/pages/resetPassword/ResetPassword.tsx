@@ -9,7 +9,6 @@ import hideIcon from "@/assets/icons/password-hide.svg";
 import axios from "axios";
 
 export default function ResetPassword() {
-    console.log("ResetPassword component rendering");
     const params = useParams();
     // Fallback to params["*"] is used to support routes defined as /reset-password/*, where the token is captured as a wildcard.
     // Prefer defining your route as /reset-password/:token to avoid this workaround.
