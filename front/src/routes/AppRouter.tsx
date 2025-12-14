@@ -20,12 +20,6 @@ import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
-function LocationLogger() {
-  const location = useLocation();
-  console.log("Current location:", location);
-  return null;
-}
-
 function NotFound() {
   const location = useLocation();
   return (
@@ -40,7 +34,6 @@ function NotFound() {
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <LocationLogger />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
