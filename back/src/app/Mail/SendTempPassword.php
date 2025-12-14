@@ -9,28 +9,28 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendTempPassword extends Mailable
+class SendPasswordResetLink extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $tempPassword;
+    public string $resetToken;
 
-    public function __construct(string $tempPassword)
+    public function __construct(string $resetToken)
     {
-        $this->tempPassword = $tempPassword;
+        $this->resetToken = $resetToken;
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Sua Nova Senha Temporária',
+            subject: 'Password Reset Request',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.send-temp-password', 
+            view: 'emails.password-reset-link', 
         );
     }
 
