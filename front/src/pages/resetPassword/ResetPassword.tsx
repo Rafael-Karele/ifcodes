@@ -57,11 +57,15 @@ export default function ResetPassword() {
                 navigate("/login");
             }, 3000);
         } catch (error) {
-            console.error("Erro ao redefinir senha:", error);
+            if (process.env.NODE_ENV === "development") {
+                console.error("Erro ao redefinir senha:", error);
+            }
             if (axios.isAxiosError(error)) {
                 const data = error.response?.data;
-                console.error("Status:", error.response?.status);
-                console.error("Data:", data);
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Status:", error.response?.status);
+                    console.error("Data:", data);
+                }
 
                 if (data?.message) {
                     setError(data.message);
