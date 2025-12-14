@@ -34,13 +34,13 @@
 
         <p>Olá,</p>
 
-        <p>Você solicitou uma redefinição de senha para sua conta. Use a senha temporária abaixo para fazer o login:</p>
+        <p>Você solicitou uma redefinição de senha para sua conta. Para redefinir sua senha, clique no link abaixo:</p>
 
         <div class="password-box">
-            {{ $tempPassword }}
+            <a href="{{ $resetLink }}">{{ $resetLink }}</a>
         </div>
 
-        <p><strong>Importante:</strong> Por motivos de segurança, você será solicitado a criar uma nova senha permanente imediatamente após o login.</p>
+        <p><strong>Importante:</strong> Se você não solicitou a redefinição de senha, por favor ignore este e-mail.</p>
 
         <p>Se você não solicitou isso, por favor, ignore este e-mail.</p>
 
