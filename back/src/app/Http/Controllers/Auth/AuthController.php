@@ -71,7 +71,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user->password = $request->new_password;
+        $user->password = Hash::make($request->new_password);
         $user->must_change_password = false;
         $user->save();
 
