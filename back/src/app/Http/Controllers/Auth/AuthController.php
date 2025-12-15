@@ -39,6 +39,7 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'must_change_password' => $user->must_change_password,
         ]);
     }
 
@@ -71,6 +72,7 @@ class AuthController extends Controller
         }
 
         $user->password = Hash::make($request->new_password);
+        $user->must_change_password = false;
         $user->save();
 
         $user->tokens()->delete();

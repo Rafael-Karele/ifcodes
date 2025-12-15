@@ -94,6 +94,7 @@ export type User = {
   name: string;
   email: string;
   roles: string[];
+  must_change_password?: boolean;
 }
 export type Student = {
   id: number;

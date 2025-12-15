@@ -4,6 +4,8 @@ import ActivitiesDetails from "@/pages/activitiesDetails/ActivitiesDetails";
 import AppLayout from "@/pages/AppLayout";
 import Home from "@/pages/home/Home";
 import Login from "@/pages/login/Login";
+import ForgotPassword from "@/pages/forgotPassword/ForgotPassword";
+import ResetPassword from "@/pages/resetPassword/ResetPassword";
 import ChangePassword from "@/pages/changePassword/ChangePassword";
 import Unauthorized from "@/pages/Unauthorized";
 import Submissions from "@/pages/submissions/Submissions";
@@ -16,13 +18,30 @@ import Problems from "@/pages/problems/Problems";
 import RequireAuth from "@/pages/RequireAuth";
 import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+
+function NotFound() {
+  const location = useLocation();
+  return (
+    <div className="flex h-screen flex-col items-center justify-center">
+      <h1 className="text-2xl font-bold">Página não encontrada</h1>
+      {process.env.NODE_ENV === "development" && (
+        <>
+          <p>Rota: {location.pathname}</p>
+          <p>Search: {location.search}</p>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/password-reset/:token" element={<ResetPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route element={<RequireAuth />}>
           <Route path="/" element={<AppLayout />}>
@@ -58,6 +77,7 @@ export default function AppRouter() {
             </Route>
           </Route>
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
