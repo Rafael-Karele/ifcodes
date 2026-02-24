@@ -144,5 +144,12 @@ services:
       - "8025:8025"
       - "1025:1025"
 
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "2a02:4780:6e:1617:1::/80"
+
 volumes:
   postgres_data:
