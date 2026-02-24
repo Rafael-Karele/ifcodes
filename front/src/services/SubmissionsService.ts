@@ -26,6 +26,7 @@ export async function getSubmissionById(
 }
 import { fakeSubmissions } from "../mocks";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
 
@@ -125,6 +126,10 @@ export async function postSubmission({
   activityId: number;
 }): Promise<Submission | undefined> {
   try {
+    await axios.get(`${API_URL}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
+
     const response = await axios.post(`${API_URL}/api/submissoes`, {
       codigo: code,
       atividade_id: activityId,
@@ -133,6 +138,7 @@ export async function postSubmission({
         Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         "Content-Type": "application/json",
         Accept: "application/json",
+        "X-XSRF-TOKEN": Cookies.get("XSRF-TOKEN"),
       },
       withCredentials: true,
     });
