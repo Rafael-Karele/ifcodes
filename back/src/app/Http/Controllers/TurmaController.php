@@ -23,9 +23,11 @@ class TurmaController extends Controller
         $user = User::find(Auth::id());
         if ($user->professor) {
             return TurmaResource::collection($user->professor->turmas)->response();
-        } else {
+        } elseif ($user->aluno) {
             return TurmaResource::collection($user->aluno->turmas)->response();
         }
+
+        return TurmaResource::collection(Turma::all())->response();
     }
 
     /**
