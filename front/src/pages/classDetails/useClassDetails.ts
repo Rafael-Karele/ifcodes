@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Class, ClassStudent } from "@/types/classes";
 import type { Student, Activity, Problem } from "@/types";
 import ClassesService from "@/services/ClassesService";
@@ -33,8 +33,14 @@ export function useClassDetails(id: string | undefined) {
   const [jamSessions, setJamSessions] = useState<JamSession[]>([]);
   const [activeJam, setActiveJam] = useState<JamSession | null>(null);
 
+  const initializedRef = useRef(false);
+
   useEffect(() => {
     if (id) {
+      // Prevent Strict Mode double-fire
+      if (initializedRef.current) return;
+      initializedRef.current = true;
+
       loadClassData();
       loadClassStudents();
       loadAllStudents();
@@ -42,6 +48,10 @@ export function useClassDetails(id: string | undefined) {
       loadProblems();
       loadJamSessions();
     }
+
+    return () => {
+      initializedRef.current = false;
+    };
   }, [id]);
 
   useEffect(() => {

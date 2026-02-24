@@ -8,7 +8,7 @@ x-logging:
 services:
 
   judge0_server:
-    image: judge0/judge0:1.13.1
+    image: mrkushalsm/judge0:cgv2
     platform: linux/amd64
     container_name: judge0_server
     depends_on:
@@ -21,7 +21,7 @@ services:
     restart: always
 
   judge0_workers:
-    image: judge0/judge0:1.13.1
+    image: mrkushalsm/judge0:cgv2
     platform: linux/amd64
     command: ["./scripts/workers"]
     container_name: judge0_workers
