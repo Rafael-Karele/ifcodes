@@ -337,7 +337,7 @@ export default function JamStudentCard({
       {/* Resize handle */}
       <div
         onMouseDown={handleResizeStart}
-        className="absolute bottom-1 right-1 cursor-nwse-resize rounded p-0.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100"
+        className="absolute bottom-1 right-1 cursor-nwse-resize rounded bg-white/80 p-0.5 text-stone-600 hover:text-stone-800 hover:bg-stone-100"
         title="Redimensionar"
       >
         <GripHorizontal className="h-4 w-4" />
