@@ -21,6 +21,7 @@ export default function JamView() {
     session,
     participants,
     myParticipant,
+    submissionResults,
     connected,
     error,
     updateCode,
@@ -105,6 +106,7 @@ export default function JamView() {
             <JamProfessorView
               session={session}
               participants={participants}
+              submissionResults={submissionResults}
               onEndSession={endSession}
               onGiveFeedback={giveFeedback}
             />
@@ -113,6 +115,7 @@ export default function JamView() {
               session={session}
               myParticipant={myParticipant}
               participants={participants}
+              submissionResult={myParticipant ? submissionResults[myParticipant.user_id] || null : null}
               onUpdateCode={updateCode}
               onSubmitCode={submitCode}
             />

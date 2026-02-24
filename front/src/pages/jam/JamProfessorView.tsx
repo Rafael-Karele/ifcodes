@@ -5,10 +5,12 @@ import JamStudentCard from "@/components/jam/JamStudentCard";
 import JamFocusView from "@/components/jam/JamFocusView";
 import JamTimer from "@/components/jam/JamTimer";
 import type { JamSession, JamStreamParticipant } from "@/types/jam";
+import type { JamSubmissionResult } from "@/hooks/useJamSession";
 
 interface JamProfessorViewProps {
   session: JamSession;
   participants: JamStreamParticipant[];
+  submissionResults: Record<number, JamSubmissionResult>;
   onEndSession: () => void;
   onGiveFeedback: (studentId: number, feedback: string) => void;
 }
@@ -16,6 +18,7 @@ interface JamProfessorViewProps {
 export default function JamProfessorView({
   session,
   participants,
+  submissionResults,
   onEndSession,
   onGiveFeedback,
 }: JamProfessorViewProps) {
@@ -98,6 +101,7 @@ export default function JamProfessorView({
       {focusedParticipant && (
         <JamFocusView
           participant={focusedParticipant}
+          submissionResult={submissionResults[focusedParticipant.userId] || null}
           onClose={() => setFocusedParticipant(null)}
           onGiveFeedback={onGiveFeedback}
         />

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { Send, CheckCircle2, XCircle, Loader2, MessageSquare } from "lucide-react";
+import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Editor from "@monaco-editor/react";
 import { RichTextViewer } from "@/components/RichTextEditor";
 import JamTimer from "@/components/jam/JamTimer";
 import type { JamSession, JamParticipant, JamStreamParticipant } from "@/types/jam";
+import type { JamSubmissionResult } from "@/hooks/useJamSession";
 
 interface JamStudentViewProps {
   session: JamSession;
   myParticipant: JamParticipant | null;
   participants: JamStreamParticipant[];
+  submissionResult: JamSubmissionResult | null;
   onUpdateCode: (code: string) => void;
   onSubmitCode: () => void;
 }
@@ -20,6 +22,7 @@ export default function JamStudentView({
   session,
   myParticipant,
   participants,
+  submissionResult,
   onUpdateCode,
   onSubmitCode,
 }: JamStudentViewProps) {
@@ -30,6 +33,10 @@ export default function JamStudentView({
   const myStream = participants.find((p) => p.userId === myParticipant?.user_id);
   const myStatus = myStream?.status || myParticipant?.status || "joined";
   const myFeedback = myStream?.feedback || myParticipant?.feedback;
+
+  // Submission result details
+  const myResult = submissionResult?.userId === myParticipant?.user_id ? submissionResult : null;
+  const compileError = myResult?.testResults?.find((t) => t.compile_output)?.compile_output || null;
 
   useEffect(() => {
     if (myParticipant?.codigo) {
@@ -165,20 +172,66 @@ export default function JamStudentView({
           )}
 
           {myStatus === "failed" && (
-            <div className="mb-4 rounded-lg bg-red-50 p-3">
-              <div className="flex items-center gap-2 text-red-700">
-                <XCircle className="h-5 w-5" />
-                <span className="font-semibold">Alguns testes falharam</span>
+            <div className="mb-4 space-y-3">
+              <div className="rounded-lg bg-red-50 p-3">
+                <div className="flex items-center gap-2 text-red-700">
+                  <XCircle className="h-5 w-5 shrink-0" />
+                  <span className="font-semibold">
+                    {myResult?.statusMessage || "Alguns testes falharam"}
+                  </span>
+                </div>
               </div>
+              {compileError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                  <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-red-700">
+                    <AlertTriangle className="h-3 w-3" />
+                    Saída do compilador
+                  </div>
+                  <pre className="whitespace-pre-wrap break-words text-xs text-red-800 font-mono">
+                    {compileError}
+                  </pre>
+                </div>
+              )}
+              {myResult?.testResults && !compileError && (
+                <div className="space-y-2">
+                  {myResult.testResults.map((t, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-lg border p-2 text-xs ${
+                        t.status === "Aceita"
+                          ? "border-green-200 bg-green-50 text-green-700"
+                          : "border-red-200 bg-red-50 text-red-700"
+                      }`}
+                    >
+                      <span className="font-medium">Teste {i + 1}:</span> {t.status}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           {myStatus === "error" && (
-            <div className="mb-4 rounded-lg bg-red-50 p-3">
-              <div className="flex items-center gap-2 text-red-700">
-                <XCircle className="h-5 w-5" />
-                <span className="font-semibold">Erro na execução</span>
+            <div className="mb-4 space-y-3">
+              <div className="rounded-lg bg-red-50 p-3">
+                <div className="flex items-center gap-2 text-red-700">
+                  <XCircle className="h-5 w-5 shrink-0" />
+                  <span className="font-semibold">
+                    {myResult?.statusMessage || "Erro na execução"}
+                  </span>
+                </div>
               </div>
+              {compileError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                  <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-red-700">
+                    <AlertTriangle className="h-3 w-3" />
+                    Detalhes do erro
+                  </div>
+                  <pre className="whitespace-pre-wrap break-words text-xs text-red-800 font-mono">
+                    {compileError}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
 

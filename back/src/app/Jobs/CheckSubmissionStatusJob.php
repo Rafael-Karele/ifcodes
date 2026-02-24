@@ -12,6 +12,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Lib\Dicionarios\Status;
+use App\Models\JamParticipant;
+use App\Services\JamSubmissaoService;
 use Throwable;
 
 class CheckSubmissionStatusJob implements ShouldQueue
@@ -58,6 +60,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
         }
 
         $possuiPendentes = false;
+        $testResults = [];
 
         foreach ($resultados as $resultado) {
             $correcao = $submissao->correcoes->firstWhere('token', $resultado['token']);
@@ -72,6 +75,9 @@ class CheckSubmissionStatusJob implements ShouldQueue
             }
 
             $statusId = $resultado['status_id'];
+            $compileOutput = isset($resultado['compile_output'])
+                ? base64_decode($resultado['compile_output'])
+                : null;
 
             if (in_array($statusId, self::PENDING_STATUSES, true)) {
                 $possuiPendentes = true;
@@ -79,11 +85,26 @@ class CheckSubmissionStatusJob implements ShouldQueue
             } elseif ($statusId != STATUS::ACEITA) {
                 $submissao->status_correcao_id = $statusId;
                 $submissao->save();
+
+                $statusInfo = Status::get($statusId);
+                $testResults[] = [
+                    'caso_teste_id' => $correcao->caso_teste_id,
+                    'status' => $statusInfo['nome'] ?? 'Erro',
+                    'compile_output' => $compileOutput,
+                ];
+
+                $this->notifyJamSidecarIfNeeded($submissao, 'failed', $statusInfo['nome'] ?? 'Erro', $testResults);
                 return;
             }
 
             $correcao->status_correcao_id = $statusId;
             $correcao->save();
+
+            $testResults[] = [
+                'caso_teste_id' => $correcao->caso_teste_id,
+                'status' => 'Aceita',
+                'compile_output' => null,
+            ];
         }
 
         if ($possuiPendentes) {
@@ -94,7 +115,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
 
                 $submissao->status_correcao_id = STATUS::TEMPO_LIMITE_EXCEDIDO;
                 $submissao->save();
-
+                $this->notifyJamSidecarIfNeeded($submissao, 'error', 'Tempo Limite Excedido', $testResults);
                 return;
             }
 
@@ -103,7 +124,29 @@ class CheckSubmissionStatusJob implements ShouldQueue
         } else {
             $submissao->status_correcao_id = Status::ACEITA;
             $submissao->save();
+            $this->notifyJamSidecarIfNeeded($submissao, 'passed', 'Aceita', $testResults);
             return;
         }
+    }
+
+    private function notifyJamSidecarIfNeeded(Submissao $submissao, string $jamStatus, string $statusMessage, array $testResults = []): void
+    {
+        $jamParticipant = JamParticipant::where('submissao_id', $submissao->id)->first();
+
+        if (!$jamParticipant) {
+            return;
+        }
+
+        $jamParticipant->update(['status' => $jamStatus]);
+
+        (new JamSubmissaoService())->notifySidecar(
+            $jamParticipant->jam_session_id,
+            $jamParticipant->user_id,
+            $jamStatus,
+            [
+                'statusMessage' => $statusMessage,
+                'testResults' => $testResults,
+            ],
+        );
     }
 }

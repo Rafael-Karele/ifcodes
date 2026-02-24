@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { X, Send } from "lucide-react";
+import { X, Send, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import type { JamStreamParticipant } from "@/types/jam";
+import type { JamSubmissionResult } from "@/hooks/useJamSession";
 
 interface JamFocusViewProps {
   participant: JamStreamParticipant;
+  submissionResult: JamSubmissionResult | null;
   onClose: () => void;
   onGiveFeedback: (studentId: number, feedback: string) => void;
 }
@@ -19,8 +21,9 @@ const statusLabels: Record<string, string> = {
   error: "Erro",
 };
 
-export default function JamFocusView({ participant, onClose, onGiveFeedback }: JamFocusViewProps) {
+export default function JamFocusView({ participant, submissionResult, onClose, onGiveFeedback }: JamFocusViewProps) {
   const [feedback, setFeedback] = useState(participant.feedback || "");
+  const compileError = submissionResult?.testResults?.find((t) => t.compile_output)?.compile_output || null;
 
   const handleSendFeedback = () => {
     if (feedback.trim()) {
@@ -65,8 +68,63 @@ export default function JamFocusView({ participant, onClose, onGiveFeedback }: J
             />
           </div>
 
-          {/* Feedback Panel */}
-          <div className="flex w-80 flex-col">
+          {/* Results & Feedback Panel */}
+          <div className="flex w-80 flex-col overflow-y-auto">
+            {/* Submission Results */}
+            {(participant.status === "passed" || participant.status === "failed" || participant.status === "error") && (
+              <div className="border-b">
+                <div className="border-b bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600">
+                  Resultado da Submissão
+                </div>
+                <div className="space-y-2 p-4">
+                  {participant.status === "passed" && (
+                    <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                      <span className="text-sm font-medium">Todos os testes passaram!</span>
+                    </div>
+                  )}
+                  {(participant.status === "failed" || participant.status === "error") && (
+                    <>
+                      <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-red-700">
+                        <XCircle className="h-4 w-4 shrink-0" />
+                        <span className="text-sm font-medium">
+                          {submissionResult?.statusMessage || (participant.status === "error" ? "Erro na execução" : "Alguns testes falharam")}
+                        </span>
+                      </div>
+                      {compileError && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                          <div className="mb-1 flex items-center gap-1 text-xs font-semibold text-red-700">
+                            <AlertTriangle className="h-3 w-3" />
+                            Saída do compilador
+                          </div>
+                          <pre className="whitespace-pre-wrap break-words text-xs text-red-800 font-mono">
+                            {compileError}
+                          </pre>
+                        </div>
+                      )}
+                      {submissionResult?.testResults && !compileError && (
+                        <div className="space-y-1">
+                          {submissionResult.testResults.map((t, i) => (
+                            <div
+                              key={i}
+                              className={`rounded-lg border p-2 text-xs ${
+                                t.status === "Aceita"
+                                  ? "border-green-200 bg-green-50 text-green-700"
+                                  : "border-red-200 bg-red-50 text-red-700"
+                              }`}
+                            >
+                              <span className="font-medium">Teste {i + 1}:</span> {t.status}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Feedback */}
             <div className="border-b bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600">
               Feedback
             </div>

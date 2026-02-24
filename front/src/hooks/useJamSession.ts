@@ -2,10 +2,22 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { JamSessionService } from "@/services/JamSessionService";
 import type { JamSession, JamParticipant, JamStreamParticipant } from "@/types/jam";
 
+export interface JamSubmissionResult {
+  userId: number;
+  status: string;
+  statusMessage?: string;
+  testResults?: Array<{
+    caso_teste_id: number;
+    status: string;
+    compile_output: string | null;
+  }>;
+}
+
 interface UseJamSessionReturn {
   session: JamSession | null;
   participants: JamStreamParticipant[];
   myParticipant: JamParticipant | null;
+  submissionResults: Record<number, JamSubmissionResult>;
   connected: boolean;
   error: string | null;
   updateCode: (code: string) => void;
@@ -21,6 +33,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
   const [myParticipant, setMyParticipant] = useState<JamParticipant | null>(null);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [submissionResults, setSubmissionResults] = useState<Record<number, JamSubmissionResult>>({});
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const codeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,6 +82,15 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
                 p.userId === msg.userId ? { ...p, status: msg.status } : p
               )
             );
+            setSubmissionResults((prev) => ({
+              ...prev,
+              [msg.userId]: {
+                userId: msg.userId,
+                status: msg.status,
+                statusMessage: msg.testResults?.statusMessage,
+                testResults: msg.testResults?.testResults,
+              },
+            }));
             break;
 
           case "ERROR":
@@ -149,6 +171,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     session,
     participants,
     myParticipant,
+    submissionResults,
     connected,
     error,
     updateCode,
