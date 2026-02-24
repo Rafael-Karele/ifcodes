@@ -227,7 +227,12 @@ class JamSessionController extends Controller
             return response()->json(['message' => 'Participante não encontrado.'], 404);
         }
 
-        $participant->update(['feedback' => $request->feedback]);
+        $feedbacks = $participant->feedback ?? [];
+        $feedbacks[] = [
+            'message' => $request->feedback,
+            'created_at' => now()->toISOString(),
+        ];
+        $participant->update(['feedback' => $feedbacks]);
 
         return response()->json($participant);
     }

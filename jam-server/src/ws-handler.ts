@@ -128,7 +128,7 @@ export async function handleConnection(ws: WebSocket) {
               code: p.codigo || '',
               language: p.linguagem || 'c',
               status: p.status,
-              feedback: p.feedback,
+              feedback: Array.isArray(p.feedback) ? p.feedback : [],
               online: existing ? existing.online : false,
             });
           }

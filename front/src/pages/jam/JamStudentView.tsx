@@ -32,7 +32,7 @@ export default function JamStudentView({
   // Find my stream data for real-time status/feedback
   const myStream = participants.find((p) => p.userId === myParticipant?.user_id);
   const myStatus = myStream?.status || myParticipant?.status || "joined";
-  const myFeedback = myStream?.feedback || myParticipant?.feedback;
+  const myFeedback = myStream?.feedback?.length ? myStream.feedback : myParticipant?.feedback || [];
 
   // Submission result details
   const myResult = submissionResult?.userId === myParticipant?.user_id ? submissionResult : null;
@@ -251,14 +251,21 @@ export default function JamStudentView({
           )}
 
           {/* Feedback Section */}
-          {myFeedback && (
+          {myFeedback.length > 0 && (
             <div className="mt-4">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
                 <MessageSquare className="h-4 w-4" />
-                Feedback do Professor
+                Feedback do Professor ({myFeedback.length})
               </h3>
-              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
-                {myFeedback}
+              <div className="space-y-2">
+                {myFeedback.map((entry, i) => (
+                  <div key={i} className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
+                    <p>{entry.message}</p>
+                    <p className="mt-1 text-xs text-blue-400">
+                      {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}

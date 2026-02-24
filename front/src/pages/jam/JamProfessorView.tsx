@@ -22,7 +22,10 @@ export default function JamProfessorView({
   onEndSession,
   onGiveFeedback,
 }: JamProfessorViewProps) {
-  const [focusedParticipant, setFocusedParticipant] = useState<JamStreamParticipant | null>(null);
+  const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
+  const focusedParticipant = focusedUserId !== null
+    ? participants.find((p) => p.userId === focusedUserId) || null
+    : null;
 
   const stats = {
     total: participants.length,
@@ -87,7 +90,7 @@ export default function JamProfessorView({
           <JamStudentCard
             key={p.userId}
             participant={p}
-            onClick={() => setFocusedParticipant(p)}
+            onClick={() => setFocusedUserId(p.userId)}
           />
         ))}
         {participants.length === 0 && (
@@ -102,7 +105,7 @@ export default function JamProfessorView({
         <JamFocusView
           participant={focusedParticipant}
           submissionResult={submissionResults[focusedParticipant.userId] || null}
-          onClose={() => setFocusedParticipant(null)}
+          onClose={() => setFocusedUserId(null)}
           onGiveFeedback={onGiveFeedback}
         />
       )}

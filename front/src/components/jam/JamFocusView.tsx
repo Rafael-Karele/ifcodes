@@ -22,12 +22,13 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function JamFocusView({ participant, submissionResult, onClose, onGiveFeedback }: JamFocusViewProps) {
-  const [feedback, setFeedback] = useState(participant.feedback || "");
+  const [feedback, setFeedback] = useState("");
   const compileError = submissionResult?.testResults?.find((t) => t.compile_output)?.compile_output || null;
 
   const handleSendFeedback = () => {
     if (feedback.trim()) {
       onGiveFeedback(participant.userId, feedback);
+      setFeedback("");
     }
   };
 
@@ -126,13 +127,19 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
 
             {/* Feedback */}
             <div className="border-b bg-gray-50 px-4 py-2 text-sm font-medium text-gray-600">
-              Feedback
+              Feedback ({participant.feedback?.length || 0})
             </div>
             <div className="flex flex-1 flex-col p-4">
-              {participant.feedback && (
-                <div className="mb-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
-                  <span className="font-medium">Feedback anterior:</span>
-                  <p className="mt-1">{participant.feedback}</p>
+              {participant.feedback?.length > 0 && (
+                <div className="mb-4 space-y-2 max-h-48 overflow-y-auto">
+                  {participant.feedback.map((entry, i) => (
+                    <div key={i} className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
+                      <p>{entry.message}</p>
+                      <p className="mt-1 text-xs text-blue-400">
+                        {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               )}
               <textarea

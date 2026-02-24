@@ -2,10 +2,12 @@ import { useState } from "react";
 import { X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import type { FeedbackEntry } from "@/types/jam";
+
 interface JamFeedbackDialogProps {
   studentName: string;
   studentId: number;
-  currentFeedback: string | null;
+  feedbackHistory: FeedbackEntry[];
   onClose: () => void;
   onSubmit: (studentId: number, feedback: string) => void;
 }
@@ -13,11 +15,11 @@ interface JamFeedbackDialogProps {
 export default function JamFeedbackDialog({
   studentName,
   studentId,
-  currentFeedback,
+  feedbackHistory,
   onClose,
   onSubmit,
 }: JamFeedbackDialogProps) {
-  const [feedback, setFeedback] = useState(currentFeedback || "");
+  const [feedback, setFeedback] = useState("");
 
   const handleSubmit = () => {
     if (feedback.trim()) {
@@ -37,6 +39,19 @@ export default function JamFeedbackDialog({
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        {feedbackHistory.length > 0 && (
+          <div className="mb-3 max-h-32 space-y-2 overflow-y-auto">
+            {feedbackHistory.map((entry, i) => (
+              <div key={i} className="rounded-lg bg-blue-50 p-2 text-sm text-blue-700">
+                <p>{entry.message}</p>
+                <p className="mt-1 text-xs text-blue-400">
+                  {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
 
         <textarea
           value={feedback}

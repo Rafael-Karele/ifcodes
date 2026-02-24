@@ -1,10 +1,15 @@
+export interface FeedbackEntry {
+  message: string;
+  created_at: string;
+}
+
 export interface ParticipantState {
   userId: number;
   userName: string;
   code: string;
   language: string;
   status: string;
-  feedback: string | null;
+  feedback: FeedbackEntry[];
   online: boolean;
 }
 
@@ -64,13 +69,14 @@ export function updateParticipantStatus(jamId: number, userId: number, status: s
   return true;
 }
 
-export function updateParticipantFeedback(jamId: number, userId: number, feedback: string): boolean {
+export function updateParticipantFeedback(jamId: number, userId: number, feedback: string): FeedbackEntry[] {
   const session = sessions.get(jamId);
-  if (!session) return false;
+  if (!session) return [];
   const p = session.participants.get(userId);
-  if (!p) return false;
-  p.feedback = feedback;
-  return true;
+  if (!p) return [];
+  const entry: FeedbackEntry = { message: feedback, created_at: new Date().toISOString() };
+  p.feedback = [...p.feedback, entry];
+  return p.feedback;
 }
 
 export function updateSessionStatus(jamId: number, status: string, startedAt?: string): void {

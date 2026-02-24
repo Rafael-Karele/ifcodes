@@ -78,9 +78,9 @@ export default function JamStudentCard({ participant, onClick }: JamStudentCardP
           }}
         />
       </div>
-      {participant.feedback && (
+      {participant.feedback?.length > 0 && (
         <div className="mt-2 rounded bg-blue-50 p-2 text-xs text-blue-700">
-          <span className="font-medium">Feedback:</span> {participant.feedback}
+          <span className="font-medium">Feedbacks:</span> {participant.feedback.length}
         </div>
       )}
     </div>

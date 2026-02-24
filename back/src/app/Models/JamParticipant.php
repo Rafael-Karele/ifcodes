@@ -24,6 +24,7 @@ class JamParticipant extends Model
     protected $casts = [
         'joined_at' => 'datetime',
         'submitted_at' => 'datetime',
+        'feedback' => 'array',
     ];
 
     public function jamSession(): BelongsTo

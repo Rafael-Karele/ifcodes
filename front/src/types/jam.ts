@@ -34,6 +34,11 @@ export interface JamSession {
   participants?: JamParticipant[];
 }
 
+export interface FeedbackEntry {
+  message: string;
+  created_at: string;
+}
+
 export interface JamParticipant {
   id: number;
   jam_session_id: number;
@@ -42,7 +47,7 @@ export interface JamParticipant {
   linguagem: string;
   status: JamParticipantStatus;
   submissao_id: number | null;
-  feedback: string | null;
+  feedback: FeedbackEntry[];
   joined_at: string | null;
   submitted_at: string | null;
   user?: {
@@ -58,7 +63,7 @@ export interface JamStreamParticipant {
   code: string;
   language: string;
   status: string;
-  feedback: string | null;
+  feedback: FeedbackEntry[];
   online: boolean;
 }
 
