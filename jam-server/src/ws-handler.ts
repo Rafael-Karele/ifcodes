@@ -35,6 +35,72 @@ interface AuthenticatedClient {
 const clients = new Map<WebSocket, AuthenticatedClient>();
 const jamClients = new Map<number, Set<WebSocket>>();
 
+// Auto-end timers: when all professors disconnect, schedule session end after 30 min
+const PROFESSOR_DISCONNECT_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+const professorDisconnectTimers = new Map<number, NodeJS.Timeout>();
+// Store a valid professor token per session so we can call endSession even after disconnect
+const professorTokens = new Map<number, string>();
+
+function hasProfessorOnline(jamId: number): boolean {
+  const sockets = jamClients.get(jamId);
+  if (!sockets) return false;
+  for (const ws of sockets) {
+    const client = clients.get(ws);
+    if (client && client.isProfessor && ws.readyState === WebSocket.OPEN) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function clearProfessorTimer(jamId: number): void {
+  const timer = professorDisconnectTimers.get(jamId);
+  if (timer) {
+    clearTimeout(timer);
+    professorDisconnectTimers.delete(jamId);
+    console.log(`[jam ${jamId}] Professor reconnected — auto-end timer cancelled`);
+  }
+}
+
+function startProfessorDisconnectTimer(jamId: number): void {
+  // Don't start if there's already a timer or if a professor is still online
+  if (professorDisconnectTimers.has(jamId) || hasProfessorOnline(jamId)) return;
+
+  const session = getSession(jamId);
+  if (!session || session.status === 'finished') return;
+
+  console.log(`[jam ${jamId}] All professors disconnected — session will auto-end in 30 minutes`);
+
+  const timer = setTimeout(async () => {
+    professorDisconnectTimers.delete(jamId);
+
+    // Re-check: maybe a professor came back (timer shouldn't exist, but be safe)
+    if (hasProfessorOnline(jamId)) return;
+
+    const currentSession = getSession(jamId);
+    if (!currentSession || currentSession.status === 'finished') return;
+
+    const token = professorTokens.get(jamId);
+    if (token) {
+      const result = await endSession(jamId, token);
+      if (!result) {
+        console.error(`[jam ${jamId}] Failed to auto-end session via Laravel`);
+      }
+    } else {
+      console.error(`[jam ${jamId}] No professor token available to auto-end session`);
+    }
+
+    updateSessionStatus(jamId, 'finished');
+    broadcastToJam(jamId, 'SESSION_AUTO_ENDED', {
+      reason: 'Professor desconectado por mais de 30 minutos',
+    });
+    broadcastToJam(jamId, 'STATE_UPDATE', serializeSession(currentSession));
+    console.log(`[jam ${jamId}] Session auto-ended due to professor inactivity`);
+  }, PROFESSOR_DISCONNECT_TIMEOUT_MS);
+
+  professorDisconnectTimers.set(jamId, timer);
+}
+
 function send(ws: WebSocket, type: string, payload: any) {
   if (ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type, ...payload }));
@@ -142,6 +208,12 @@ export async function handleConnection(ws: WebSocket) {
 
         // Mark this user as online
         setParticipantOnline(jamId, user.id, true);
+
+        // Professor-specific: store token for auto-end and cancel disconnect timer
+        if (isProfessor) {
+          professorTokens.set(jamId, token);
+          clearProfessorTimer(jamId);
+        }
 
         // Find this user's participant data
         const myParticipant = sessionData.participants?.find((p: any) => p.user_id === user.id);
@@ -331,6 +403,11 @@ export async function handleConnection(ws: WebSocket) {
       const session = getSession(jamId);
       if (session) {
         broadcastToJam(jamId, 'STATE_UPDATE', serializeSession(session));
+      }
+
+      // If a professor disconnected, start auto-end timer
+      if (client.isProfessor) {
+        startProfessorDisconnectTimer(jamId);
       }
     }
   });

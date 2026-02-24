@@ -116,6 +116,14 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
             }));
             break;
 
+          case "SESSION_AUTO_ENDED":
+            sessionStatusRef.current = "finished";
+            setSession((prev) =>
+              prev ? { ...prev, status: "finished" } : prev
+            );
+            setError(msg.reason || "Sessão encerrada automaticamente — professor desconectado por mais de 30 minutos");
+            break;
+
           case "ERROR":
             setError(msg.message);
             break;
