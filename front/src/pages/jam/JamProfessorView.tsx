@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Users, CheckCircle2, Code2, Square, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JamStudentCard from "@/components/jam/JamStudentCard";
@@ -6,6 +6,8 @@ import JamFocusView from "@/components/jam/JamFocusView";
 import JamTimer from "@/components/jam/JamTimer";
 import type { JamSession, JamStreamParticipant } from "@/types/jam";
 import type { JamSubmissionResult } from "@/hooks/useJamSession";
+
+type CardSize = "sm" | "md" | "lg";
 
 interface JamProfessorViewProps {
   session: JamSession;
@@ -24,7 +26,11 @@ export default function JamProfessorView({
   onGiveFeedback,
   onUpdateSettings,
 }: JamProfessorViewProps) {
+  const [cardSize, setCardSize] = useState<CardSize>("sm");
+  const [cardSizes, setCardSizes] = useState<Record<number, { colSpan: number; height: number }>>({});
   const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [gridColWidth, setGridColWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsTitulo, setSettingsTitulo] = useState(session.titulo || "");
   const [settingsInstrucoes, setSettingsInstrucoes] = useState(session.instrucoes || "");
@@ -49,6 +55,42 @@ export default function JamProfessorView({
     });
     setShowSettings(false);
   };
+  const gridClasses: Record<CardSize, string> = {
+    sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+    md: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+    lg: "grid-cols-1 md:grid-cols-1 lg:grid-cols-2",
+  };
+
+  const maxColsMap: Record<CardSize, number> = { sm: 4, md: 3, lg: 2 };
+
+  const editorHeights: Record<CardSize, string> = {
+    sm: "h-32",
+    md: "h-48",
+    lg: "h-64",
+  };
+
+  // Measure grid column width for snap-to-column resize
+  useEffect(() => {
+    const measure = () => {
+      if (!gridRef.current) return;
+      const style = window.getComputedStyle(gridRef.current);
+      const cols = style.gridTemplateColumns.split(" ");
+      if (cols.length > 0) {
+        setGridColWidth(parseFloat(cols[0]) || 0);
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [cardSize, participants.length]);
+
+  const handleCardResize = useCallback(
+    (userId: number, size: { colSpan: number; height: number }) => {
+      setCardSizes((prev) => ({ ...prev, [userId]: size }));
+    },
+    []
+  );
+
   const focusedParticipant = focusedUserId !== null
     ? participants.find((p) => p.userId === focusedUserId) || null
     : null;
@@ -75,6 +117,21 @@ export default function JamProfessorView({
             startedAt={session.started_at}
             timeLimitMinutes={session.tempo_limite}
           />
+          <div className="flex items-center rounded-md border">
+            {(["sm", "md", "lg"] as const).map((size) => (
+              <button
+                key={size}
+                onClick={() => setCardSize(size)}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                  cardSize === size
+                    ? "bg-gray-800 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                } ${size === "sm" ? "rounded-l-md" : ""} ${size === "lg" ? "rounded-r-md" : ""}`}
+              >
+                {size === "sm" ? "P" : size === "md" ? "M" : "G"}
+              </button>
+            ))}
+          </div>
           <Button
             onClick={() => setShowSettings(true)}
             variant="outline"
@@ -119,12 +176,17 @@ export default function JamProfessorView({
       </div>
 
       {/* Student Grid */}
-      <div className="grid flex-1 auto-rows-min grid-cols-2 content-start gap-4 overflow-y-auto md:grid-cols-3 lg:grid-cols-4">
+      <div ref={gridRef} className={`grid flex-1 auto-rows-min content-start gap-4 overflow-y-auto [grid-auto-flow:dense] ${gridClasses[cardSize]}`}>
         {participants.map((p) => (
           <JamStudentCard
             key={p.userId}
             participant={p}
             onClick={() => setFocusedUserId(p.userId)}
+            editorHeight={editorHeights[cardSize]}
+            customSize={cardSizes[p.userId]}
+            onResize={(size) => handleCardResize(p.userId, size)}
+            gridColWidth={gridColWidth}
+            maxCols={maxColsMap[cardSize]}
           />
         ))}
         {participants.length === 0 && (
