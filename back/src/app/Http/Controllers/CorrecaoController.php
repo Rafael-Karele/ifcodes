@@ -27,7 +27,8 @@ class CorrecaoController extends Controller
             
             $correcao['stdout'] = isset($resultado['stdout']) ? base64_decode($resultado['stdout']) : null;
             $correcao['stderr'] = isset($resultado['stderr']) ? base64_decode($resultado['stderr']) : null;
-            
+            $correcao['compile_output'] = isset($resultado['compile_output']) ? base64_decode($resultado['compile_output']) : null;
+
             unset($correcao['token']);
         }
 

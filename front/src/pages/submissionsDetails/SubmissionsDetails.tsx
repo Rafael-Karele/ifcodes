@@ -585,6 +585,27 @@ export default function SubmissionsDetails() {
         </div>
       </div>
 
+      {/* Erro de compilação */}
+      {results.some((r) => r.compileOutput) && (
+        <div className="bg-white rounded-lg border border-orange-200 shadow-sm">
+          <div className="border-b border-orange-200 p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-orange-50 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-orange-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-stone-800">
+                Saída do Compilador
+              </h2>
+            </div>
+          </div>
+          <div className="p-6">
+            <pre className="bg-gray-900 text-gray-300 rounded-lg p-4 text-sm font-mono whitespace-pre-wrap overflow-auto max-h-80">
+              {results.find((r) => r.compileOutput)?.compileOutput}
+            </pre>
+          </div>
+        </div>
+      )}
+
       {/* Casos de teste da submissão */}
       <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
         <div className="border-b border-stone-200 p-6">

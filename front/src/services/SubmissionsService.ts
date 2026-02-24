@@ -111,6 +111,7 @@ export async function getResultBySubmissionId(
       submissionId: item.submissao_id,
       stdout: item.stdout || null,
       stderr: item.stderr || null,
+      compileOutput: item.compile_output || null,
     }));
   } catch (error) {
     console.log("erro ao buscar resultados", error);

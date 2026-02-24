@@ -59,6 +59,7 @@ export type TestCaseResult = {
   status: string;
   stdout?: string | null;
   stderr?: string | null;
+  compileOutput?: string | null;
 };
 
 export type SubmissionReport = {
