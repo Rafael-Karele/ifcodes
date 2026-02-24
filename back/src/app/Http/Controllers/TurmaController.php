@@ -25,9 +25,11 @@ class TurmaController extends Controller
             return TurmaResource::collection($user->professor->turmas)->response();
         } elseif ($user->aluno) {
             return TurmaResource::collection($user->aluno->turmas)->response();
+        } elseif ($user->hasRole('admin')) {
+            return TurmaResource::collection(Turma::all())->response();
         }
 
-        return TurmaResource::collection(Turma::all())->response();
+        return response()->json('Acesso não autorizado.', 403);
     }
 
     /**
