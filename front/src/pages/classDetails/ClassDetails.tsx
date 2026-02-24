@@ -272,7 +272,7 @@ export default function ClassDetails() {
     return (
       <div className="container mx-auto p-6">
         <div className="text-center py-12">
-          <p className="text-gray-500">Turma não encontrada</p>
+          <p className="text-stone-500">Turma não encontrada</p>
           <Button onClick={() => navigate("/classes")} className="mt-4">
             Voltar para Turmas
           </Button>
@@ -305,7 +305,7 @@ export default function ClassDetails() {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-2">{classData.nome}</h1>
           {classData.teacherName && (
-            <p className="mt-2 text-gray-700">
+            <p className="mt-2 text-stone-700">
               Professor: {classData.teacherName}
             </p>
           )}
@@ -339,7 +339,7 @@ export default function ClassDetails() {
               <h2 className="text-xl font-semibold">Atividades da Turma</h2>
               {hasAnyRole(["professor", "admin"]) && (
                 <Button onClick={() => setShowNewActivity(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity shadow-md">
+                  className="text-white rounded-lg hover:opacity-90 font-medium transition-opacity shadow-md" style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}>
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Atividade
                 </Button>
@@ -348,7 +348,7 @@ export default function ClassDetails() {
 
             <div className="space-y-3">
               {activities.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-stone-500 text-center py-8">
                   Nenhuma atividade cadastrada para esta turma
                 </p>
               ) : (
@@ -374,7 +374,7 @@ export default function ClassDetails() {
                           <h3 className="font-semibold text-lg">
                             {problem?.title || "Atividade"}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-stone-600 mt-1">
                             Prazo: {dueDate.toLocaleDateString("pt-BR")} às{" "}
                             {dueDate.toLocaleTimeString("pt-BR", {
                               hour: "2-digit",
@@ -389,14 +389,14 @@ export default function ClassDetails() {
                                 e.stopPropagation();
                                 setOpenMenuId(openMenuId === activity.id ? null : activity.id);
                               }}
-                              className="p-2 rounded-full hover:bg-gray-100"
+                              className="p-2 rounded-full hover:bg-stone-100"
                             >
                               <MoreVertical size={20} />
                             </button>
 
                             {openMenuId === activity.id && (
                               <div
-                                className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200"
+                                className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-stone-200"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <div className="py-1">
@@ -406,7 +406,7 @@ export default function ClassDetails() {
                                       setEditingActivity(activity);
                                       setOpenMenuId(null);
                                     }}
-                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
                                   >
                                     <Pencil className="mr-2 h-4 w-4" />
                                     <span>Editar</span>
@@ -417,7 +417,7 @@ export default function ClassDetails() {
                                       setDeletingActivity(activity);
                                       setOpenMenuId(null);
                                     }}
-                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                    className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-stone-100"
                                   >
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     <span>Apagar</span>
@@ -498,10 +498,10 @@ export default function ClassDetails() {
 
             {/* Formulário de adicionar aluno */}
             {showAddStudent && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="mb-6 p-4 bg-stone-50 rounded-lg">
                 <div className="mb-4">
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-3 w-4 h-4 text-stone-400" />
                     <Input
                       type="text"
                       placeholder="Buscar alunos disponíveis..."
@@ -514,7 +514,7 @@ export default function ClassDetails() {
 
                 <div className="max-h-64 overflow-y-auto space-y-2">
                   {filteredStudents.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">
+                    <p className="text-stone-500 text-center py-4">
                       {searchTerm
                         ? "Nenhum aluno encontrado"
                         : "Todos os alunos já estão matriculados"}
@@ -523,11 +523,11 @@ export default function ClassDetails() {
                     filteredStudents.map((student) => (
                       <div
                         key={student.id}
-                        className="flex justify-between items-center p-3 bg-white rounded border hover:border-blue-300 transition-colors"
+                        className="flex justify-between items-center p-3 bg-white rounded border hover:border-teal-300 transition-colors"
                       >
                         <div>
                           <p className="font-medium">{student.name}</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-stone-600">
                             {student.email}
                           </p>
                         </div>
@@ -547,21 +547,21 @@ export default function ClassDetails() {
             {/* Lista de alunos matriculados */}
             <div className="space-y-2">
               {students.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
+                <p className="text-stone-500 text-center py-8">
                   Nenhum aluno matriculado nesta turma
                 </p>
               ) : (
                 students.map((student) => (
                   <div
                     key={student.id}
-                    className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex justify-between items-center p-4 bg-stone-50 rounded-lg hover:bg-stone-100 transition-colors"
                   >
                     <div>
                       <p className="font-medium">{student.studentName}</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-stone-600">
                         {student.studentEmail}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-stone-500 mt-1">
                         Matriculado em:{" "}
                         {new Date(student.enrolledAt).toLocaleDateString(
                           "pt-BR"
@@ -602,8 +602,8 @@ export default function ClassDetails() {
             </div>
 
             {jamSessions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Codesandbox className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <div className="text-center py-8 text-stone-500">
+                <Codesandbox className="w-12 h-12 mx-auto mb-3 text-stone-300" />
                 <p>Nenhuma jam session criada ainda.</p>
               </div>
             ) : (
@@ -612,17 +612,17 @@ export default function ClassDetails() {
                   <div
                     key={jam.id}
                     onClick={() => navigate(`/jam/${jam.id}`)}
-                    className="flex items-center justify-between rounded-lg border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between rounded-lg border border-stone-200 p-4 cursor-pointer hover:bg-stone-50 transition-colors"
                   >
                     <div>
-                      <h3 className="font-semibold text-gray-800">{jam.titulo}</h3>
-                      <p className="text-sm text-gray-500">
+                      <h3 className="font-semibold text-stone-800">{jam.titulo}</h3>
+                      <p className="text-sm text-stone-500">
                         Problema: {jam.problema?.titulo || "—"}
                         {jam.tempo_limite && ` · ${jam.tempo_limite} min`}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-stone-400">
                         {jam.participants?.length || 0} participantes
                       </span>
                       <span
@@ -631,7 +631,7 @@ export default function ClassDetails() {
                             ? "bg-green-100 text-green-700"
                             : jam.status === "waiting"
                             ? "bg-yellow-100 text-yellow-700"
-                            : "bg-gray-100 text-gray-600"
+                            : "bg-stone-100 text-stone-600"
                         }`}
                       >
                         {jam.status === "active"
@@ -755,13 +755,13 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h2 className="text-xl font-bold text-gray-900">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <h2 className="text-xl font-bold text-stone-900">
               {selectedProblem ? selectedProblem.title : "Nova Atividade"}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -771,7 +771,7 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
             <div>
               <Label htmlFor="search-problem">Selecione um Problema *</Label>
               <div className="relative mt-2">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-stone-400" />
                 <Input
                   id="search-problem"
                   placeholder="Buscar problemas..."
@@ -781,25 +781,25 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
                 />
               </div>
 
-              <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-lg">
                 {filteredProblems.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">Nenhum problema encontrado</p>
+                  <p className="text-center text-stone-500 py-8">Nenhum problema encontrado</p>
                 ) : (
                   filteredProblems.map((problem) => (
                     <div
                       key={problem.id}
-                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
+                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-stone-50 transition-colors ${selectedProblemId === problem.id ? "bg-teal-50 border-l-4 border-l-teal-600" : ""
                         }`}
                       onClick={() => setSelectedProblemId(problem.id)}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-center flex-1">
                           <div className="flex-shrink-0 mr-3">
-                            <Codesandbox size={24} className="text-gray-500" />
+                            <Codesandbox size={24} className="text-stone-500" />
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{problem.title}</h4>
-                            <div className="flex gap-3 mt-1 text-xs text-gray-600">
+                            <h4 className="font-medium text-stone-900">{problem.title}</h4>
+                            <div className="flex gap-3 mt-1 text-xs text-stone-600">
                               <span>Tempo: {problem.timeLimitMs}ms</span>
                               <span>Memória: {problem.memoryLimitKb}KB</span>
                             </div>
@@ -824,8 +824,8 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
               </div>
 
               {selectedProblem && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-900">
+                <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+                  <p className="text-sm text-teal-900">
                     <strong>Problema selecionado:</strong> {selectedProblem.title}
                   </p>
                 </div>
@@ -847,14 +847,14 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                className="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={!selectedProblemId || !dueDate}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}
               >
                 Criar Atividade
               </button>
@@ -883,26 +883,26 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <Codesandbox className="w-6 h-6 mr-3 text-gray-600" />
+          <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <h2 className="text-xl font-bold text-stone-900 flex items-center">
+              <Codesandbox className="w-6 h-6 mr-3 text-stone-600" />
               {problem.title}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold mb-2 flex items-center text-blue-900">
+            <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
+              <h3 className="font-semibold mb-2 flex items-center text-teal-900">
                 <Calendar className="w-5 h-5 mr-2" />
                 Data de Entrega
               </h3>
-              <p className="text-lg font-medium text-blue-900">
+              <p className="text-lg font-medium text-teal-900">
                 {dueDate.toLocaleDateString("pt-BR", {
                   day: "2-digit",
                   month: "long",
@@ -916,7 +916,7 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
 
             <div>
               <h3 className="font-semibold mb-2">Enunciado</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-stone-50 p-4 rounded-lg">
                 <RichTextViewer value={problem.statement} />
               </div>
             </div>
@@ -949,7 +949,7 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
                         <div className="flex justify-between items-center mb-3">
                           <h4 className="font-medium">Caso {index + 1}</h4>
                           {testCase.private && (
-                            <span className="px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded">
+                            <span className="px-2 py-1 bg-stone-200 text-stone-700 text-xs rounded">
                               Privado
                             </span>
                           )}
@@ -957,13 +957,13 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
                         <div className="space-y-3">
                           <div>
                             <Label className="text-xs font-medium">Entrada</Label>
-                            <div className="bg-gray-50 p-3 rounded mt-1">
+                            <div className="bg-stone-50 p-3 rounded mt-1">
                               <pre className="text-sm">{testCase.input}</pre>
                             </div>
                           </div>
                           <div>
                             <Label className="text-xs font-medium">Saída Esperada</Label>
-                            <div className="bg-gray-50 p-3 rounded mt-1">
+                            <div className="bg-stone-50 p-3 rounded mt-1">
                               <pre className="text-sm">{testCase.expectedOutput}</pre>
                             </div>
                           </div>
@@ -1031,11 +1031,11 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h2 className="text-xl font-bold text-gray-900">Editar Atividade</h2>
+          <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <h2 className="text-xl font-bold text-stone-900">Editar Atividade</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1045,7 +1045,7 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
             <div>
               <Label htmlFor="search-problem-edit">Selecione um Problema *</Label>
               <div className="relative mt-2">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-stone-400" />
                 <Input
                   id="search-problem-edit"
                   placeholder="Buscar problemas..."
@@ -1055,25 +1055,25 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
                 />
               </div>
 
-              <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-lg">
                 {filteredProblems.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8">Nenhum problema encontrado</p>
+                  <p className="text-center text-stone-500 py-8">Nenhum problema encontrado</p>
                 ) : (
                   filteredProblems.map((problem) => (
                     <div
                       key={problem.id}
-                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 transition-colors ${selectedProblemId === problem.id ? "bg-blue-50 border-l-4 border-l-blue-600" : ""
+                      className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-stone-50 transition-colors ${selectedProblemId === problem.id ? "bg-teal-50 border-l-4 border-l-teal-600" : ""
                         }`}
                       onClick={() => setSelectedProblemId(problem.id)}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-center flex-1">
                           <div className="flex-shrink-0 mr-3">
-                            <Codesandbox size={24} className="text-gray-500" />
+                            <Codesandbox size={24} className="text-stone-500" />
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-900">{problem.title}</h4>
-                            <div className="flex gap-3 mt-1 text-xs text-gray-600">
+                            <h4 className="font-medium text-stone-900">{problem.title}</h4>
+                            <div className="flex gap-3 mt-1 text-xs text-stone-600">
                               <span>Tempo: {problem.timeLimitMs}ms</span>
                               <span>Memória: {problem.memoryLimitKb}KB</span>
                             </div>
@@ -1098,8 +1098,8 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
               </div>
 
               {selectedProblem && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-900">
+                <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+                  <p className="text-sm text-teal-900">
                     <strong>Problema selecionado:</strong> {selectedProblem.title}
                   </p>
                 </div>
@@ -1121,14 +1121,14 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                className="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={!selectedProblemId || !dueDate}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}
               >
                 Atualizar Atividade
               </button>
@@ -1157,17 +1157,17 @@ function DeleteActivityModal({ isOpen, onClose, onConfirm, activityTitle }: Dele
           <div className="p-2 bg-red-100 rounded-lg">
             <Trash2 className="w-6 h-6 text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Confirmar Exclusão</h3>
+          <h3 className="text-xl font-bold text-stone-900">Confirmar Exclusão</h3>
         </div>
-        <p className="text-gray-600 mb-6">
+        <p className="text-stone-600 mb-6">
           Tem certeza que deseja excluir a atividade{" "}
-          <span className="font-semibold text-gray-900">"{activityTitle}"</span>?
+          <span className="font-semibold text-stone-900">"{activityTitle}"</span>?
           Esta ação não pode ser desfeita.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+            className="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors"
           >
             Cancelar
           </button>
@@ -1217,8 +1217,8 @@ const submissionStatusConfig = {
   processing: {
     label: "Processando",
     icon: Loader2,
-    className: "bg-blue-100 text-blue-800 border-blue-200",
-    dotColor: "bg-blue-500",
+    className: "bg-teal-100 text-teal-800 border-teal-200",
+    dotColor: "bg-teal-500",
   },
   "compile-error": {
     label: "Erro de Compilação",
@@ -1229,8 +1229,8 @@ const submissionStatusConfig = {
   timeout: {
     label: "Tempo Excedido",
     icon: Clock,
-    className: "bg-purple-100 text-purple-800 border-purple-200",
-    dotColor: "bg-purple-500",
+    className: "bg-teal-100 text-teal-800 border-teal-200",
+    dotColor: "bg-teal-500",
   },
   "runtime-error": {
     label: "Erro de Execução",
@@ -1241,14 +1241,14 @@ const submissionStatusConfig = {
   "internal-error": {
     label: "Erro Interno",
     icon: XCircle,
-    className: "bg-gray-100 text-gray-800 border-gray-200",
-    dotColor: "bg-gray-500",
+    className: "bg-stone-100 text-stone-800 border-stone-200",
+    dotColor: "bg-stone-500",
   },
   unknown: {
     label: "Desconhecido",
     icon: AlertCircle,
-    className: "bg-gray-100 text-gray-800 border-gray-200",
-    dotColor: "bg-gray-500",
+    className: "bg-stone-100 text-stone-800 border-stone-200",
+    dotColor: "bg-stone-500",
   },
 } as const;
 
@@ -1427,19 +1427,19 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-stone-200">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-stone-900">
                   Submissão de {selectedSubmission.studentName}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-stone-500 mt-1">
                   {new Date(selectedSubmission.submission.dateSubmitted).toLocaleString("pt-BR")}
                 </p>
               </div>
               <button
                 onClick={handleCloseDetails}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-stone-400 hover:text-stone-600 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1452,13 +1452,13 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
 
             {/* Casos de teste */}
             {problem && problem.testCases && problem.testCases.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-                <div className="border-b border-gray-200 p-6">
+              <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
+                <div className="border-b border-stone-200 p-6">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-green-100 rounded-lg">
                       <TestTube className="w-5 h-5 text-green-600" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-2xl font-bold text-stone-900">
                       Casos de Teste
                     </h2>
                   </div>
@@ -1468,26 +1468,26 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
                   <div className="overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-gray-50 hover:bg-gray-50">
-                          <TableHead className="font-semibold text-gray-900">
+                        <TableRow className="bg-stone-50 hover:bg-stone-50">
+                          <TableHead className="font-semibold text-stone-900">
                             <div className="flex items-center gap-2">
                               <Hash className="w-4 h-4" />
                               Teste
                             </div>
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-900">
+                          <TableHead className="font-semibold text-stone-900">
                             <div className="flex items-center gap-2">
                               <Clock className="w-4 h-4" />
                               Status
                             </div>
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-900">
+                          <TableHead className="font-semibold text-stone-900">
                             <div className="flex items-center gap-2">
                               <Terminal className="w-4 h-4" />
                               Saída Atual
                             </div>
                           </TableHead>
-                          <TableHead className="font-semibold text-gray-900">
+                          <TableHead className="font-semibold text-stone-900">
                             <div className="flex items-center gap-2">
                               <TargetIcon className="w-4 h-4" />
                               Saída Esperada
@@ -1515,7 +1515,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
             )}
           </div>
 
-          <div className="p-6 border-t border-gray-200 flex justify-end">
+          <div className="p-6 border-t border-stone-200 flex justify-end">
             <Button onClick={handleCloseDetails} variant="outline">
               Voltar para lista
             </Button>
@@ -1529,12 +1529,12 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-stone-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Submissões da Atividade</h2>
+            <h2 className="text-xl font-bold text-stone-900">Submissões da Atividade</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1548,32 +1548,32 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
             </div>
           ) : submissions.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <Users className="w-12 h-12 text-stone-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-stone-900 mb-2">
                 Nenhuma submissão encontrada
               </h3>
-              <p className="text-gray-500">
+              <p className="text-stone-500">
                 Ainda não há submissões para esta atividade
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-lg border border-stone-200 shadow-sm overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50 hover:bg-gray-50">
-                    <TableHead className="font-semibold text-gray-900">
+                  <TableRow className="bg-stone-50 hover:bg-stone-50">
+                    <TableHead className="font-semibold text-stone-900">
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Nome
                       </div>
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-900">
+                    <TableHead className="font-semibold text-stone-900">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         Data de Submissão
                       </div>
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-900">
+                    <TableHead className="font-semibold text-stone-900">
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4" />
                         Status
@@ -1586,20 +1586,20 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
                     <TableRow
                       key={submission.studentId}
                       onClick={() => handleRowClick(submission as StudentSubmission & { submissionId?: number })}
-                      className="cursor-pointer hover:bg-blue-50 transition-colors duration-200 group"
+                      className="cursor-pointer hover:bg-teal-50 transition-colors duration-200 group"
                     >
                       <TableCell className="font-medium">
-                        <span className="text-gray-900 group-hover:text-blue-600 transition-colors">
+                        <span className="text-stone-900 group-hover:text-teal-600 transition-colors">
                           {submission.studentName}
                         </span>
                       </TableCell>
                       <TableCell>
                         {submission.submissionDate ? (
                           <div className="flex flex-col">
-                            <span className="text-gray-900 font-medium">
+                            <span className="text-stone-900 font-medium">
                               {new Date(submission.submissionDate).toLocaleDateString("pt-BR")}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-stone-500">
                               {new Date(submission.submissionDate).toLocaleTimeString("pt-BR", {
                                 hour: "2-digit",
                                 minute: "2-digit",
@@ -1608,7 +1608,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
                             </span>
                           </div>
                         ) : (
-                          <span className="text-gray-400 text-sm">Não submetido</span>
+                          <span className="text-stone-400 text-sm">Não submetido</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -1624,8 +1624,8 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
           {loadingDetails && (
             <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-6 shadow-xl">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
-                <p className="text-gray-600">Carregando detalhes...</p>
+                <Loader2 className="w-8 h-8 animate-spin text-teal-600 mx-auto mb-2" />
+                <p className="text-stone-600">Carregando detalhes...</p>
               </div>
             </div>
           )}
@@ -1653,10 +1653,10 @@ function TestCaseRow({ testCase, result, index }: TestCaseRowProps) {
   };
 
   return (
-    <TableRow className="hover:bg-gray-50 transition-colors duration-200">
+    <TableRow className="hover:bg-stone-50 transition-colors duration-200">
       <TableCell className="font-medium">
         <div className="flex items-center gap-2">
-          <Hash className="w-4 h-4 text-gray-400" />
+          <Hash className="w-4 h-4 text-stone-400" />
           <span>Teste {index + 1}</span>
         </div>
       </TableCell>
@@ -1691,8 +1691,8 @@ function TestCaseRow({ testCase, result, index }: TestCaseRowProps) {
             )}
           </div>
           {showOutput && (
-            <div className="bg-gray-900 rounded p-2 max-w-xs">
-              <pre className="text-xs text-gray-300 whitespace-pre-wrap overflow-auto max-h-20">
+            <div className="bg-stone-900 rounded p-2 max-w-xs">
+              <pre className="text-xs text-stone-300 whitespace-pre-wrap overflow-auto max-h-20">
                 {actualOutput}
               </pre>
             </div>
@@ -1712,8 +1712,8 @@ function TestCaseRow({ testCase, result, index }: TestCaseRowProps) {
               Copiar
             </Button>
           </div>
-          <div className="bg-gray-900 rounded p-2 max-w-xs">
-            <pre className="text-xs text-gray-300 whitespace-pre-wrap overflow-auto max-h-20">
+          <div className="bg-stone-900 rounded p-2 max-w-xs">
+            <pre className="text-xs text-stone-300 whitespace-pre-wrap overflow-auto max-h-20">
               {expectedOutput}
             </pre>
           </div>

@@ -24,30 +24,28 @@ import {
   Mail,
   UserCircle,
   Briefcase,
+  Sparkles,
 } from "lucide-react";
 import Notification from "@/components/Notification";
 import Loading from "@/components/Loading";
 
-// Skeleton de loading exibido enquanto os professores são carregados
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/5 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/6 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse"></div>
-        </div>
-      ))}
-    </div>
-  );
-}
+/* ── palette tokens (inline, no global leak) ────────────────── */
+const palette = {
+  accent: "#0d9488",        // teal-600
+  accentLight: "#ccfbf1",   // teal-100
+  accentSoft: "#f0fdfa",    // teal-50
+  warm: "#f59e0b",          // amber-500
+  warmLight: "#fef3c7",     // amber-100
+  surface: "#fafaf9",       // stone-50
+  cardBg: "#ffffff",
+  textPrimary: "#1c1917",   // stone-900
+  textSecondary: "#78716c", // stone-500
+  border: "#e7e5e4",        // stone-300
+  dangerText: "#dc2626",
+  dangerBg: "#fef2f2",
+};
 
-// Interface para props do modal de formulário
+// Interface para props do modal de formulario
 interface ProfessorFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,7 +54,7 @@ interface ProfessorFormModalProps {
   mode: "create" | "edit";
 }
 
-// Componente de modal de formulário para criar/editar professor
+// Componente de modal de formulario para criar/editar professor
 function ProfessorFormModal({
   isOpen,
   onClose,
@@ -74,7 +72,7 @@ function ProfessorFormModal({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Atualiza o formulário quando o professor selecionado muda
+  // Atualiza o formulario quando o professor selecionado muda
   useEffect(() => {
     if (professor && mode === "edit") {
       setFormData({
@@ -102,7 +100,7 @@ function ProfessorFormModal({
     return emailRegex.test(email);
   };
 
-  // Valida o formulário
+  // Valida o formulario
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -144,7 +142,7 @@ function ProfessorFormModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submete o formulário
+  // Submete o formulario
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -164,7 +162,7 @@ function ProfessorFormModal({
       professorData.password_confirmation = formData.password_confirmation;
     }
 
-    // Adiciona ID se for edição
+    // Adiciona ID se for edicao
     if (mode === "edit" && professor) {
       professorData.id = professor.id;
     }
@@ -176,38 +174,38 @@ function ProfessorFormModal({
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header do modal */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <GraduationCap className="w-5 h-5 text-blue-600" />
+        <div className="flex items-center justify-between p-6 border-b border-stone-200">
+          <h2 className="text-xl font-bold text-stone-900 flex items-center gap-2">
+            <GraduationCap className="w-5 h-5" style={{ color: palette.accent }} />
             {mode === "create" ? "Novo Professor" : "Editar Professor"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-stone-400 hover:text-stone-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Formulário */}
+        {/* Formulario */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Nome */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-stone-600 mb-1">
               Nome *
             </label>
             <div className="relative">
-              <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.name ? "border-red-500" : "border-gray-300"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.name ? "border-red-500" : "border-stone-300"
                 }`}
                 placeholder="Nome completo do professor"
               />
@@ -219,19 +217,19 @@ function ProfessorFormModal({
 
           {/* E-mail */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-stone-600 mb-1">
               E-mail *
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.email ? "border-red-500" : "border-gray-300"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.email ? "border-red-500" : "border-stone-300"
                 }`}
                 placeholder="email@exemplo.com"
               />
@@ -241,21 +239,21 @@ function ProfessorFormModal({
             )}
           </div>
 
-          {/* Área de Atuação */}
+          {/* Area de Atuacao */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-stone-600 mb-1">
               Área de Atuação *
             </label>
             <div className="relative">
-              <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-5 h-5" />
               <input
                 type="text"
                 value={formData.area_atuacao}
                 onChange={(e) =>
                   setFormData({ ...formData, area_atuacao: e.target.value })
                 }
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  errors.area_atuacao ? "border-red-500" : "border-gray-300"
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                  errors.area_atuacao ? "border-red-500" : "border-stone-300"
                 }`}
                 placeholder="Ex: Matemática, Física, Programação"
               />
@@ -267,7 +265,7 @@ function ProfessorFormModal({
 
           {/* Senha */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-stone-600 mb-1">
               Senha {mode === "create" ? "*" : "(opcional)"}
             </label>
             <input
@@ -276,8 +274,8 @@ function ProfessorFormModal({
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
               }
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.password ? "border-red-500" : "border-gray-300"
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                errors.password ? "border-red-500" : "border-stone-300"
               }`}
               placeholder="Mínimo 8 caracteres"
             />
@@ -288,7 +286,7 @@ function ProfessorFormModal({
 
           {/* Confirmar Senha */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-stone-600 mb-1">
               Confirmar Senha {mode === "create" ? "*" : "(opcional)"}
             </label>
             <input
@@ -300,10 +298,10 @@ function ProfessorFormModal({
                   password_confirmation: e.target.value,
                 })
               }
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
                 errors.password_confirmation
                   ? "border-red-500"
-                  : "border-gray-300"
+                  : "border-stone-300"
               }`}
               placeholder="Repita a senha"
             />
@@ -314,18 +312,19 @@ function ProfessorFormModal({
             )}
           </div>
 
-          {/* Botões */}
+          {/* Botoes */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+              className="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity"
+              className="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 font-medium transition-opacity"
+              style={{ backgroundColor: palette.accent }}
             >
               {mode === "create" ? "Criar" : "Salvar"}
             </button>
@@ -336,7 +335,7 @@ function ProfessorFormModal({
   );
 }
 
-// Interface para props do dialog de confirmação
+// Interface para props do dialog de confirmacao
 interface DeleteConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -344,7 +343,7 @@ interface DeleteConfirmDialogProps {
   professorName: string;
 }
 
-// Dialog de confirmação de remoção
+// Dialog de confirmacao de remocao
 function DeleteConfirmDialog({
   isOpen,
   onClose,
@@ -355,30 +354,31 @@ function DeleteConfirmDialog({
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6" style={{ borderColor: palette.border }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="p-2 rounded-lg" style={{ backgroundColor: palette.dangerBg }}>
+            <Trash2 className="w-6 h-6" style={{ color: palette.dangerText }} />
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Confirmar Remoção</h2>
+          <h2 className="text-xl font-bold text-stone-900">Confirmar Remoção</h2>
         </div>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-stone-500 mb-6">
           Tem certeza que deseja remover o professor{" "}
-          <span className="font-semibold text-gray-900">{professorName}</span>?
+          <span className="font-semibold text-stone-900">{professorName}</span>?
           Esta ação não pode ser desfeita.
         </p>
 
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+            className="flex-1 px-4 py-2 border border-stone-300 rounded-lg text-stone-700 hover:bg-stone-50 font-medium transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
+            className="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 font-medium transition-opacity"
+            style={{ backgroundColor: palette.dangerText }}
           >
             Confirmar Remoção
           </button>
@@ -388,7 +388,7 @@ function DeleteConfirmDialog({
   );
 }
 
-// Componente principal da página de gerenciamento de professores
+// Componente principal da pagina de gerenciamento de professores
 export default function Teachers() {
   const [professors, setProfessors] = useState<Professor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -408,7 +408,7 @@ export default function Teachers() {
     loadProfessors();
   }, []);
 
-  // Função para carregar todos os professores
+  // Funcao para carregar todos os professores
   async function loadProfessors() {
     setLoading(true);
     try {
@@ -424,27 +424,27 @@ export default function Teachers() {
     }
   }
 
-  // Abre o modal de criação
+  // Abre o modal de criacao
   function handleCreate() {
     setSelectedProfessor(null);
     setModalMode("create");
     setIsModalOpen(true);
   }
 
-  // Abre o modal de edição
+  // Abre o modal de edicao
   function handleEdit(professor: Professor) {
     setSelectedProfessor(professor);
     setModalMode("edit");
     setIsModalOpen(true);
   }
 
-  // Abre o dialog de confirmação de remoção
+  // Abre o dialog de confirmacao de remocao
   function handleDeleteClick(professor: Professor) {
     setProfessorToDelete(professor);
     setIsDeleteDialogOpen(true);
   }
 
-  // Confirma a remoção do professor
+  // Confirma a remocao do professor
   async function confirmDelete() {
     if (!professorToDelete) return;
 
@@ -470,7 +470,7 @@ export default function Teachers() {
     }
   }
 
-  // Salva o professor (criação ou edição)
+  // Salva o professor (criacao ou edicao)
   async function handleSave(professorData: Omit<Professor, "id"> | Professor) {
     try {
       if (modalMode === "create") {
@@ -486,7 +486,7 @@ export default function Teachers() {
       // Recarrega a lista de professores
       await loadProfessors();
 
-      // Mostra notificação de sucesso
+      // Mostra notificacao de sucesso
       setNotification({
         message: modalMode === "create"
           ? "Professor criado com sucesso!"
@@ -517,8 +517,19 @@ export default function Teachers() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Notificação */}
+    <div className="min-h-[80vh]">
+      {/* ---- scoped keyframes ---- */}
+      <style>{`
+        @keyframes teachers-fade-up {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .teacher-row {
+          animation: teachers-fade-up .45s cubic-bezier(.22,1,.36,1) both;
+        }
+      `}</style>
+
+      {/* Notificacao */}
       {notification && (
         <Notification
           message={notification.message}
@@ -527,114 +538,148 @@ export default function Teachers() {
         />
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            Gerenciamento de Professores
-          </h1>
-        </div>
+      {/* ══════ HERO HEADER ══════ */}
+      <div
+        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
+      >
+        {/* decorative circles */}
+        <div
+          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
+          style={{ background: "white" }}
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
+          style={{ background: "white" }}
+        />
 
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity shadow-md"
-        >
-          <Plus className="w-5 h-5" />
-          Adicionar Professor
-        </button>
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <GraduationCap className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+              Gerenciamento de Professores
+            </h1>
+            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
+              Cadastre, edite e gerencie os professores da plataforma.
+            </p>
+          </div>
+
+          <button
+            onClick={handleCreate}
+            className="shrink-0 flex items-center gap-2 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar Professor
+          </button>
+        </div>
       </div>
 
-      {/* Barra de busca */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+      {/* ══════ SEARCH + STATS BAR ══════ */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
           <input
             type="text"
             placeholder="Buscar por nome, área de atuação ou e-mail..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="w-full pl-10 pr-4 h-11 rounded-xl border border-stone-200 bg-white shadow-sm focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 focus:outline-none transition-colors"
           />
+        </div>
+        <div
+          className="shrink-0 flex items-center gap-2 rounded-xl px-4 h-11 text-sm font-medium"
+          style={{ background: palette.accentSoft, color: palette.accent }}
+        >
+          <GraduationCap className="w-4 h-4" />
+          {filteredProfessors.length}{" "}
+          {filteredProfessors.length === 1 ? "professor" : "professores"}
         </div>
       </div>
 
-      {/* Tabela de professores */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      {/* ══════ TABLE ══════ */}
+      <div
+        className="rounded-2xl border shadow-sm overflow-hidden"
+        style={{ borderColor: palette.border, backgroundColor: palette.cardBg }}
+      >
         {loading ? (
           <div className="p-6">
             <Loading />
           </div>
         ) : filteredProfessors.length === 0 ? (
-          <div className="text-center py-12">
-            <GraduationCap className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          /* ── empty state ── */
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div
+              className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
+              style={{ background: palette.accentLight }}
+            >
+              <Sparkles className="w-9 h-9" style={{ color: palette.accent }} />
+            </div>
+            <p className="text-lg font-semibold text-stone-700">
               {searchTerm
                 ? "Nenhum professor encontrado"
                 : "Nenhum professor cadastrado"}
-            </h3>
-            <p className="text-gray-500">
+            </p>
+            <p className="mt-1 text-sm text-stone-400 max-w-xs">
               {searchTerm
-                ? "Tente ajustar o termo de busca"
-                : "Clique em 'Adicionar Professor' para começar"}
+                ? "Tente ajustar o termo de busca."
+                : "Clique em 'Adicionar Professor' para começar."}
             </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50 hover:bg-gray-50">
-                <TableHead className="font-semibold text-gray-900">
+              <TableRow className="bg-stone-50 hover:bg-stone-50">
+                <TableHead className="font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <UserCircle className="w-4 h-4" />
                     Nome
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-900">
+                <TableHead className="font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
                     E-mail
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-900">
+                <TableHead className="font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <Briefcase className="w-4 h-4" />
                     Área de Atuação
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-gray-900 text-center">
+                <TableHead className="font-semibold text-stone-900 text-center">
                   Ações
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProfessors.map((professor) => (
+              {filteredProfessors.map((professor, i) => (
                 <TableRow
                   key={professor.id}
-                  className="hover:bg-gray-50 transition-colors duration-200"
+                  className="teacher-row hover:bg-stone-50 transition-colors duration-200"
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <TableCell className="font-medium text-gray-900">
+                  <TableCell className="font-medium text-stone-900">
                     {professor.name}
                   </TableCell>
-                  <TableCell className="text-gray-600">
+                  <TableCell className="text-stone-500">
                     {professor.email}
                   </TableCell>
-                  <TableCell className="text-gray-600">
+                  <TableCell className="text-stone-500">
                     {professor.area_atuacao}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handleEdit(professor)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 rounded-lg text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
                         title="Editar professor"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(professor)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                         title="Remover professor"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -648,20 +693,7 @@ export default function Teachers() {
         )}
       </div>
 
-      {/* Contador de professores */}
-      {!loading && professors.length > 0 && (
-        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-2 text-gray-600">
-            <GraduationCap className="w-5 h-5" />
-            <span className="font-medium">
-              {filteredProfessors.length} professor{filteredProfessors.length !== 1 ? "es" : ""}{" "}
-              {searchTerm && `de ${professors.length}`}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de formulário */}
+      {/* Modal de formulario */}
       <ProfessorFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -670,7 +702,7 @@ export default function Teachers() {
         mode={modalMode}
       />
 
-      {/* Dialog de confirmação de remoção */}
+      {/* Dialog de confirmacao de remocao */}
       <DeleteConfirmDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => {

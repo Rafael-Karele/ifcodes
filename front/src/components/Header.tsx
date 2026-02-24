@@ -128,7 +128,7 @@ export default function Header() {
           onClose={() => setError(null)}
         />
       )}
-      <header className="sticky top-0 z-50 bg-white border-b border-zinc-200">
+      <header className="sticky top-0 z-50 bg-white border-b border-stone-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
 
@@ -138,10 +138,10 @@ export default function Header() {
               className="flex items-center gap-2 shrink-0"
               onClick={closeMobileMenu}
             >
-              <div className="w-7 h-7 rounded-md bg-zinc-900 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-md bg-stone-900 flex items-center justify-center">
                 <Terminal className="h-4 w-4 text-white" />
               </div>
-              <span className="text-zinc-900 text-base font-bold tracking-tight">
+              <span className="text-stone-900 text-base font-bold tracking-tight">
                 IFCode
               </span>
             </Link>
@@ -160,7 +160,7 @@ export default function Header() {
                       className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                         isActiveGroup(item)
                           ? "text-teal-700 bg-teal-50"
-                          : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+                          : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
                       }`}
                     >
                       {item.label}
@@ -173,7 +173,7 @@ export default function Header() {
 
                     {openDropdown === item.label && (
                       <div className="absolute left-0 top-full pt-1 z-50">
-                        <div className="bg-white border border-zinc-200 rounded-lg shadow-lg py-1 min-w-[180px]">
+                        <div className="bg-white border border-stone-200 rounded-lg shadow-lg py-1 min-w-[180px]">
                           {item.submenu.map((sub) => (
                             <Link
                               key={sub.to}
@@ -181,7 +181,7 @@ export default function Header() {
                               className={`block px-3 py-2 text-sm transition-colors ${
                                 isActiveRoute(sub.to)
                                   ? "text-teal-700 bg-teal-50 font-medium"
-                                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                                  : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
                               }`}
                               onClick={() => setOpenDropdown(null)}
                             >
@@ -199,7 +199,7 @@ export default function Header() {
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                       isActiveRoute(item.to!)
                         ? "text-teal-700 bg-teal-50"
-                        : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+                        : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
                     }`}
                   >
                     {item.label}
@@ -212,7 +212,7 @@ export default function Header() {
             <div className="hidden md:flex items-center ml-auto relative" ref={profileMenuRef}>
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-zinc-100 transition-colors"
+                className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-stone-100 transition-colors"
                 aria-expanded={isProfileMenuOpen}
                 aria-haspopup="true"
               >
@@ -220,26 +220,26 @@ export default function Header() {
                   {userInitial}
                 </div>
                 <ChevronDown
-                  className={`w-3.5 h-3.5 text-zinc-400 transition-transform duration-150 ${
+                  className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-150 ${
                     isProfileMenuOpen ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               {isProfileMenuOpen && (
-                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-lg shadow-lg border border-zinc-200 py-1 z-50">
-                  <div className="px-3 py-2 border-b border-zinc-100">
-                    <p className="text-sm font-medium text-zinc-900 truncate">
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-lg shadow-lg border border-stone-200 py-1 z-50">
+                  <div className="px-3 py-2 border-b border-stone-100">
+                    <p className="text-sm font-medium text-stone-900 truncate">
                       {user?.name || "Usuário"}
                     </p>
-                    <p className="text-xs text-zinc-400 truncate mt-0.5">
+                    <p className="text-xs text-stone-400 truncate mt-0.5">
                       {user?.email || ""}
                     </p>
                   </div>
                   <div className="py-1">
                     <Link
                       to="/perfil"
-                      className="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
                       <User className="w-4 h-4" />
@@ -247,14 +247,14 @@ export default function Header() {
                     </Link>
                     <Link
                       to="/change-password"
-                      className="flex items-center gap-2.5 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                      className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
                       <KeyRound className="w-4 h-4" />
                       Alterar Senha
                     </Link>
                   </div>
-                  <div className="border-t border-zinc-100 py-1">
+                  <div className="border-t border-stone-100 py-1">
                     <button
                       onClick={() => {
                         setIsProfileMenuOpen(false);
@@ -273,7 +273,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-md text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 transition-colors"
+              className="md:hidden p-2 rounded-md text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
               aria-expanded={isMobileMenuOpen}
               aria-label="Menu de navegação"
             >
@@ -291,7 +291,7 @@ export default function Header() {
               isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            <div className="border-t border-zinc-100 py-3 space-y-1">
+            <div className="border-t border-stone-100 py-3 space-y-1">
               {navigationItems.map((item) => (
                 <div key={item.label}>
                   {item.submenu ? (
@@ -305,7 +305,7 @@ export default function Header() {
                         className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                           isActiveGroup(item)
                             ? "text-teal-700 bg-teal-50"
-                            : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                            : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
                         }`}
                       >
                         {item.label}
@@ -328,7 +328,7 @@ export default function Header() {
                               className={`block px-3 py-2 rounded-md text-sm transition-colors ${
                                 isActiveRoute(sub.to)
                                   ? "text-teal-700 bg-teal-50 font-medium"
-                                  : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
+                                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
                               }`}
                               onClick={closeMobileMenu}
                             >
@@ -344,7 +344,7 @@ export default function Header() {
                       className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
                         isActiveRoute(item.to!)
                           ? "text-teal-700 bg-teal-50"
-                          : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                          : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
                       }`}
                       onClick={closeMobileMenu}
                     >
@@ -355,16 +355,16 @@ export default function Header() {
               ))}
 
               {/* Mobile profile section */}
-              <div className="border-t border-zinc-100 pt-3 mt-3 space-y-1">
+              <div className="border-t border-stone-100 pt-3 mt-3 space-y-1">
                 <div className="flex items-center gap-3 px-3 py-2">
                   <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center text-white text-sm font-bold">
                     {userInitial}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-zinc-900 truncate">
+                    <p className="text-sm font-medium text-stone-900 truncate">
                       {user?.name || "Usuário"}
                     </p>
-                    <p className="text-xs text-zinc-400 truncate">
+                    <p className="text-xs text-stone-400 truncate">
                       {user?.email || ""}
                     </p>
                   </div>
@@ -372,7 +372,7 @@ export default function Header() {
 
                 <Link
                   to="/perfil"
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
                   onClick={closeMobileMenu}
                 >
                   <User className="w-4 h-4" />
@@ -380,7 +380,7 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/change-password"
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
                   onClick={closeMobileMenu}
                 >
                   <KeyRound className="w-4 h-4" />

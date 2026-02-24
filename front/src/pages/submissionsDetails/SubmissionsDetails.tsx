@@ -108,18 +108,18 @@ const statusConfig = {
   "internal-error": {
     label: "Erro Interno",
     icon: AlertCircle,
-    className: "bg-gray-100 text-gray-800 border-gray-200",
-    dotColor: "bg-gray-500",
-    bgColor: "bg-gray-50",
-    borderColor: "border-gray-200",
+    className: "bg-stone-100 text-stone-800 border-stone-200",
+    dotColor: "bg-stone-500",
+    bgColor: "bg-stone-50",
+    borderColor: "border-stone-200",
   },
   unknown: {
     label: "Desconhecido",
     icon: AlertCircle,
-    className: "bg-gray-100 text-gray-800 border-gray-200",
-    dotColor: "bg-gray-500",
-    bgColor: "bg-gray-50",
-    borderColor: "border-gray-200",
+    className: "bg-stone-100 text-stone-800 border-stone-200",
+    dotColor: "bg-stone-500",
+    bgColor: "bg-stone-50",
+    borderColor: "border-stone-200",
   },
 } as const;
 
@@ -195,7 +195,7 @@ interface TestCaseRowProps {
 // Linha da tabela de casos de teste, com exibição/ocultação de saída e copiar para clipboard
 function TestCaseRow({ testCase, index, result }: TestCaseRowProps) {
   const [showOutput, setShowOutput] = useState(false);
-  
+
   // Determina a saída real: stdout se passou, stderr se falhou
   const actualOutput = result?.stdout || result?.stderr || "Sem saída";
   const expectedOutput = testCase.expectedOutput || "Sem saída esperada";
@@ -205,10 +205,10 @@ function TestCaseRow({ testCase, index, result }: TestCaseRowProps) {
   };
 
   return (
-    <TableRow className="hover:bg-gray-50 transition-colors duration-200">
+    <TableRow className="hover:bg-stone-50 transition-colors duration-200">
       <TableCell className="font-medium">
         <div className="flex items-center gap-2">
-          <Hash className="w-4 h-4 text-gray-400" />
+          <Hash className="w-4 h-4 text-stone-400" />
           <span>Teste {index + 1}</span>
         </div>
       </TableCell>
@@ -282,7 +282,7 @@ interface StatsCardProps {
   title: string;
   value: string | number;
   icon: React.ElementType;
-  color: string;
+  gradient: string;
   description?: string;
 }
 
@@ -291,20 +291,23 @@ function StatsCard({
   title,
   value,
   icon: Icon,
-  color,
+  gradient,
   description,
 }: StatsCardProps) {
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+    <div className="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-sm font-medium text-stone-600">{title}</p>
+          <p className="text-xl font-bold text-stone-900 mt-1">{value}</p>
           {description && (
-            <p className="text-xs text-gray-500 mt-1">{description}</p>
+            <p className="text-xs text-stone-500 mt-1">{description}</p>
           )}
         </div>
-        <div className={`p-2 rounded-lg ${color}`}>
+        <div
+          className="p-2 rounded-lg"
+          style={{ background: gradient }}
+        >
           <Icon className="w-5 h-5 text-white" />
         </div>
       </div>
@@ -415,10 +418,10 @@ export default function SubmissionsDetails() {
       <div className="max-w-7xl mx-auto p-6">
         <div className="text-center py-12">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-stone-900 mb-2">
             Submissão não encontrada
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-stone-600 mb-4">
             A submissão solicitada não existe ou não pôde ser carregada.
           </p>
           <Button onClick={() => navigate("/submissions")} variant="outline">
@@ -456,20 +459,33 @@ export default function SubmissionsDetails() {
         </Button>
       </div>
 
-      {/* Header da submissão */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-white">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      {/* Hero header da submissão */}
+      <div
+        className="relative rounded-2xl px-8 py-10 text-white overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}
+      >
+        {/* Decorative circles */}
+        <div
+          className="absolute -top-10 -right-10 w-48 h-48 rounded-full"
+          style={{ background: "rgba(255,255,255,0.1)" }}
+        />
+        <div
+          className="absolute -bottom-8 -left-8 w-36 h-36 rounded-full"
+          style={{ background: "rgba(255,255,255,0.07)" }}
+        />
+
+        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-6 h-6" />
-              <span className="text-blue-100 text-sm font-medium">
+              <span className="text-teal-100 text-sm font-medium">
                 Detalhes da Submissão
               </span>
             </div>
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-3xl font-extrabold tracking-tight mb-2">
               {selectedProblem?.title || "Problema não encontrado"}
             </h1>
-            <div className="flex items-center gap-4 text-blue-100">
+            <div className="flex items-center gap-4 text-teal-100">
               <div className="flex items-center gap-1">
                 <User className="w-4 h-4" />
                 <span>Usuário</span>
@@ -500,40 +516,40 @@ export default function SubmissionsDetails() {
           title="Casos de Teste"
           value={testStats.total}
           icon={TestTube}
-          color="bg-gradient-to-r from-blue-500 to-blue-600"
+          gradient="linear-gradient(135deg, #0d9488 0%, #0f766e 100%)"
           description="Total de testes"
         />
         <StatsCard
           title="Testes Aprovados"
           value={testStats.passed}
           icon={CheckCircle2}
-          color="bg-gradient-to-r from-green-500 to-green-600"
+          gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
           description={`${testStats.passed}/${testStats.total} passaram`}
         />
         <StatsCard
           title="Taxa de Sucesso"
           value={`${testStats.successRate}%`}
           icon={TrendingUp}
-          color="bg-gradient-to-r from-purple-500 to-purple-600"
+          gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
           description="Aprovação dos testes"
         />
         <StatsCard
           title="Testes Falharam"
           value={testStats.failed}
           icon={XCircle}
-          color="bg-gradient-to-r from-red-500 to-red-600"
+          gradient="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
           description={`${testStats.failed} falharam`}
         />
       </div>
 
       {/* Informações da atividade */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="border-b border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
+        <div className="border-b border-stone-200 p-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Target className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-teal-50 rounded-lg">
+              <Target className="w-5 h-5 text-teal-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-stone-800">
               Informações da Atividade
             </h2>
           </div>
@@ -541,28 +557,28 @@ export default function SubmissionsDetails() {
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="text-sm font-medium text-gray-600">Titulo</label>
+            <label className="text-sm font-medium text-stone-600">Titulo</label>
             <div className="mt-1">
-              <div className="text-lg font-semibold text-gray-900">
+              <div className="text-lg font-semibold text-stone-900">
                 {selectedProblem?.title || "Título não encontrado"}
               </div>
             </div>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-600">
+            <label className="text-sm font-medium text-stone-600">
               Prazo de Entrega
             </label>
             <div className="mt-1">
-                <div className="text-lg font-semibold text-gray-900">
+                <div className="text-lg font-semibold text-stone-900">
                   {dueDate.formatted}
                 </div>
               </div>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-600">
+            <label className="text-sm font-medium text-stone-600">
               ID da Atividade
             </label>
-            <div className="mt-1 text-lg font-semibold text-gray-900">
+            <div className="mt-1 text-lg font-semibold text-stone-900">
               {selectedActivity.id}
             </div>
           </div>
@@ -570,14 +586,14 @@ export default function SubmissionsDetails() {
       </div>
 
       {/* Casos de teste da submissão */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
-        <div className="border-b border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
+        <div className="border-b border-stone-200 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <TestTube className="w-5 h-5 text-green-600" />
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <TestTube className="w-5 h-5 text-emerald-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-stone-800">
                 Casos de Teste
               </h2>
             </div>
@@ -587,11 +603,11 @@ export default function SubmissionsDetails() {
         <div className="p-6">
           {selectedProblem?.testCases?.length === 0 ? (
             <div className="text-center py-8">
-              <TestTube className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <TestTube className="w-12 h-12 text-stone-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-stone-900 mb-2">
                 Nenhum caso de teste
               </h3>
-              <p className="text-gray-500">
+              <p className="text-stone-500">
                 Esta submissão não possui casos de teste para exibir
               </p>
             </div>
@@ -599,26 +615,26 @@ export default function SubmissionsDetails() {
             <div className="overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50 hover:bg-gray-50">
-                    <TableHead className="font-semibold text-gray-900">
+                  <TableRow className="bg-stone-50 hover:bg-stone-50">
+                    <TableHead className="font-semibold text-stone-800">
                       <div className="flex items-center gap-2">
                         <Hash className="w-4 h-4" />
                         Teste
                       </div>
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-900">
+                    <TableHead className="font-semibold text-stone-800">
                       <div className="flex items-center gap-2">
                         <ActivityIcon className="w-4 h-4" />
                         Status
                       </div>
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-900">
+                    <TableHead className="font-semibold text-stone-800">
                       <div className="flex items-center gap-2">
                         <Terminal className="w-4 h-4" />
                         Saída Atual
                       </div>
                     </TableHead>
-                    <TableHead className="font-semibold text-gray-900">
+                    <TableHead className="font-semibold text-stone-800">
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4" />
                         Saída Esperada

@@ -170,9 +170,9 @@ export default function ActivitiesDetails() {
   if (loading || (selectedActivity && !selectedProblem && localLoading)) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-16">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-12 flex flex-col items-center gap-4">
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
           <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-          <p className="text-sm text-zinc-500 font-medium">Carregando detalhes da atividade...</p>
+          <p className="text-sm text-stone-500 font-medium">Carregando detalhes da atividade...</p>
         </div>
       </div>
     );
@@ -229,8 +229,8 @@ export default function ActivitiesDetails() {
           Voltar para Atividades
         </button>
 
-        <p className="text-sm text-zinc-400 font-medium">Atividade #{selectedActivity.id}</p>
-        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight mt-1">
+        <p className="text-sm text-stone-400 font-medium">Atividade #{selectedActivity.id}</p>
+        <h1 className="text-2xl font-bold text-stone-900 tracking-tight mt-1">
           {selectedProblem.title}
         </h1>
       </div>
@@ -255,7 +255,7 @@ export default function ActivitiesDetails() {
         <div className="p-6">
           <RichTextViewer
             value={selectedProblem.statement}
-            className="text-zinc-700 leading-relaxed"
+            className="text-stone-700 leading-relaxed"
           />
         </div>
       </SectionCard>
@@ -287,7 +287,7 @@ export default function ActivitiesDetails() {
           {localLoading ? (
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-              <p className="text-sm text-zinc-500 font-medium">Carregando submissões...</p>
+              <p className="text-sm text-stone-500 font-medium">Carregando submissões...</p>
             </div>
           ) : activitySubmissions.length === 0 ? (
             <EmptyState
@@ -296,14 +296,14 @@ export default function ActivitiesDetails() {
               description="Use o editor acima para enviar seu código."
             />
           ) : (
-            <div className="overflow-hidden rounded-lg border border-zinc-200">
+            <div className="overflow-hidden rounded-lg border border-stone-200">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-zinc-50 hover:bg-zinc-50">
-                    <TableHead className="font-semibold text-zinc-700 text-xs">
+                  <TableRow className="bg-stone-50 hover:bg-stone-50">
+                    <TableHead className="font-semibold text-stone-700 text-xs">
                       Data de Submissão
                     </TableHead>
-                    <TableHead className="font-semibold text-zinc-700 text-xs">
+                    <TableHead className="font-semibold text-stone-700 text-xs">
                       Status
                     </TableHead>
                     <TableHead className="w-12"></TableHead>
@@ -318,14 +318,14 @@ export default function ActivitiesDetails() {
                       <TableRow
                         key={submission.id}
                         onClick={() => redirectToSubmission(submission)}
-                        className="cursor-pointer hover:bg-zinc-50 transition-colors duration-150 group"
+                        className="cursor-pointer hover:bg-stone-50 transition-colors duration-150 group"
                       >
                         <TableCell>
                           <div className="flex flex-col">
-                            <span className="text-zinc-800 text-sm font-medium">
+                            <span className="text-stone-800 text-sm font-medium">
                               {submissionDate.formatted}
                             </span>
-                            <span className="text-xs text-zinc-400">
+                            <span className="text-xs text-stone-400">
                               {submissionDate.relative}
                             </span>
                           </div>
@@ -337,7 +337,7 @@ export default function ActivitiesDetails() {
                           />
                         </TableCell>
                         <TableCell>
-                          <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-teal-600 transition-colors" />
+                          <ArrowRight className="w-4 h-4 text-stone-300 group-hover:text-teal-600 transition-colors" />
                         </TableCell>
                       </TableRow>
                     );

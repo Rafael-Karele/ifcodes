@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, Clock, HardDrive, X, BookOpen, Search, Codesandbox } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Clock, HardDrive, X, BookOpen, Search, Codesandbox, Sparkles } from "lucide-react";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import {
   Table,
@@ -20,6 +20,22 @@ import { ProblemCard } from "@/components/ProblemCard";
 import { useUser } from "@/context/UserContext";
 import ProblemViewModal from "@/components/ProblemViewModal";
 
+/* ── palette tokens (inline, no global leak) ────────────────── */
+const palette = {
+  accent: "#0d9488",
+  accentLight: "#ccfbf1",
+  accentSoft: "#f0fdfa",
+  warm: "#f59e0b",
+  warmLight: "#fef3c7",
+  surface: "#fafaf9",
+  cardBg: "#ffffff",
+  textPrimary: "#1c1917",
+  textSecondary: "#78716c",
+  border: "#e7e5e4",
+  dangerText: "#dc2626",
+  dangerBg: "#fef2f2",
+};
+
 interface TestCase {
   entrada: string;
   saida: string;
@@ -35,7 +51,7 @@ interface ProblemFormData {
   created_by?: number;
 }
 
-// Modal simples para formulário
+// Modal simples para formulario
 interface ProblemFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -52,14 +68,14 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
     memoria_limite: 512,
     casos_teste: [{ entrada: "", saida: "", privado: false }]
   });
-  
+
   const [errors, setErrors] = useState<{
     titulo?: string;
     enunciado?: string;
     tempo_limite?: string;
     memoria_limite?: string;
   }>({});
-  
+
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   useEffect(() => {
@@ -91,16 +107,16 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
 
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
-    
-    // Validar título
+
+    // Validar titulo
     if (!formData.titulo.trim()) {
-      newErrors.titulo = "O título é obrigatório";
+      newErrors.titulo = "O titulo e obrigatorio";
     } else if (formData.titulo.length < 3) {
-      newErrors.titulo = "O título deve ter pelo menos 3 caracteres";
+      newErrors.titulo = "O titulo deve ter pelo menos 3 caracteres";
     } else if (formData.titulo.length > 200) {
-      newErrors.titulo = "O título não pode ter mais de 200 caracteres";
+      newErrors.titulo = "O titulo nao pode ter mais de 200 caracteres";
     }
-    
+
     // Validar enunciado
     let plainText = '';
     try {
@@ -111,27 +127,27 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
     } catch (e) {
       plainText = formData.enunciado.trim();
     }
-    
+
     if (!plainText) {
-      newErrors.enunciado = "O enunciado é obrigatório";
+      newErrors.enunciado = "O enunciado e obrigatorio";
     } else if (plainText.length < 10) {
       newErrors.enunciado = "O enunciado deve ter pelo menos 10 caracteres";
     } else if (plainText.length > 10000) {
-      newErrors.enunciado = "O enunciado não pode ter mais de 10000 caracteres";
+      newErrors.enunciado = "O enunciado nao pode ter mais de 10000 caracteres";
     }
 
     // Validar tempo limite
     if (!formData.tempo_limite || formData.tempo_limite < 100) {
-      newErrors.tempo_limite = "O tempo limite deve ser no mínimo 100ms";
+      newErrors.tempo_limite = "O tempo limite deve ser no minimo 100ms";
     } else if (formData.tempo_limite > 30000) {
-      newErrors.tempo_limite = "O tempo limite não pode ser maior que 30000ms (30s)";
+      newErrors.tempo_limite = "O tempo limite nao pode ser maior que 30000ms (30s)";
     }
 
-    // Validar memória limite
+    // Validar memoria limite
     if (!formData.memoria_limite || formData.memoria_limite < 128) {
-      newErrors.memoria_limite = "A memória limite deve ser no mínimo 128KB";
+      newErrors.memoria_limite = "A memoria limite deve ser no minimo 128KB";
     } else if (formData.memoria_limite > 1048576) {
-      newErrors.memoria_limite = "A memória limite não pode ser maior que 1048576KB (1GB)";
+      newErrors.memoria_limite = "A memoria limite nao pode ser maior que 1048576KB (1GB)";
     }
 
     // Validar casos de teste
@@ -140,7 +156,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
       if (!tc.entrada.trim() || !tc.saida.trim()) {
         setNotification({
           type: 'error',
-          message: `Caso de teste ${i + 1}: entrada e saída são obrigatórias`
+          message: `Caso de teste ${i + 1}: entrada e saida sao obrigatorias`
         });
         return false;
       }
@@ -196,23 +212,23 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h2 className="text-xl font-bold text-gray-900">
+          <div className="flex items-center justify-between border-b border-stone-200 pb-4">
+            <h2 className="text-xl font-bold text-stone-900">
               {mode === "edit" ? "Editar Problema" : "Novo Problema"}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 mt-6">
             <div>
-              <Label htmlFor="titulo">Título *</Label>
+              <Label htmlFor="titulo" className="text-sm font-medium text-stone-600">Titulo *</Label>
               <Input
                 id="titulo"
                 value={formData.titulo}
@@ -220,7 +236,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                   setFormData(prev => ({ ...prev, titulo: e.target.value }));
                   if (errors.titulo) setErrors(prev => ({ ...prev, titulo: undefined }));
                 }}
-                className={errors.titulo ? "border-red-500" : ""}
+                className={`mt-1.5 h-11 rounded-lg border-stone-300 focus-visible:ring-teal-500/30 focus-visible:border-teal-400 ${errors.titulo ? "border-red-500" : ""}`}
                 required
               />
               {errors.titulo && (
@@ -229,7 +245,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
             </div>
 
             <div>
-              <Label htmlFor="enunciado">Enunciado *</Label>
+              <Label htmlFor="enunciado" className="text-sm font-medium text-stone-600">Enunciado *</Label>
               <RichTextEditor
                 value={formData.enunciado}
                 onChange={(content) => {
@@ -249,7 +265,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="tempo_limite">Tempo Limite (ms) *</Label>
+                <Label htmlFor="tempo_limite" className="text-sm font-medium text-stone-600">Tempo Limite (ms) *</Label>
                 <Input
                   id="tempo_limite"
                   type="number"
@@ -260,7 +276,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                     setFormData(prev => ({ ...prev, tempo_limite: parseInt(e.target.value) || 0 }));
                     if (errors.tempo_limite) setErrors(prev => ({ ...prev, tempo_limite: undefined }));
                   }}
-                  className={errors.tempo_limite ? "border-red-500" : ""}
+                  className={`mt-1.5 h-11 rounded-lg border-stone-300 focus-visible:ring-teal-500/30 focus-visible:border-teal-400 ${errors.tempo_limite ? "border-red-500" : ""}`}
                   required
                 />
                 {errors.tempo_limite && (
@@ -269,7 +285,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
               </div>
 
               <div>
-                <Label htmlFor="memoria_limite">Memória Limite (KB) *</Label>
+                <Label htmlFor="memoria_limite" className="text-sm font-medium text-stone-600">Memoria Limite (KB) *</Label>
                 <Input
                   id="memoria_limite"
                   type="number"
@@ -280,7 +296,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                     setFormData(prev => ({ ...prev, memoria_limite: parseInt(e.target.value) || 0 }));
                     if (errors.memoria_limite) setErrors(prev => ({ ...prev, memoria_limite: undefined }));
                   }}
-                  className={errors.memoria_limite ? "border-red-500" : ""}
+                  className={`mt-1.5 h-11 rounded-lg border-stone-300 focus-visible:ring-teal-500/30 focus-visible:border-teal-400 ${errors.memoria_limite ? "border-red-500" : ""}`}
                   required
                 />
                 {errors.memoria_limite && (
@@ -289,47 +305,61 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
               </div>
             </div>
 
-            <div className="border-t pt-6">
+            <div className="border-t border-stone-200 pt-6">
               <div className="flex justify-between items-center mb-4">
-                <Label>Casos de Teste *</Label>
-                <Button type="button" onClick={addTestCase} variant="outline" size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Label className="text-sm font-medium text-stone-600">Casos de Teste *</Label>
+                <button
+                  type="button"
+                  onClick={addTestCase}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                  style={{ color: palette.accent, background: palette.accentSoft }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = palette.accent;
+                    e.currentTarget.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = palette.accentSoft;
+                    e.currentTarget.style.color = palette.accent;
+                  }}
+                >
+                  <Plus className="w-4 h-4" />
                   Adicionar Caso
-                </Button>
+                </button>
               </div>
 
               <div className="space-y-4">
                 {formData.casos_teste.map((testCase, index) => (
-                  <div key={index} className="border rounded-lg p-4">
+                  <div key={index} className="border border-stone-200 rounded-xl p-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium">Caso de Teste {index + 1}</h4>
+                      <h4 className="font-medium text-stone-700">Caso de Teste {index + 1}</h4>
                       {formData.casos_teste.length > 1 && (
-                        <Button
+                        <button
                           type="button"
                           onClick={() => removeTestCase(index)}
-                          variant="outline"
-                          size="sm"
+                          className="rounded-lg p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
-                        </Button>
+                        </button>
                       )}
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <Label>Entrada</Label>
+                        <Label className="text-sm font-medium text-stone-600">Entrada</Label>
                         <Textarea
                           value={testCase.entrada}
                           onChange={(e) => updateTestCase(index, 'entrada', e.target.value)}
                           rows={3}
+                          className="mt-1.5 border-stone-300 rounded-lg focus-visible:ring-teal-500/30 focus-visible:border-teal-400"
                           required
                         />
                       </div>
                       <div>
-                        <Label>Saída Esperada</Label>
+                        <Label className="text-sm font-medium text-stone-600">Saida Esperada</Label>
                         <Textarea
                           value={testCase.saida}
                           onChange={(e) => updateTestCase(index, 'saida', e.target.value)}
                           rows={3}
+                          className="mt-1.5 border-stone-300 rounded-lg focus-visible:ring-teal-500/30 focus-visible:border-teal-400"
                           required
                         />
                       </div>
@@ -339,8 +369,9 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
                           id={`privado-${index}`}
                           checked={testCase.privado}
                           onChange={(e) => updateTestCase(index, 'privado', e.target.checked)}
+                          className="accent-teal-600"
                         />
-                        <Label htmlFor={`privado-${index}`}>Caso de teste privado</Label>
+                        <Label htmlFor={`privado-${index}`} className="text-sm font-medium text-stone-600">Caso de teste privado</Label>
                       </div>
                     </div>
                   </div>
@@ -352,13 +383,14 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                className="flex-1 px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 font-medium transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity"
+                className="flex-1 px-4 py-2.5 text-white rounded-xl font-semibold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: palette.accent }}
               >
                 {mode === "edit" ? "Atualizar" : "Criar"} Problema
               </button>
@@ -380,7 +412,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
 
 
 
-// Modal de confirmação de exclusão
+// Modal de confirmacao de exclusao
 interface DeleteConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -394,27 +426,27 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, problemTitle, activiti
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Trash2 className="w-6 h-6 text-red-600" />
+          <div className="p-2 rounded-lg" style={{ backgroundColor: palette.dangerBg }}>
+            <Trash2 className="w-6 h-6" style={{ color: palette.dangerText }} />
           </div>
-          <h3 className="text-xl font-bold text-gray-900">Confirmar Exclusão</h3>
+          <h3 className="text-xl font-bold text-stone-900">Confirmar Exclusao</h3>
         </div>
-        <p className="text-gray-600 mb-6">
+        <p className="text-stone-500 mb-6">
           Tem certeza que deseja excluir o problema{" "}
-          <span className="font-semibold text-gray-900">"{problemTitle}"</span>?
-          Esta ação não pode ser desfeita.
+          <span className="font-semibold text-stone-900">"{problemTitle}"</span>?
+          Esta acao nao pode ser desfeita.
         </p>
 
         {activitiesCount !== undefined && activitiesCount > 0 && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h4 className="text-sm font-semibold text-yellow-800 mb-1 flex items-center">
-              <span className="mr-2">⚠️</span> Atenção: Problema em uso
+          <div className="mb-6 p-4 rounded-xl border" style={{ backgroundColor: palette.warmLight, borderColor: "#fde68a" }}>
+            <h4 className="text-sm font-semibold text-yellow-800 mb-1 flex items-center gap-2">
+              <span>Atencao: Problema em uso</span>
             </h4>
             <p className="text-sm text-yellow-700">
-              Este problema está atribuído a <strong>{activitiesCount}</strong> atividade{activitiesCount > 1 ? 's' : ''}.
-              Excluí-lo removerá todas as atividades, submissões e correções associadas.
+              Este problema esta atribuido a <strong>{activitiesCount}</strong> atividade{activitiesCount > 1 ? 's' : ''}.
+              Exclui-lo removera todas as atividades, submissoes e correcoes associadas.
             </p>
           </div>
         )}
@@ -422,15 +454,18 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, problemTitle, activiti
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+            className="flex-1 px-4 py-2.5 border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-50 font-medium transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
+            className="flex-1 px-4 py-2.5 rounded-xl text-white font-medium transition-colors"
+            style={{ backgroundColor: palette.dangerText }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.9"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
           >
-            Confirmar Exclusão
+            Confirmar Exclusao
           </button>
         </div>
       </div>
@@ -528,7 +563,7 @@ export default function Problems() {
       try {
         const success = await deleteProblem(deletingProblem.id);
         if (success) {
-          setNotification({ type: 'success', message: 'Problema excluído com sucesso!' });
+          setNotification({ type: 'success', message: 'Problema excluido com sucesso!' });
           loadProblems();
         } else {
           setNotification({ type: 'error', message: 'Erro ao excluir problema' });
@@ -552,13 +587,21 @@ export default function Problems() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: palette.accent }}></div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="min-h-[80vh]">
+      {/* ---- scoped keyframes ---- */}
+      <style>{`
+        @keyframes problems-fade-up {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {notification && (
         <Notification
           type={notification.type}
@@ -567,85 +610,100 @@ export default function Problems() {
         />
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-              <Codesandbox className="w-6 h-6 text-white" />
-            </div>
-            Gerenciamento de Problemas
-          </h1>
-        </div>
+      {/* ═══════ HERO / HEADER AREA ═══════ */}
+      <div
+        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
+      >
+        {/* decorative circles */}
+        <div
+          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
+          style={{ background: "white" }}
+        />
+        <div
+          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
+          style={{ background: "white" }}
+        />
 
-        <button
-          onClick={() => {
-            setEditingProblem(null);
-            setIsFormModalOpen(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 font-medium transition-opacity shadow-md"
-        >
-          <Plus className="w-5 h-5" />
-          Adicionar Problema
-        </button>
+        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <Codesandbox className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+              Gerenciamento de Problemas
+            </h1>
+            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
+              Crie e gerencie problemas de programacao, defina casos de teste e acompanhe as atividades.
+            </p>
+          </div>
+
+          <Button
+            onClick={() => {
+              setEditingProblem(null);
+              setIsFormModalOpen(true);
+            }}
+            className="shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Adicionar Problema
+          </Button>
+        </div>
       </div>
 
-      {/* Barra de busca */}
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
+      {/* ═══════ SEARCH + STATS BAR ═══════ */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+          <Input
             type="text"
-            placeholder="Buscar por título do problema..."
+            placeholder="Buscar por titulo do problema..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="pl-10 h-11 rounded-xl border-stone-200 bg-white shadow-sm focus-visible:ring-teal-500/30 focus-visible:border-teal-400"
           />
+        </div>
+        <div
+          className="shrink-0 flex items-center gap-2 rounded-xl px-4 h-11 text-sm font-medium"
+          style={{ background: palette.accentSoft, color: palette.accent }}
+        >
+          <Codesandbox className="w-4 h-4" />
+          {filteredProblems.length}{" "}
+          {filteredProblems.length === 1 ? "problema" : "problemas"}
         </div>
       </div>
 
-      {/* Lista de Problemas */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+      {/* ═══════ CARDS GRID ═══════ */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filteredProblems.length === 0 ? (
-          <div className="text-center py-12">
-            <Codesandbox className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          /* ── empty state ── */
+          <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
+            <div
+              className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
+              style={{ background: palette.accentLight }}
+            >
+              <Sparkles className="w-9 h-9" style={{ color: palette.accent }} />
+            </div>
+            <p className="text-lg font-semibold text-stone-700">
+              {searchTerm ? "Nenhum problema encontrado" : "Nenhum problema cadastrado"}
+            </p>
+            <p className="mt-1 text-sm text-stone-400 max-w-xs">
               {searchTerm
-                ? "Nenhum problema encontrado"
-                : "Nenhum problema cadastrado"}
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {searchTerm
-                ? "Tente ajustar o termo de busca"
-                : "Clique em 'Adicionar Problema' para começar"}
+                ? "Tente ajustar o termo de busca."
+                : "Clique em 'Adicionar Problema' para comecar."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredProblems.map((problem) => (
-              <ProblemCard
-                key={problem.id}
-                problem={problem}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDeleteClick}
-              />
-            ))}
-          </div>
+          filteredProblems.map((problem, i) => (
+            <ProblemCard
+              key={problem.id}
+              problem={problem}
+              index={i}
+              onView={handleView}
+              onEdit={handleEdit}
+              onDelete={handleDeleteClick}
+            />
+          ))
         )}
       </div>
-
-      {/* Contador de problemas */}
-      {!loading && problems.length > 0 && (
-        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Codesandbox className="w-5 h-5" />
-            <span className="font-medium">
-              {filteredProblems.length} problema{filteredProblems.length !== 1 ? "s" : ""}{" "}
-              {searchTerm && `de ${problems.length}`}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Modais */}
       <ProblemFormModal

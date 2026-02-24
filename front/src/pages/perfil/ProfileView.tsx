@@ -29,9 +29,9 @@ export default function ProfileView() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-12 flex flex-col items-center gap-4">
+        <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
           <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-          <p className="text-sm text-zinc-500 font-medium">Carregando perfil...</p>
+          <p className="text-sm text-stone-500 font-medium">Carregando perfil...</p>
         </div>
       </div>
     );
@@ -40,10 +40,10 @@ export default function ProfileView() {
   if (!user) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-16">
-        <div className="bg-zinc-50 border border-dashed border-zinc-200 rounded-xl py-12 text-center">
-          <UserIcon className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-zinc-600 mb-1">Perfil não encontrado</p>
-          <p className="text-xs text-zinc-400 mb-4">
+        <div className="bg-stone-50 border border-dashed border-stone-200 rounded-xl py-12 text-center">
+          <UserIcon className="w-8 h-8 text-stone-300 mx-auto mb-3" />
+          <p className="text-sm font-medium text-stone-600 mb-1">Perfil não encontrado</p>
+          <p className="text-xs text-stone-400 mb-4">
             Ocorreu um problema ao carregar os dados. Tente fazer login novamente.
           </p>
           <button
@@ -69,8 +69,8 @@ export default function ProfileView() {
 
       {/* ── header ── */}
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Meu Perfil</h1>
-        <p className="text-zinc-400 text-sm mt-1">Gerencie suas informações pessoais</p>
+        <h1 className="text-2xl font-bold text-stone-900 tracking-tight">Meu Perfil</h1>
+        <p className="text-stone-400 text-sm mt-1">Gerencie suas informações pessoais</p>
       </div>
 
       {/* ── profile info ── */}
@@ -151,7 +151,7 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
           {editing ? (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <input
-                className="flex-1 sm:flex-auto text-lg font-bold text-zinc-900 border border-zinc-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="flex-1 sm:flex-auto text-lg font-bold text-stone-900 border border-stone-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 value={name}
                 onChange={(e) => setNameState(e.target.value)}
               />
@@ -165,7 +165,7 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
               </button>
               <button
                 onClick={() => { setEditing(false); setNameState(user.name || ""); }}
-                className="p-1.5 rounded-lg bg-zinc-100 text-zinc-500 hover:bg-zinc-200 transition-colors"
+                className="p-1.5 rounded-lg bg-stone-100 text-stone-500 hover:bg-stone-200 transition-colors"
                 title="Cancelar"
               >
                 <X className="w-4 h-4" />
@@ -173,10 +173,10 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-zinc-900 break-words">{displayName}</h2>
+              <h2 className="text-xl font-bold text-stone-900 break-words">{displayName}</h2>
               <button
                 onClick={() => setEditing(true)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-teal-600 hover:bg-zinc-100 transition-colors"
+                className="p-1.5 rounded-lg text-stone-400 hover:text-teal-600 hover:bg-stone-100 transition-colors"
                 title="Editar nome"
               >
                 <Pencil className="w-4 h-4" />
@@ -186,8 +186,8 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
         </div>
 
         {/* Email */}
-        <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-zinc-500">
-          <Mail className="w-4 h-4 text-zinc-400" />
+        <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-stone-500">
+          <Mail className="w-4 h-4 text-stone-400" />
           {user.email}
         </div>
 
@@ -220,17 +220,17 @@ function SecuritySettings({ onChangePasswordClick }: SecuritySettingsProps) {
       className="group w-full flex items-center justify-between gap-4 text-left"
     >
       <div className="flex items-center gap-4">
-        <div className="p-2 rounded-lg bg-zinc-100 text-zinc-500">
+        <div className="p-2 rounded-lg bg-stone-100 text-stone-500">
           <KeyRound className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-sm font-medium text-zinc-800">Alterar senha</p>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <p className="text-sm font-medium text-stone-800">Alterar senha</p>
+          <p className="text-xs text-stone-400 mt-0.5">
             Mantenha sua conta segura atualizando sua senha regularmente
           </p>
         </div>
       </div>
-      <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+      <ArrowRight className="w-4 h-4 text-stone-300 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0" />
     </button>
   );
 }

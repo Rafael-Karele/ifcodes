@@ -8,6 +8,7 @@ import {
   Filter,
   RefreshCw,
   FileText,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/context/DataContext";
@@ -15,6 +16,17 @@ import { StatCard } from "@/components/StatCard";
 import { ActivityCard } from "@/components/ActivityCard";
 import { EmptyState } from "@/components/EmptyState";
 import { activityStatusConfig, type ActivityStatusKey } from "@/components/StatusBadge";
+
+/* ── palette ──────────────────────────────────────────── */
+
+const palette = {
+  accent: "#0d9488",
+  accentDark: "#065f46",
+  accentLight: "#ccfbf1",
+  accentSoft: "#f0fdfa",
+  textSecondary: "#78716c",
+  border: "#e7e5e4",
+};
 
 /* ── helpers ────────────────────────────────────────── */
 
@@ -31,16 +43,16 @@ function LoadingSkeleton() {
       {[...Array(5)].map((_, i) => (
         <div
           key={i}
-          className="relative bg-white border border-zinc-200 rounded-xl px-5 py-4 overflow-hidden"
+          className="relative bg-white border border-stone-200 rounded-xl px-5 py-4 overflow-hidden"
         >
-          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-zinc-200 animate-pulse" />
+          <div className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full bg-stone-200 animate-pulse" />
           <div className="flex items-center gap-4 pl-2">
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-zinc-200 rounded w-1/3 animate-pulse" />
-              <div className="h-3 bg-zinc-100 rounded w-48 animate-pulse" />
-              <div className="h-3 bg-zinc-100 rounded w-24 animate-pulse" />
+              <div className="h-4 bg-stone-200 rounded w-1/3 animate-pulse" />
+              <div className="h-3 bg-stone-100 rounded w-48 animate-pulse" />
+              <div className="h-3 bg-stone-100 rounded w-24 animate-pulse" />
             </div>
-            <div className="h-5 bg-zinc-100 rounded-md w-16 animate-pulse" />
+            <div className="h-5 bg-stone-100 rounded-md w-16 animate-pulse" />
           </div>
         </div>
       ))}
@@ -97,50 +109,87 @@ export default function Activities() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
 
-      {/* ── header ── */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Atividades</h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Gerencie e acompanhe suas atividades acadêmicas
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-zinc-400">
-            {activities.length} atividade{activities.length !== 1 ? "s" : ""}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={refreshData}
-            disabled={loading || refreshing}
-          >
-            <RefreshCw
-              className={`w-4 h-4 ${(loading || refreshing) ? "animate-spin" : ""}`}
-            />
-            Atualizar
-          </Button>
+      {/* ── hero header ── */}
+      <div
+        className="relative rounded-2xl px-8 py-10 overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)` }}
+      >
+        {/* decorative circles */}
+        <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
+        <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <BookOpen className="w-8 h-8" />
+              Atividades
+            </h1>
+            <p className="text-teal-100 text-sm mt-2">
+              Gerencie e acompanhe suas atividades acadêmicas
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-teal-100">
+              {activities.length} atividade{activities.length !== 1 ? "s" : ""}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshData}
+              disabled={loading || refreshing}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${(loading || refreshing) ? "animate-spin" : ""}`}
+              />
+              Atualizar
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* ── search / filter ── */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
           <input
             type="text"
             placeholder="Buscar por título do problema..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white text-sm"
+            className="w-full pl-10 pr-4 h-11 rounded-xl text-sm bg-white"
+            style={{
+              border: `1px solid ${palette.border}`,
+              outline: "none",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = palette.accent;
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = palette.border;
+              e.currentTarget.style.boxShadow = "none";
+            }}
           />
         </div>
         <div className="relative">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="pl-10 pr-8 py-2 border border-zinc-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white min-w-[140px] text-sm"
+            className="pl-10 pr-8 h-11 rounded-xl text-sm bg-white min-w-[140px]"
+            style={{
+              border: `1px solid ${palette.border}`,
+              outline: "none",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = palette.accent;
+              e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = palette.border;
+              e.currentTarget.style.boxShadow = "none";
+            }}
           >
             <option value="all">Todos os status</option>
             {uniqueStatuses.map((status) => (
@@ -150,6 +199,13 @@ export default function Activities() {
             ))}
           </select>
         </div>
+        {/* count badge */}
+        <span
+          className="text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap"
+          style={{ backgroundColor: palette.accentSoft, color: palette.accent }}
+        >
+          {filteredActivities.length} resultado{filteredActivities.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
       {/* ── stats ── */}

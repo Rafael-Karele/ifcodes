@@ -50,12 +50,12 @@ export function ActivityCard({ activity, problemTitle, problemPreview, onClick, 
         ? "bg-red-500"
         : rel.tone === "urgent"
           ? "bg-amber-500"
-          : (activityStatusConfig[activity.status as ActivityStatusKey]?.barColor || "bg-zinc-300");
+          : (activityStatusConfig[activity.status as ActivityStatusKey]?.barColor || "bg-stone-300");
 
   return (
     <button
       onClick={onClick}
-      className="group relative w-full text-left bg-white border border-zinc-200 rounded-xl px-5 py-4 hover:border-zinc-300 hover:shadow-sm transition-all duration-150 overflow-hidden"
+      className="group relative w-full text-left bg-white border border-stone-200 rounded-xl px-5 py-4 hover:border-stone-300 hover:shadow-sm transition-all duration-150 overflow-hidden"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* left accent bar */}
@@ -63,14 +63,14 @@ export function ActivityCard({ activity, problemTitle, problemPreview, onClick, 
 
       <div className="flex items-center justify-between gap-4 pl-2">
         <div className="min-w-0 flex-1">
-          <p className={`text-sm font-medium truncate ${isCompleted ? "text-zinc-400 line-through" : "text-zinc-800"}`}>
+          <p className={`text-sm font-medium truncate ${isCompleted ? "text-stone-400 line-through" : "text-stone-800"}`}>
             {problemTitle}
           </p>
           {problemPreview && !isCompleted && (
-            <p className="text-xs text-zinc-400 truncate mt-0.5">{problemPreview}</p>
+            <p className="text-xs text-stone-400 truncate mt-0.5">{problemPreview}</p>
           )}
           <div className="flex items-center gap-3 mt-1.5">
-            <span className="text-xs text-zinc-400">{dueDateStr}</span>
+            <span className="text-xs text-stone-400">{dueDateStr}</span>
             {!isCompleted && (
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded-md ${
@@ -78,18 +78,18 @@ export function ActivityCard({ activity, problemTitle, problemPreview, onClick, 
                     ? "bg-red-100 text-red-700"
                     : rel.tone === "urgent"
                       ? "bg-amber-100 text-amber-700"
-                      : "bg-zinc-100 text-zinc-500"
+                      : "bg-stone-100 text-stone-500"
                 }`}
               >
                 {rel.text}
               </span>
             )}
             {isCompleted && (
-              <StatusBadge label="Concluída" className="bg-emerald-50 text-emerald-600" />
+              <StatusBadge label="Concluida" className="bg-emerald-50 text-emerald-600" />
             )}
           </div>
         </div>
-        <ArrowRight className="w-4 h-4 text-zinc-300 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+        <ArrowRight className="w-4 h-4 text-stone-300 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0" />
       </div>
     </button>
   );

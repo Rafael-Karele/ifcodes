@@ -2,17 +2,27 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { Problem } from "@/types";
-import { MoreVertical, Pencil, Trash2, Codesandbox } from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
 import { getPlainTextFromRichValue } from "@/components/RichTextEditor";
+
+const stripColours = [
+  "linear-gradient(90deg, #14b8a6, #34d399)",
+  "linear-gradient(90deg, #f59e0b, #fb923c)",
+  "linear-gradient(90deg, #38bdf8, #22d3ee)",
+  "linear-gradient(90deg, #fb7185, #f472b6)",
+  "linear-gradient(90deg, #a78bfa, #c084fc)",
+  "linear-gradient(90deg, #a3e635, #4ade80)",
+];
 
 type ProblemCardProps = {
   problem: Problem;
   onDelete: (problem: Problem) => void;
   onEdit: (problem: Problem) => void;
   onView: (problem: Problem) => void;
+  index?: number;
 };
 
-export function ProblemCard({ problem, onDelete, onEdit, onView }: ProblemCardProps) {
+export function ProblemCard({ problem, onDelete, onEdit, onView, index = 0 }: ProblemCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -36,58 +46,59 @@ export function ProblemCard({ problem, onDelete, onEdit, onView }: ProblemCardPr
 
   return (
     <div
-      className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col"
+      className="group bg-white rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden cursor-pointer"
       onClick={() => onView(problem)}
+      style={{ animation: "problems-fade-up 0.5s cubic-bezier(.22,1,.36,1) both", animationDelay: `${index * 60}ms` }}
     >
-      <div className="p-4 flex justify-between items-center cursor-pointer">
-        {/* Left side: Icon, Title and Statement */}
-        <div className="flex items-center flex-grow">
-          <div className="flex-shrink-0 mr-4">
-            <Codesandbox size={24} className="text-gray-500" />
-          </div>
-          <div className="flex-grow">
-            <h3 className="text-lg font-semibold text-gray-800">{problem.title}</h3>
-            <p className="text-gray-600 line-clamp-2 mt-1">
-              {getPlainTextFromRichValue(problem.statement)}
-            </p>
+      {/* Color strip */}
+      <div className="h-1.5" style={{ background: stripColours[index % stripColours.length] }} />
+
+      <div className="p-5 flex items-center justify-between gap-4">
+        {/* Content */}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-[1.05rem] font-bold leading-snug text-stone-800 truncate">
+            {problem.title}
+          </h3>
+          <p className="text-sm text-stone-500 line-clamp-2 mt-1">
+            {getPlainTextFromRichValue(problem.statement)}
+          </p>
+          <div className="flex items-center gap-3 mt-2">
+            {problem.testCasesCount !== undefined && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-md" style={{ backgroundColor: "#f0fdfa", color: "#0d9488" }}>
+                {problem.testCasesCount} caso{problem.testCasesCount !== 1 ? "s" : ""} de teste
+              </span>
+            )}
+            {problem.atividades_count !== undefined && problem.atividades_count > 0 && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-amber-50 text-amber-600">
+                {problem.atividades_count} atividade{problem.atividades_count !== 1 ? "s" : ""}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Right side: Actions Menu */}
-        <div className="relative ml-4" ref={menuRef}>
+        {/* Action buttons (show on hover) */}
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" ref={menuRef}>
           <button
-            onClick={(e) => {
-              e.stopPropagation(); // Prevent card click
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            className="p-2 rounded-full hover:bg-gray-100"
+            onClick={(e) => { e.stopPropagation(); onView(problem); }}
+            className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
+            title="Ver detalhes"
           >
-            <MoreVertical size={20} />
+            <Eye className="w-4 h-4" />
           </button>
-
-          {isMenuOpen && (
-            <div 
-              className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-200"
-              onClick={(e) => e.stopPropagation()} // Prevent card click inside menu
-            >
-              <div className="py-1">
-                <button
-                  onClick={() => { onEdit(problem); setIsMenuOpen(false); }}
-                  className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <span>Editar</span>
-                </button>
-                <button
-                  onClick={() => { onDelete(problem); setIsMenuOpen(false); }}
-                  className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  <span>Apagar</span>
-                </button>
-              </div>
-            </div>
-          )}
+          <button
+            onClick={(e) => { e.stopPropagation(); onEdit(problem); }}
+            className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
+            title="Editar"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(problem); }}
+            className="rounded-lg p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+            title="Apagar"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>

@@ -31,8 +31,8 @@ export const activityStatusConfig = {
   },
   draft: {
     label: "Rascunho",
-    className: "bg-zinc-100 text-zinc-500",
-    barColor: "bg-zinc-300",
+    className: "bg-stone-100 text-stone-500",
+    barColor: "bg-stone-300",
   },
 } as const;
 
@@ -53,7 +53,7 @@ export const submissionStatusConfig = {
   },
   processing: {
     label: "Processando",
-    className: "bg-zinc-100 text-zinc-500",
+    className: "bg-stone-100 text-stone-500",
   },
   "compile-error": {
     label: "Erro de Compilação",
@@ -69,11 +69,11 @@ export const submissionStatusConfig = {
   },
   "internal-error": {
     label: "Erro Interno",
-    className: "bg-zinc-100 text-zinc-500",
+    className: "bg-stone-100 text-stone-500",
   },
   unknown: {
     label: "Desconhecido",
-    className: "bg-zinc-100 text-zinc-500",
+    className: "bg-stone-100 text-stone-500",
   },
 } as const;
 
