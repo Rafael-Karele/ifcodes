@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Users, CheckCircle2, Code2, Square, Settings, X, RotateCcw } from "lucide-react";
+import { Users, CheckCircle2, Square, Settings, X, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JamStudentCard from "@/components/jam/JamStudentCard";
 import type { CardLayout } from "@/components/jam/JamStudentCard";
@@ -131,7 +131,6 @@ export default function JamProfessorView({
 
   const stats = {
     total: participants.length,
-    coding: participants.filter((p) => p.status === "coding").length,
     submitted: participants.filter((p) => ["submitted", "passed", "failed"].includes(p.status)).length,
     passed: participants.filter((p) => p.status === "passed").length,
   };
@@ -161,12 +160,7 @@ export default function JamProfessorView({
             <span className="font-semibold text-stone-800">{stats.total}</span>
             <span className="text-stone-400">participantes</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm">
-            <Code2 className="h-3.5 w-3.5 text-blue-500" />
-            <span className="font-semibold text-blue-700">{stats.coding}</span>
-            <span className="text-blue-400">codificando</span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
+<span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
             <Square className="h-3.5 w-3.5 text-yellow-500" />
             <span className="font-semibold text-yellow-700">{stats.submitted}</span>
             <span className="text-yellow-400">submetidos</span>
