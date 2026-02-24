@@ -32,6 +32,7 @@ interface JamProfessorViewProps {
   onEndSession: () => void;
   onGiveFeedback: (studentId: number, feedback: string) => void;
   onUpdateSettings: (settings: { titulo?: string; instrucoes?: string | null; tempoLimite?: number | null }) => void;
+  isFinished?: boolean;
 }
 
 export default function JamProfessorView({
@@ -41,6 +42,7 @@ export default function JamProfessorView({
   onEndSession,
   onGiveFeedback,
   onUpdateSettings,
+  isFinished = false,
 }: JamProfessorViewProps) {
   const [layouts, setLayouts] = useState<Record<number, CardLayout>>({});
   const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
@@ -155,12 +157,17 @@ export default function JamProfessorView({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {isFinished && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-stone-100 px-3 py-1 text-sm font-medium text-stone-600">
+              Sessão Encerrada
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1 text-sm">
             <Users className="h-3.5 w-3.5 text-stone-500" />
             <span className="font-semibold text-stone-800">{stats.total}</span>
             <span className="text-stone-400">participantes</span>
           </span>
-<span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
             <Square className="h-3.5 w-3.5 text-yellow-500" />
             <span className="font-semibold text-yellow-700">{stats.submitted}</span>
             <span className="text-yellow-400">submetidos</span>
@@ -170,36 +177,40 @@ export default function JamProfessorView({
             <span className="font-semibold text-green-700">{stats.passed}</span>
             <span className="text-green-400">aprovados</span>
           </span>
-          <div className="mx-1 h-6 w-px bg-stone-200" />
-          <JamTimer
-            startedAt={session.started_at}
-            timeLimitMinutes={session.tempo_limite}
-          />
-          <Button
-            onClick={handleResetLayout}
-            variant="outline"
-            className="flex items-center gap-2 border-stone-300"
-            title="Reorganizar cards"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reorganizar
-          </Button>
-          <Button
-            onClick={() => setShowSettings(true)}
-            variant="outline"
-            className="flex items-center gap-2 border-stone-300"
-          >
-            <Settings className="h-4 w-4" />
-            Configurações
-          </Button>
-          <Button
-            onClick={onEndSession}
-            variant="outline"
-            className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <Square className="h-4 w-4" />
-            Encerrar
-          </Button>
+          {!isFinished && (
+            <>
+              <div className="mx-1 h-6 w-px bg-stone-200" />
+              <JamTimer
+                startedAt={session.started_at}
+                timeLimitMinutes={session.tempo_limite}
+              />
+              <Button
+                onClick={handleResetLayout}
+                variant="outline"
+                className="flex items-center gap-2 border-stone-300"
+                title="Reorganizar cards"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Reorganizar
+              </Button>
+              <Button
+                onClick={() => setShowSettings(true)}
+                variant="outline"
+                className="flex items-center gap-2 border-stone-300"
+              >
+                <Settings className="h-4 w-4" />
+                Configurações
+              </Button>
+              <Button
+                onClick={onEndSession}
+                variant="outline"
+                className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
+              >
+                <Square className="h-4 w-4" />
+                Encerrar
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -221,7 +232,7 @@ export default function JamProfessorView({
           })}
           {participants.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center text-stone-400">
-              Nenhum participante conectado ainda.
+              {isFinished ? "Nenhum participante registrado nesta sessão." : "Nenhum participante conectado ainda."}
             </div>
           )}
         </div>

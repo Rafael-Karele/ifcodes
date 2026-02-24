@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { ArrowLeft, Wifi, WifiOff } from "lucide-react";
+import { ArrowLeft, Wifi, WifiOff, Ban } from "lucide-react";
 import { useJamSession } from "@/hooks/useJamSession";
 import { useUserRole } from "@/hooks/useUserRole";
 import { JamSessionService } from "@/services/JamSessionService";
-import type { JamSession } from "@/types/jam";
+import type { JamSession, JamStreamParticipant } from "@/types/jam";
 import Loading from "@/components/Loading";
 import JamLobby from "./JamLobby";
 import JamProfessorView from "./JamProfessorView";
@@ -39,6 +39,25 @@ export default function JamView() {
 
   // Use WS session when available, fall back to REST session
   const session = wsSession || restSession;
+
+  // Convert REST participants to stream format as fallback for finished sessions
+  const restParticipants: JamStreamParticipant[] = useMemo(
+    () =>
+      (restSession?.participants || []).map((p) => ({
+        userId: p.user_id,
+        userName: p.user?.name || "Aluno",
+        code: p.codigo || "",
+        language: p.linguagem || "c",
+        status: p.status,
+        feedback: p.feedback || [],
+        online: false,
+        cursor: undefined,
+      })),
+    [restSession?.participants]
+  );
+
+  // Use WS participants when active, REST participants when finished
+  const effectiveParticipants = isFinished ? restParticipants : participants;
 
   const isProfessor = hasAnyRole(["professor", "admin"]);
 
@@ -108,7 +127,12 @@ export default function JamView() {
           <span className="text-sm font-medium text-stone-500">Jam Session</span>
         </div>
         <div className="flex items-center gap-2">
-          {connected ? (
+          {isFinished ? (
+            <div className="flex items-center gap-1 rounded-full border border-stone-200 bg-stone-100 px-2.5 py-0.5 text-stone-600">
+              <Ban className="h-3.5 w-3.5" />
+              <span className="text-xs font-medium">Encerrada</span>
+            </div>
+          ) : connected ? (
             <div className="flex items-center gap-1 text-teal-600">
               <Wifi className="h-4 w-4" />
               <span className="text-xs">Conectado</span>
@@ -133,7 +157,7 @@ export default function JamView() {
         {session.status === "waiting" ? (
           <JamLobby
             session={session}
-            participants={participants}
+            participants={effectiveParticipants}
             isProfessor={isProfessor}
             onStart={startSession}
           />
@@ -141,17 +165,18 @@ export default function JamView() {
           isProfessor ? (
             <JamProfessorView
               session={session}
-              participants={participants}
+              participants={effectiveParticipants}
               submissionResults={submissionResults}
               onEndSession={endSession}
               onGiveFeedback={giveFeedback}
               onUpdateSettings={updateSettings}
+              isFinished={isFinished}
             />
           ) : (
             <JamStudentView
               session={session}
               myParticipant={myParticipant}
-              participants={participants}
+              participants={effectiveParticipants}
               submissionResult={myParticipant ? submissionResults[myParticipant.user_id] || null : null}
               onUpdateCode={updateCode}
               onUpdateCursor={updateCursor}
