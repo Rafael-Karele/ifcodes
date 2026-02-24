@@ -92,17 +92,17 @@ export default function JamStudentView({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b bg-white px-6 py-3">
+      <div className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-3">
         <div>
-          <h2 className="text-lg font-bold text-gray-800">{session.titulo}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg font-bold text-stone-800">{session.titulo}</h2>
+          <p className="text-sm text-stone-500">
             Problema: {session.problema?.titulo}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {statusIcon()}
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-stone-600">
               {statusLabel[myStatus] || myStatus}
             </span>
           </div>
@@ -116,32 +116,33 @@ export default function JamStudentView({
       {/* Main Content - 3 Panels */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel - Problem Statement */}
-        <div className="w-1/3 overflow-y-auto border-r bg-white p-4">
-          <h3 className="mb-3 text-sm font-semibold text-gray-700">Enunciado</h3>
+        <div className="w-1/3 overflow-y-auto border-r border-stone-200 bg-white p-4">
+          <h3 className="mb-3 text-sm font-semibold text-stone-700">Enunciado</h3>
           {session.problema?.enunciado ? (
             <RichTextViewer content={session.problema.enunciado} />
           ) : (
-            <p className="text-sm text-gray-400">Carregando enunciado...</p>
+            <p className="text-sm text-stone-400">Carregando enunciado...</p>
           )}
           {session.instrucoes && (
-            <div className="mt-4 rounded-lg bg-blue-50 p-3">
-              <h4 className="mb-1 text-xs font-semibold text-blue-700">
+            <div className="mt-4 rounded-lg bg-teal-50 border border-teal-200 p-3">
+              <h4 className="mb-1 text-xs font-semibold text-teal-700">
                 Instruções do Professor
               </h4>
-              <p className="text-sm text-blue-600">{session.instrucoes}</p>
+              <p className="text-sm text-teal-700">{session.instrucoes}</p>
             </div>
           )}
         </div>
 
         {/* Center Panel - Code Editor */}
         <div className="flex flex-1 flex-col">
-          <div className="flex items-center justify-between border-b bg-gray-50 px-4 py-2">
-            <span className="text-sm font-medium text-gray-600">Editor de Código</span>
+          <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-4 py-2">
+            <span className="text-sm font-medium text-stone-600">Editor de Código</span>
             <Button
               onClick={handleSubmit}
               disabled={submitting || myStatus === "submitted"}
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:opacity-90"
+              style={{ backgroundColor: "#0d9488" }}
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -171,7 +172,7 @@ export default function JamStudentView({
 
         {/* Right Panel - Results & Feedback */}
         <div className="w-1/4 overflow-y-auto border-l bg-white p-4">
-          <h3 className="mb-3 text-sm font-semibold text-gray-700">Resultados</h3>
+          <h3 className="mb-3 text-sm font-semibold text-stone-700">Resultados</h3>
 
           {myStatus === "passed" && (
             <div className="mb-4 rounded-lg bg-green-50 p-3">
@@ -256,7 +257,7 @@ export default function JamStudentView({
           )}
 
           {(myStatus === "joined" || myStatus === "coding") && (
-            <div className="mb-4 rounded-lg bg-gray-50 p-3 text-sm text-gray-500">
+            <div className="mb-4 rounded-lg bg-stone-50 p-3 text-sm text-stone-500">
               Submeta seu código para ver os resultados.
             </div>
           )}
@@ -264,15 +265,15 @@ export default function JamStudentView({
           {/* Feedback Section */}
           {myFeedback.length > 0 && (
             <div className="mt-4">
-              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-700">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-stone-700">
                 <MessageSquare className="h-4 w-4" />
                 Feedback do Professor ({myFeedback.length})
               </h3>
               <div className="space-y-2">
                 {myFeedback.map((entry, i) => (
-                  <div key={i} className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
+                  <div key={i} className="rounded-lg bg-teal-50 p-3 text-sm text-teal-700">
                     <p>{entry.message}</p>
-                    <p className="mt-1 text-xs text-blue-400">
+                    <p className="mt-1 text-xs text-teal-400">
                       {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                     </p>
                   </div>

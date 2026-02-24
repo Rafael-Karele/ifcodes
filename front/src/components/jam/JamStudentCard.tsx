@@ -42,7 +42,7 @@ interface JamStudentCardProps {
 }
 
 const statusColors: Record<string, string> = {
-  joined: "bg-gray-100 text-gray-700",
+  joined: "bg-stone-100 text-stone-700",
   coding: "bg-blue-100 text-blue-700",
   submitted: "bg-yellow-100 text-yellow-700",
   passed: "bg-green-100 text-green-700",
@@ -218,18 +218,18 @@ export default function JamStudentCard({
         customSize ? "flex flex-col" : ""
       } ${
         participant.online
-          ? "border-gray-200 bg-white"
-          : "border-gray-200 bg-gray-50 opacity-60"
+          ? "border-stone-200 bg-white"
+          : "border-stone-200 bg-stone-50 opacity-60"
       }`}
     >
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2 truncate">
           <span
             className={`inline-block h-2 w-2 rounded-full ${
-              participant.online ? "bg-green-500" : "bg-gray-400"
+              participant.online ? "bg-green-500" : "bg-stone-400"
             }`}
           />
-          <span className="text-sm font-semibold text-gray-800 truncate">
+          <span className="text-sm font-semibold text-stone-800 truncate">
             {participant.userName}
           </span>
         </div>
@@ -237,8 +237,8 @@ export default function JamStudentCard({
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
               !participant.online
-                ? "bg-gray-100 text-gray-500"
-                : statusColors[participant.status] || "bg-gray-100 text-gray-700"
+                ? "bg-stone-100 text-stone-500"
+                : statusColors[participant.status] || "bg-stone-100 text-stone-700"
             }`}
           >
             {!participant.online
@@ -247,7 +247,7 @@ export default function JamStudentCard({
           </span>
         </div>
       </div>
-      <div className={`${customSize ? "flex-1" : editorHeight} overflow-hidden rounded border border-gray-100`}>
+      <div className={`${customSize ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
         <Editor
           height="100%"
           language="c"
@@ -271,14 +271,14 @@ export default function JamStudentCard({
         />
       </div>
       {participant.feedback?.length > 0 && (
-        <div className="mt-2 rounded bg-blue-50 p-2 text-xs text-blue-700">
+        <div className="mt-2 rounded bg-teal-50 p-2 text-xs text-teal-700">
           <span className="font-medium">Feedbacks:</span> {participant.feedback.length}
         </div>
       )}
       {onResize && (
         <div
           onMouseDown={handleResizeStart}
-          className="absolute bottom-1 right-1 cursor-nwse-resize rounded p-0.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+          className="absolute bottom-1 right-1 cursor-nwse-resize rounded p-0.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100"
           title="Arrastar para redimensionar"
         >
           <GripHorizontal className="h-4 w-4" />

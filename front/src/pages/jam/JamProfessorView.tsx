@@ -107,8 +107,8 @@ export default function JamProfessorView({
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">{session.titulo}</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-xl font-bold text-stone-800">{session.titulo}</h2>
+          <p className="text-sm text-stone-500">
             Problema: {session.problema?.titulo}
           </p>
         </div>
@@ -117,16 +117,17 @@ export default function JamProfessorView({
             startedAt={session.started_at}
             timeLimitMinutes={session.tempo_limite}
           />
-          <div className="flex items-center rounded-md border">
+          <div className="flex items-center rounded-md border border-stone-300">
             {(["sm", "md", "lg"] as const).map((size) => (
               <button
                 key={size}
                 onClick={() => setCardSize(size)}
                 className={`px-3 py-1.5 text-xs font-medium transition-colors ${
                   cardSize === size
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "text-white"
+                    : "text-stone-600 hover:bg-stone-100"
                 } ${size === "sm" ? "rounded-l-md" : ""} ${size === "lg" ? "rounded-r-md" : ""}`}
+                style={cardSize === size ? { backgroundColor: "#0d9488" } : undefined}
               >
                 {size === "sm" ? "P" : size === "md" ? "M" : "G"}
               </button>
@@ -135,7 +136,7 @@ export default function JamProfessorView({
           <Button
             onClick={() => setShowSettings(true)}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-stone-300"
           >
             <Settings className="h-4 w-4" />
             Configurações
@@ -153,25 +154,25 @@ export default function JamProfessorView({
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-4 gap-4">
-        <div className="rounded-lg border bg-white p-4 text-center">
-          <Users className="mx-auto mb-1 h-5 w-5 text-gray-500" />
-          <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-          <p className="text-xs text-gray-500">Participantes</p>
+        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
+          <Users className="mx-auto mb-1 h-5 w-5 text-stone-500" />
+          <p className="text-2xl font-bold text-stone-800">{stats.total}</p>
+          <p className="text-xs text-stone-500">Participantes</p>
         </div>
-        <div className="rounded-lg border bg-white p-4 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
           <Code2 className="mx-auto mb-1 h-5 w-5 text-blue-500" />
           <p className="text-2xl font-bold text-blue-600">{stats.coding}</p>
-          <p className="text-xs text-gray-500">Codificando</p>
+          <p className="text-xs text-stone-500">Codificando</p>
         </div>
-        <div className="rounded-lg border bg-white p-4 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
           <Square className="mx-auto mb-1 h-5 w-5 text-yellow-500" />
           <p className="text-2xl font-bold text-yellow-600">{stats.submitted}</p>
-          <p className="text-xs text-gray-500">Submetidos</p>
+          <p className="text-xs text-stone-500">Submetidos</p>
         </div>
-        <div className="rounded-lg border bg-white p-4 text-center">
+        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
           <CheckCircle2 className="mx-auto mb-1 h-5 w-5 text-green-500" />
           <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
-          <p className="text-xs text-gray-500">Aprovados</p>
+          <p className="text-xs text-stone-500">Aprovados</p>
         </div>
       </div>
 
@@ -190,7 +191,7 @@ export default function JamProfessorView({
           />
         ))}
         {participants.length === 0 && (
-          <div className="col-span-full flex items-center justify-center text-gray-400">
+          <div className="col-span-full flex items-center justify-center text-stone-400">
             Nenhum participante conectado ainda.
           </div>
         )}
@@ -208,45 +209,45 @@ export default function JamProfessorView({
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-800">Configurações da Sessão</h3>
-              <button onClick={() => setShowSettings(false)} className="rounded p-1 hover:bg-gray-100">
-                <X className="h-5 w-5 text-gray-500" />
+              <h3 className="text-lg font-semibold text-stone-800">Configurações da Sessão</h3>
+              <button onClick={() => setShowSettings(false)} className="rounded p-1 hover:bg-stone-100">
+                <X className="h-5 w-5 text-stone-500" />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Título</label>
+                <label className="mb-1 block text-sm font-medium text-stone-700">Título</label>
                 <input
                   type="text"
                   value={settingsTitulo}
                   onChange={(e) => setSettingsTitulo(e.target.value)}
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Instruções</label>
+                <label className="mb-1 block text-sm font-medium text-stone-700">Instruções</label>
                 <textarea
                   value={settingsInstrucoes}
                   onChange={(e) => setSettingsInstrucoes(e.target.value)}
                   rows={3}
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Tempo limite (minutos)</label>
+                <label className="mb-1 block text-sm font-medium text-stone-700">Tempo limite (minutos)</label>
                 <input
                   type="number"
                   min="1"
                   value={settingsTempoLimite}
                   onChange={(e) => setSettingsTempoLimite(e.target.value)}
                   placeholder="Sem limite"
-                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
                 />
               </div>
             </div>
@@ -255,7 +256,11 @@ export default function JamProfessorView({
               <Button variant="outline" onClick={() => setShowSettings(false)}>
                 Cancelar
               </Button>
-              <Button onClick={handleSaveSettings}>
+              <Button
+                onClick={handleSaveSettings}
+                style={{ backgroundColor: "#0d9488" }}
+                className="hover:opacity-90"
+              >
                 Salvar
               </Button>
             </div>

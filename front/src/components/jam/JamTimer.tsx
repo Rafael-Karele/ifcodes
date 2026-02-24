@@ -35,7 +35,7 @@ export default function JamTimer({ startedAt, timeLimitMinutes }: JamTimerProps)
       className={`flex items-center gap-2 rounded-lg px-4 py-2 font-mono text-lg font-bold ${
         isLow
           ? "animate-pulse bg-red-100 text-red-700"
-          : "bg-gray-100 text-gray-700"
+          : "bg-stone-100 text-stone-700"
       }`}
     >
       <Clock className="h-5 w-5" />

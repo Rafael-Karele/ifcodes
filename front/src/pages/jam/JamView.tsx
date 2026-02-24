@@ -82,10 +82,10 @@ export default function JamView() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-500">Sessão não encontrada.</p>
+          <p className="text-stone-500">Sessão não encontrada.</p>
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 text-sm text-blue-600 hover:underline"
+            className="mt-4 text-sm text-teal-600 hover:text-teal-700 hover:underline"
           >
             Voltar
           </button>
@@ -97,19 +97,19 @@ export default function JamView() {
   return (
     <div className="flex h-[calc(100vh-64px)] flex-col">
       {/* Top bar */}
-      <div className="flex items-center justify-between border-b bg-white px-4 py-2">
+      <div className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-2">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="rounded-lg p-1 hover:bg-gray-100"
+            className="rounded-lg p-1 hover:bg-stone-100"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <span className="text-sm font-medium text-gray-500">Jam Session</span>
+          <span className="text-sm font-medium text-stone-500">Jam Session</span>
         </div>
         <div className="flex items-center gap-2">
           {connected ? (
-            <div className="flex items-center gap-1 text-green-600">
+            <div className="flex items-center gap-1 text-teal-600">
               <Wifi className="h-4 w-4" />
               <span className="text-xs">Conectado</span>
             </div>
@@ -123,7 +123,7 @@ export default function JamView() {
       </div>
 
       {error && (
-        <div className="border-b bg-red-50 px-4 py-2 text-sm text-red-600">
+        <div className="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
           {error}
         </div>
       )}
