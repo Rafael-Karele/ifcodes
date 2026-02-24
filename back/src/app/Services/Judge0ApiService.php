@@ -40,17 +40,17 @@ class Judge0ApiService
         $casosIds = [];
         foreach ($submissao->atividade->problema->casosTeste as $caso) {
             $data['submissions'][] = [
-                'source_code' => $submissao->codigo,
+                'source_code' => base64_encode($submissao->codigo),
                 'language_id' => self::LINGUAGEM_C,
-                'stdin' => $caso->entrada,
-                'expected_output' => $caso->saida,
+                'stdin' => base64_encode($caso->entrada ?? ''),
+                'expected_output' => base64_encode($caso->saida ?? ''),
                 'cpu_time_limit' => $submissao->atividade->problema->tempo_limite / 1000,
                 'memory_limit' => $submissao->atividade->problema->memory_limite
             ];
             $casosIds[] = $caso->id;
         }
 
-        $response = $this->client->post('/submissions/batch', $data);
+        $response = $this->client->post('/submissions/batch?base64_encoded=true', $data);
         $response->throw();
 
         $resultado = [];
