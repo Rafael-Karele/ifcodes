@@ -11,6 +11,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["ifcodes.cloud"],
+  },
   define: {
     global: "globalThis",
   },
