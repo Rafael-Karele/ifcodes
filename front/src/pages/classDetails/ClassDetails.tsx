@@ -282,7 +282,7 @@ export default function ClassDetails() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
       {notification && (
         <Notification
           message={notification.message}
@@ -291,24 +291,44 @@ export default function ClassDetails() {
         />
       )}
 
-      {/* Header */}
-      <div className="mb-6">
-        <Button
-          variant="outline"
-          onClick={() => navigate("/classes")}
-          className="mb-4"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
-        </Button>
+      {/* Back link */}
+      <button
+        onClick={() => navigate("/classes")}
+        className="inline-flex items-center gap-1 text-sm font-medium transition-colors"
+        style={{ color: "#0d9488" }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Voltar para Turmas
+      </button>
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h1 className="text-3xl font-bold mb-2">{classData.nome}</h1>
-          {classData.teacherName && (
-            <p className="mt-2 text-stone-700">
-              Professor: {classData.teacherName}
-            </p>
-          )}
+      {/* Hero Header */}
+      <div
+        className="relative rounded-2xl px-8 py-10 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}
+      >
+        <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
+        <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <BookOpen className="w-8 h-8" />
+              {classData.nome}
+            </h1>
+            {classData.teacherName && (
+              <p className="text-teal-100 text-sm mt-2">
+                Professor: {classData.teacherName}
+              </p>
+            )}
+            <div className="flex items-center gap-4 mt-3">
+              <span className="text-sm font-medium px-3 py-1 rounded-full bg-white/15 text-white">
+                {activities.length} atividade{activities.length !== 1 ? "s" : ""}
+              </span>
+              <span className="text-sm font-medium px-3 py-1 rounded-full bg-white/15 text-white">
+                {students.length} aluno{students.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -334,12 +354,12 @@ export default function ClassDetails() {
 
         {/* Aba de Atividades */}
         <TabsContent value="activities">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Atividades da Turma</h2>
+              <h2 className="text-lg font-semibold text-stone-800">Atividades da Turma</h2>
               {hasAnyRole(["professor", "admin"]) && (
                 <Button onClick={() => setShowNewActivity(true)}
-                  className="text-white rounded-lg hover:opacity-90 font-medium transition-opacity shadow-md" style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}>
+                  className="text-white rounded-xl hover:opacity-90 font-semibold transition-opacity h-11 px-6" style={{ backgroundColor: "#0d9488" }}>
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Atividade
                 </Button>
@@ -348,9 +368,13 @@ export default function ClassDetails() {
 
             <div className="space-y-3">
               {activities.length === 0 ? (
-                <p className="text-stone-500 text-center py-8">
-                  Nenhuma atividade cadastrada para esta turma
-                </p>
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: "#ccfbf1" }}>
+                    <BookOpen className="w-7 h-7" style={{ color: "#0d9488" }} />
+                  </div>
+                  <p className="text-sm font-medium text-stone-600">Nenhuma atividade cadastrada</p>
+                  <p className="text-xs text-stone-400 mt-1">Crie a primeira atividade para esta turma</p>
+                </div>
               ) : (
                 activities.map((activity) => {
                   const dueDate = new Date(activity.dueDate);
@@ -362,11 +386,11 @@ export default function ClassDetails() {
                   return (
                     <div
                       key={activity.id}
-                      className={`p-4 pb-14 rounded-lg border-l-4 transition-colors hover:shadow-md relative ${isOverdue
+                      className={`p-4 pb-14 rounded-xl border-l-4 transition-all hover:shadow-md relative ${isOverdue
                         ? "bg-red-50 border-red-500"
                         : isPending
-                          ? "bg-yellow-50 border-yellow-500"
-                          : "bg-green-50 border-green-500"
+                          ? "bg-amber-50 border-amber-500"
+                          : "bg-emerald-50 border-emerald-500"
                         }`}
                     >
                       <div className="flex justify-between items-start">
@@ -462,11 +486,11 @@ export default function ClassDetails() {
                       </div>
 
                       <span
-                        className={`absolute bottom-3 right-10 px-2 py-1 rounded text-xs font-medium ${isOverdue
+                        className={`absolute bottom-3 right-10 px-2.5 py-1 rounded-lg text-xs font-medium ${isOverdue
                           ? "bg-red-100 text-red-700"
                           : isPending
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-green-100 text-green-700"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-emerald-100 text-emerald-700"
                           }`}
                       >
                         {isOverdue
@@ -485,9 +509,9 @@ export default function ClassDetails() {
 
         {/* Aba de Alunos */}
         <TabsContent value="students">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Alunos Matriculados</h2>
+              <h2 className="text-lg font-semibold text-stone-800">Alunos Matriculados</h2>
               {hasAnyRole(["professor", "admin"]) && (
                 <Button onClick={() => setShowAddStudent(!showAddStudent)}>
                   <UserPlus className="w-4 h-4 mr-2" />
@@ -547,9 +571,13 @@ export default function ClassDetails() {
             {/* Lista de alunos matriculados */}
             <div className="space-y-2">
               {students.length === 0 ? (
-                <p className="text-stone-500 text-center py-8">
-                  Nenhum aluno matriculado nesta turma
-                </p>
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: "#ccfbf1" }}>
+                    <Users className="w-7 h-7" style={{ color: "#0d9488" }} />
+                  </div>
+                  <p className="text-sm font-medium text-stone-600">Nenhum aluno matriculado</p>
+                  <p className="text-xs text-stone-400 mt-1">Adicione alunos a esta turma</p>
+                </div>
               ) : (
                 students.map((student) => (
                   <div
@@ -587,9 +615,9 @@ export default function ClassDetails() {
 
         {/* Aba de Jam Sessions */}
         <TabsContent value="jam">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Jam Sessions</h2>
+              <h2 className="text-lg font-semibold text-stone-800">Jam Sessions</h2>
               {hasAnyRole(["professor", "admin"]) && (
                 <Button
                   onClick={() => navigate(`/jam/create/${id}`)}
@@ -602,9 +630,12 @@ export default function ClassDetails() {
             </div>
 
             {jamSessions.length === 0 ? (
-              <div className="text-center py-8 text-stone-500">
-                <Codesandbox className="w-12 h-12 mx-auto mb-3 text-stone-300" />
-                <p>Nenhuma jam session criada ainda.</p>
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: "#ccfbf1" }}>
+                  <Codesandbox className="w-7 h-7" style={{ color: "#0d9488" }} />
+                </div>
+                <p className="text-sm font-medium text-stone-600">Nenhuma jam session criada</p>
+                <p className="text-xs text-stone-400 mt-1">Crie uma sessão para começar</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -753,7 +784,7 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between border-b border-stone-200 pb-4">
             <h2 className="text-xl font-bold text-stone-900">
@@ -781,7 +812,7 @@ function NewActivityModal({ isOpen, onClose, onSave, problems, onViewProblem }: 
                 />
               </div>
 
-              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-lg">
+              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-xl">
                 {filteredProblems.length === 0 ? (
                   <p className="text-center text-stone-500 py-8">Nenhum problema encontrado</p>
                 ) : (
@@ -881,7 +912,7 @@ function ActivityViewModal({ isOpen, onClose, activity, problem }: ActivityViewM
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between border-b border-stone-200 pb-4">
             <h2 className="text-xl font-bold text-stone-900 flex items-center">
@@ -1029,7 +1060,7 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between border-b border-stone-200 pb-4">
             <h2 className="text-xl font-bold text-stone-900">Editar Atividade</h2>
@@ -1055,7 +1086,7 @@ function EditActivityModal({ isOpen, onClose, onSave, activity, problems, onView
                 />
               </div>
 
-              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-lg">
+              <div className="mt-3 max-h-64 overflow-y-auto border border-stone-200 rounded-xl">
                 {filteredProblems.length === 0 ? (
                   <p className="text-center text-stone-500 py-8">Nenhum problema encontrado</p>
                 ) : (
@@ -1152,7 +1183,7 @@ function DeleteActivityModal({ isOpen, onClose, onConfirm, activityTitle }: Dele
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-red-100 rounded-lg">
             <Trash2 className="w-6 h-6 text-red-600" />
@@ -1426,7 +1457,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
   if (selectedSubmission) {
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
           <div className="p-6 border-b border-stone-200">
             <div className="flex items-center justify-between">
               <div>
@@ -1528,7 +1559,7 @@ function SubmissionsModal({ isOpen, onClose, activity, classId }: SubmissionsMod
   // Lista de submissões
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <div className="p-6 border-b border-stone-200">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-stone-900">Submissões da Atividade</h2>
