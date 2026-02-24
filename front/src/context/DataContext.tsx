@@ -112,7 +112,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchData();
   }, [user, userLoading]);
 
-  // Polling para atualizar submissões pendentes/processando a cada 10 segundos
+  // Polling unificado: atualiza submissões e atividades quando há submissões pendentes
   const hasPendingSubmissions = useRef(false);
   useEffect(() => {
     hasPendingSubmissions.current = submissions.some(
@@ -123,34 +123,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const intervalId = setInterval(async () => {
       if (hasPendingSubmissions.current) {
-        await updateSubmissions();
+        await Promise.all([updateSubmissions(), updateActivities()]);
       }
     }, 10000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [updateSubmissions]);
-
-  // Polling para atualizar atividades pendentes a cada 10 segundos
-  const hasPendingActivities = useRef(false);
-  useEffect(() => {
-    hasPendingActivities.current = activities.some(
-      (a: Activity) => a.status === "pending"
-    );
-  }, [activities]);
-
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      if (hasPendingActivities.current) {
-        await updateActivities();
-      }
-    }, 10000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [updateActivities]);
+  }, [updateSubmissions, updateActivities]);
 
   return (
     <DataContext.Provider

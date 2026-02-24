@@ -122,6 +122,19 @@ services:
     depends_on:
       - backend_app
 
+  # --- SERVIÇO DO JAM SERVER (WebSocket Sidecar) ---
+  jam_server:
+    build: ./jam-server
+    container_name: jam_server
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    environment:
+      - LARAVEL_API_URL=http://laravel_app:8000
+      - PORT=3001
+    depends_on:
+      - backend_app
+
   # --- SERVIÇO DE EMAIL (MAILPIT) ---
   mailpit:
     image: axllent/mailpit

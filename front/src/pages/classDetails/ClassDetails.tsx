@@ -16,6 +16,9 @@ import Notification from "@/components/Notification";
 import { ArrowLeft, UserPlus, UserMinus, Users, Search, BookOpen, Plus, X, Codesandbox, Clock, HardDrive, Calendar, MoreVertical, Pencil, Trash2, CheckCircle2, AlertCircle, XCircle, Loader2, Eye, EyeOff, Copy, Hash, Terminal, Target as TargetIcon, TestTube, FileText } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { JamSessionService } from "@/services/JamSessionService";
+import JamSessionBanner from "@/components/jam/JamSessionBanner";
+import type { JamSession } from "@/types/jam";
 import ProblemViewModal from "@/components/ProblemViewModal";
 import { RichTextViewer } from "@/components/RichTextEditor";
 import { CodeViewer } from "@/components/CodeSubmission";
@@ -57,6 +60,8 @@ export default function ClassDetails() {
   const [deletingActivity, setDeletingActivity] = useState<Activity | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [viewSubmissionsActivity, setViewSubmissionsActivity] = useState<Activity | null>(null);
+  const [jamSessions, setJamSessions] = useState<JamSession[]>([]);
+  const [activeJam, setActiveJam] = useState<JamSession | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -65,6 +70,7 @@ export default function ClassDetails() {
       loadAllStudents();
       loadClassActivities();
       loadProblems();
+      loadJamSessions();
     }
   }, [id]);
 
@@ -138,6 +144,17 @@ export default function ClassDetails() {
       setAllProblems(data);
     } catch (error) {
       console.error("Erro ao carregar problemas:", error);
+    }
+  };
+
+  const loadJamSessions = async () => {
+    try {
+      const sessions = await JamSessionService.getByTurma(Number(id));
+      setJamSessions(sessions);
+      const active = await JamSessionService.getActiveForTurma(Number(id));
+      setActiveJam(active);
+    } catch (error) {
+      console.error("Erro ao carregar jam sessions:", error);
     }
   };
 
@@ -295,9 +312,12 @@ export default function ClassDetails() {
         </div>
       </div>
 
-      {/* Tabs: Atividades e Alunos */}
+      {/* Banner de Jam Session ativa */}
+      {activeJam && <JamSessionBanner session={activeJam} />}
+
+      {/* Tabs: Atividades, Alunos e Jam Sessions */}
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="activities" className="flex items-center gap-2">
             <BookOpen className="w-4 h-4" />
             Atividades ({activities.length})
@@ -305,6 +325,10 @@ export default function ClassDetails() {
           <TabsTrigger value="students" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
             Alunos ({students.length})
+          </TabsTrigger>
+          <TabsTrigger value="jam" className="flex items-center gap-2">
+            <Codesandbox className="w-4 h-4" />
+            Jam Sessions ({jamSessions.length})
           </TabsTrigger>
         </TabsList>
 
@@ -558,6 +582,69 @@ export default function ClassDetails() {
                 ))
               )}
             </div>
+          </div>
+        </TabsContent>
+
+        {/* Aba de Jam Sessions */}
+        <TabsContent value="jam">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Jam Sessions</h2>
+              {hasAnyRole(["professor", "admin"]) && (
+                <Button
+                  onClick={() => navigate(`/jam/create/${id}`)}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nova Sessão
+                </Button>
+              )}
+            </div>
+
+            {jamSessions.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Codesandbox className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Nenhuma jam session criada ainda.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {jamSessions.map((jam) => (
+                  <div
+                    key={jam.id}
+                    onClick={() => navigate(`/jam/${jam.id}`)}
+                    className="flex items-center justify-between rounded-lg border border-gray-200 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{jam.titulo}</h3>
+                      <p className="text-sm text-gray-500">
+                        Problema: {jam.problema?.titulo || "—"}
+                        {jam.tempo_limite && ` · ${jam.tempo_limite} min`}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">
+                        {jam.participants?.length || 0} participantes
+                      </span>
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                          jam.status === "active"
+                            ? "bg-green-100 text-green-700"
+                            : jam.status === "waiting"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {jam.status === "active"
+                          ? "Ativa"
+                          : jam.status === "waiting"
+                          ? "Aguardando"
+                          : "Encerrada"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>

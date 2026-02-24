@@ -431,13 +431,14 @@ export default function SubmissionsDetails() {
   }
 
   const dueDate = formatDate(selectedActivity.dueDate);
-  // mostra apenas a data (sem horário) no cartão de detalhes
   const formattedSubmissionDateOnly = new Date(
     submission.dateSubmitted
   ).toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 
   return (

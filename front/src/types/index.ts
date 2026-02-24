@@ -123,3 +123,6 @@ export type Professor = {
 
 // Classes/Turmas
 export * from './classes';
+
+// Jam Sessions
+export * from './jam';

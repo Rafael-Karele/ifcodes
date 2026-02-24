@@ -36,6 +36,10 @@ class Submissao extends Model
         'status_correcao_id'
     ];
 
+    protected $casts = [
+        'data_submissao' => 'datetime',
+    ];
+
     public function atividade(): BelongsTo
     {
         return $this->belongsTo(Atividade::class);

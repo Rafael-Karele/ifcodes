@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\ForgotPasswordTempController; 
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\TurmaController;
+use App\Http\Controllers\JamSessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +61,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rotas de correção
     Route::get('/correcao/busca-por-submissao/{submissao}', [CorrecaoController::class, 'buscaPorSubmissao']);
+
+    // Rotas de Jam Sessions
+    Route::get('/jam-sessions', [JamSessionController::class, 'index']);
+    Route::post('/jam-sessions', [JamSessionController::class, 'store']);
+    Route::get('/jam-sessions/{id}', [JamSessionController::class, 'show']);
+    Route::post('/jam-sessions/{id}/start', [JamSessionController::class, 'start']);
+    Route::post('/jam-sessions/{id}/finish', [JamSessionController::class, 'finish']);
+    Route::post('/jam-sessions/{id}/join', [JamSessionController::class, 'join']);
+    Route::put('/jam-sessions/{id}/code', [JamSessionController::class, 'updateCode']);
+    Route::post('/jam-sessions/{id}/submit', [JamSessionController::class, 'submitCode']);
+    Route::put('/jam-sessions/{id}/feedback/{userId}', [JamSessionController::class, 'giveFeedback']);
+    Route::post('/jam-sessions/notify-result', [JamSessionController::class, 'notifyResult']);
+    Route::get('/turmas/{id}/jam-session/active', [JamSessionController::class, 'activeForTurma']);
 });
 
 // Rota pública para recuperação de senha (fora do middleware auth:sanctum)

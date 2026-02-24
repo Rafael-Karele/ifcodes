@@ -18,6 +18,10 @@ use App\Lib\Dicionarios\Status;
  */
 class SubmissaoController extends Controller
 {
+    private function resolveStatusFromDb(Submissao $submissao): int
+    {
+        return $submissao->status_correcao_id ?? Status::NA_FILA;
+    }
     /**
      * @OA\Get(
      *      path="/api/submissoes",
@@ -47,20 +51,10 @@ class SubmissaoController extends Controller
         $submissoesFormatted = collect($submissoes)->map(function (Submissao $submissao) {
             $dados = $submissao->toArray();
 
-            // Usa o getStatus() que já busca corretamente do Judge0
-            try {
-                $statusData = $submissao->getStatus();
-
-                $dados['status'] = $statusData['status'] ?? null;
-                $dados['status_descricao'] = $statusData['status'] ?? null;
-            } catch (Exception $e) {
-                \Log::error("Erro ao buscar status da submissão {$submissao->id}: " . $e->getMessage());
-
-                // Fallback para o status da submissão
-                $statusInfo = Status::get((int) $submissao->status_correcao_id) ?? null;
-                $dados['status'] = $statusInfo['nome'] ?? null;
-                $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
-            }
+            $statusFinal = $this->resolveStatusFromDb($submissao);
+            $statusInfo = Status::get((int) $statusFinal);
+            $dados['status'] = $statusInfo['nome'] ?? null;
+            $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
 
             // Adiciona informações do problema
             if ($submissao->atividade && $submissao->atividade->problema) {
@@ -179,7 +173,7 @@ class SubmissaoController extends Controller
     {
         $userId = $request->user()->id;
 
-        $submissoes = Submissao::with('atividade.problema')
+        $submissoes = Submissao::with(['atividade.problema'])
             ->where('atividade_id', $atividade)
             ->where('user_id', $userId)
             ->orderByDesc('data_submissao')
@@ -188,20 +182,10 @@ class SubmissaoController extends Controller
         $submissoesFormatted = collect($submissoes->items())->map(function (Submissao $submissao) {
             $dados = $submissao->toArray();
 
-            // Usa o getStatus() que já busca corretamente do Judge0
-            try {
-                $statusData = $submissao->getStatus();
-
-                $dados['status'] = $statusData['status'] ?? null;
-                $dados['status_descricao'] = $statusData['status'] ?? null;
-            } catch (Exception $e) {
-                \Log::error("Erro ao buscar status da submissão {$submissao->id}: " . $e->getMessage());
-
-                // Fallback para o status da submissão
-                $statusInfo = Status::get((int) $submissao->status_correcao_id) ?? null;
-                $dados['status'] = $statusInfo['nome'] ?? null;
-                $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
-            }
+            $statusFinal = $this->resolveStatusFromDb($submissao);
+            $statusInfo = Status::get((int) $statusFinal);
+            $dados['status'] = $statusInfo['nome'] ?? null;
+            $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
 
             unset($dados['status_correcao_id']);
             unset($dados['correcoes']);

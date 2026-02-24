@@ -5,7 +5,8 @@ import hideIcon from "@/assets/icons/password-hide.svg";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import Notification from "@/components/Notification";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, KeyRound, Loader2 } from "lucide-react";
+import { SectionCard } from "@/components/SectionCard";
 
 export default function ChangePassword() {
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -13,6 +14,7 @@ export default function ChangePassword() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,7 +46,7 @@ export default function ChangePassword() {
         const currentErr = validateCurrentPassword(currentPassword);
         const newErr = validateNewPassword(newPassword);
         const confirmErr = validateConfirmPassword(confirmPassword, newPassword);
-        
+
         setCurrentPasswordError(currentErr);
         setNewPasswordError(newErr);
         setConfirmPasswordError(confirmErr);
@@ -52,20 +54,19 @@ export default function ChangePassword() {
         if (currentErr || newErr || confirmErr) return;
 
         try {
+            setSubmitting(true);
             await changePassword({
                 currentPassword,
                 newPassword,
                 newPasswordConfirmation: confirmPassword
             });
-            
+
             setSuccess("Senha alterada com sucesso! Você será redirecionado para fazer login novamente.");
-            
-            // Limpa o token e redireciona após 2 segundos
+
             setTimeout(() => {
                 localStorage.removeItem("auth_token");
                 navigate("/login");
             }, 2000);
-            
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {
@@ -77,143 +78,157 @@ export default function ChangePassword() {
                 setError(`Um erro inesperado ocorreu: ${error.message}`);
                 console.log('erro: ', error);
             }
+        } finally {
+            setSubmitting(false);
         }
-        
+
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
     }
 
     return (
-        <>
+        <div className="max-w-lg mx-auto px-6 py-10 space-y-8">
             {error && <Notification type="error" message={error} onClose={() => setError(null)} />}
             {success && <Notification type="success" message={success} onClose={() => setSuccess(null)} />}
-            <div className="w-full min-h-screen flex justify-center items-start bg-white p-4 pt-20">
-                <div className="w-full max-w-md bg-white shadow-xl rounded-2xl p-8">
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 mb-6 transition-colors"
-                        title="Voltar"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        <span>Voltar</span>
-                    </button>
 
-                    <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-                        Alterar Senha
-                    </h2>
+            {/* ── header ── */}
+            <div>
+                <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors mb-4"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Voltar
+                </button>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Alterar Senha</h1>
+                <p className="text-zinc-400 text-sm mt-1">Atualize sua senha para manter a conta segura</p>
+            </div>
 
-                        {/* Senha Atual */}
+            {/* ── form ── */}
+            <SectionCard title="Nova senha" icon={KeyRound}>
+                <form onSubmit={handleSubmit} className="p-6 space-y-5">
+
+                    {/* Senha Atual */}
+                    <div>
+                        <label htmlFor="currentPassword" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                            Senha Atual
+                        </label>
                         <div className="relative">
-                            <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Senha Atual
-                            </label>
                             <input
                                 type={showCurrentPassword ? "text" : "password"}
                                 id="currentPassword"
-                                className={`block w-full border rounded-md p-2 pr-10 transition-all
-                                    ${currentPasswordError ? "border-red-500 ring-2 ring-red-400" : "border-gray-300"}
-                                `}
+                                className={`block w-full border rounded-lg px-3 py-2 pr-10 text-sm transition-all focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                                    currentPasswordError ? "border-red-300 bg-red-50/50" : "border-zinc-200 bg-white"
+                                }`}
                                 required
                                 value={currentPassword}
                                 onChange={e => setCurrentPassword(e.target.value)}
                                 onBlur={e => setCurrentPasswordError(validateCurrentPassword(e.target.value))}
                             />
-                            <span
-                                className="absolute right-3 top-9 cursor-pointer select-none text-gray-500 hover:text-gray-700 transition-colors"
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
                                 onClick={() => setShowCurrentPassword(v => !v)}
                                 title={showCurrentPassword ? "Ocultar senha" : "Mostrar senha"}
                             >
                                 <img
                                     src={showCurrentPassword ? hideIcon : showIcon}
                                     alt={showCurrentPassword ? "Ocultar senha" : "Mostrar senha"}
-                                    width={20}
-                                    height={20}
+                                    width={18}
+                                    height={18}
                                 />
-                            </span>
-                            {currentPasswordError && (
-                                <span className="text-red-600 text-sm mt-1 block animate-pulse">{currentPasswordError}</span>
-                            )}
+                            </button>
                         </div>
+                        {currentPasswordError && (
+                            <p className="text-red-600 text-xs mt-1.5">{currentPasswordError}</p>
+                        )}
+                    </div>
 
-                        {/* Nova Senha */}
+                    {/* Nova Senha */}
+                    <div>
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                            Nova Senha
+                        </label>
                         <div className="relative">
-                            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Nova Senha
-                            </label>
                             <input
                                 type={showNewPassword ? "text" : "password"}
                                 id="newPassword"
-                                className={`block w-full border rounded-md p-2 pr-10 transition-all
-                                    ${newPasswordError ? "border-red-500 ring-2 ring-red-400" : "border-gray-300"}
-                                `}
+                                className={`block w-full border rounded-lg px-3 py-2 pr-10 text-sm transition-all focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                                    newPasswordError ? "border-red-300 bg-red-50/50" : "border-zinc-200 bg-white"
+                                }`}
                                 required
                                 value={newPassword}
                                 onChange={e => setNewPassword(e.target.value)}
                                 onBlur={e => setNewPasswordError(validateNewPassword(e.target.value))}
                             />
-                            <span
-                                className="absolute right-3 top-9 cursor-pointer select-none text-gray-500 hover:text-gray-700 transition-colors"
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
                                 onClick={() => setShowNewPassword(v => !v)}
                                 title={showNewPassword ? "Ocultar senha" : "Mostrar senha"}
                             >
                                 <img
                                     src={showNewPassword ? hideIcon : showIcon}
                                     alt={showNewPassword ? "Ocultar senha" : "Mostrar senha"}
-                                    width={20}
-                                    height={20}
+                                    width={18}
+                                    height={18}
                                 />
-                            </span>
-                            {newPasswordError && (
-                                <span className="text-red-600 text-sm mt-1 block animate-pulse">{newPasswordError}</span>
-                            )}
+                            </button>
                         </div>
+                        {newPasswordError && (
+                            <p className="text-red-600 text-xs mt-1.5">{newPasswordError}</p>
+                        )}
+                    </div>
 
-                        {/* Confirmar Nova Senha */}
+                    {/* Confirmar Nova Senha */}
+                    <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-zinc-700 mb-1.5">
+                            Confirmar Nova Senha
+                        </label>
                         <div className="relative">
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                                Confirmar Nova Senha
-                            </label>
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
                                 id="confirmPassword"
-                                className={`block w-full border rounded-md p-2 pr-10 transition-all
-                                    ${confirmPasswordError ? "border-red-500 ring-2 ring-red-400" : "border-gray-300"}
-                                `}
+                                className={`block w-full border rounded-lg px-3 py-2 pr-10 text-sm transition-all focus:ring-2 focus:ring-teal-500 focus:border-transparent ${
+                                    confirmPasswordError ? "border-red-300 bg-red-50/50" : "border-zinc-200 bg-white"
+                                }`}
                                 required
                                 value={confirmPassword}
                                 onChange={e => setConfirmPassword(e.target.value)}
                                 onBlur={e => setConfirmPasswordError(validateConfirmPassword(e.target.value, newPassword))}
                             />
-                            <span
-                                className="absolute right-3 top-9 cursor-pointer select-none text-gray-500 hover:text-gray-700 transition-colors"
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
                                 onClick={() => setShowConfirmPassword(v => !v)}
                                 title={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
                             >
                                 <img
                                     src={showConfirmPassword ? hideIcon : showIcon}
                                     alt={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
-                                    width={20}
-                                    height={20}
+                                    width={18}
+                                    height={18}
                                 />
-                            </span>
-                            {confirmPasswordError && (
-                                <span className="text-red-600 text-sm mt-1 block animate-pulse">{confirmPasswordError}</span>
-                            )}
+                            </button>
                         </div>
+                        {confirmPasswordError && (
+                            <p className="text-red-600 text-xs mt-1.5">{confirmPasswordError}</p>
+                        )}
+                    </div>
 
-                        <button 
-                            type="submit" 
-                            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg text-white font-semibold p-3 transition duration-300"
-                        >
-                            Alterar Senha
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </>
-    )
+                    <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-white text-sm font-medium py-2.5 transition-colors"
+                    >
+                        {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {submitting ? "Alterando..." : "Alterar Senha"}
+                    </button>
+                </form>
+            </SectionCard>
+        </div>
+    );
 }
