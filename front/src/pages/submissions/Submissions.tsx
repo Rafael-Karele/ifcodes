@@ -368,13 +368,14 @@ export default function Submissions() {
             </TableHeader>
             <TableBody>
               {sortedSubmissions.map((submission) => {
-                // mostra apenas a data (sem horário) na tabela principal
                 const formattedDateOnly = new Date(
                   submission.dateSubmitted
                 ).toLocaleDateString("pt-BR", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
                 });
                 
                 // Usa o título do problema que vem do backend
