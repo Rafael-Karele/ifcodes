@@ -18,6 +18,10 @@ use App\Lib\Dicionarios\Status;
  */
 class SubmissaoController extends Controller
 {
+    private function resolveStatusFromDb(Submissao $submissao): int
+    {
+        return $submissao->status_correcao_id ?? Status::NA_FILA;
+    }
     /**
      * @OA\Get(
      *      path="/api/submissoes",
@@ -47,7 +51,8 @@ class SubmissaoController extends Controller
         $submissoesFormatted = collect($submissoes)->map(function (Submissao $submissao) {
             $dados = $submissao->toArray();
 
-            $statusInfo = Status::get((int) ($submissao->status_correcao_id ?? Status::NA_FILA));
+            $statusFinal = $this->resolveStatusFromDb($submissao);
+            $statusInfo = Status::get((int) $statusFinal);
             $dados['status'] = $statusInfo['nome'] ?? null;
             $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
 
@@ -168,7 +173,7 @@ class SubmissaoController extends Controller
     {
         $userId = $request->user()->id;
 
-        $submissoes = Submissao::with('atividade.problema')
+        $submissoes = Submissao::with(['atividade.problema'])
             ->where('atividade_id', $atividade)
             ->where('user_id', $userId)
             ->orderByDesc('data_submissao')
@@ -177,7 +182,8 @@ class SubmissaoController extends Controller
         $submissoesFormatted = collect($submissoes->items())->map(function (Submissao $submissao) {
             $dados = $submissao->toArray();
 
-            $statusInfo = Status::get((int) ($submissao->status_correcao_id ?? Status::NA_FILA));
+            $statusFinal = $this->resolveStatusFromDb($submissao);
+            $statusInfo = Status::get((int) $statusFinal);
             $dados['status'] = $statusInfo['nome'] ?? null;
             $dados['status_descricao'] = $statusInfo['descricao'] ?? null;
 

@@ -18,6 +18,8 @@ import Problems from "@/pages/problems/Problems";
 import RequireAuth from "@/pages/RequireAuth";
 import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
+import JamCreate from "@/pages/jam/JamCreate";
+import JamView from "@/pages/jam/JamView";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 
 function NotFound() {
@@ -73,6 +75,10 @@ export default function AppRouter() {
               <Route path="classes">
                 <Route index element={<Classes />} />
                 <Route path=":id" element={<ClassDetails />} />
+              </Route>
+              <Route path="jam">
+                <Route path="create/:turmaId" element={<JamCreate />} />
+                <Route path=":jamId" element={<JamView />} />
               </Route>
             </Route>
           </Route>

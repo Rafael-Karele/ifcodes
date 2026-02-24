@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Submission } from "@/types";
 import {
   Table,
@@ -169,11 +169,6 @@ export default function Submissions() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
-
-  // Força atualização quando a página é montada
-  useEffect(() => {
-    updateSubmissions();
-  }, []);
 
   // Calcula estatísticas rápidas sobre as submissões
   const stats = useMemo(() => {

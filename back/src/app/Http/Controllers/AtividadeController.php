@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\ProblemaService;
 use App\Models\Atividade;
+use App\Models\Submissao;
+use App\Lib\Dicionarios\Status;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -41,6 +43,23 @@ class AtividadeController extends Controller
         }
 
         $atividades = $query->get();
+
+        $userId = auth()->id();
+        $acceptedActivityIds = Submissao::where('user_id', $userId)
+            ->where('status_correcao_id', Status::ACEITA)
+            ->distinct()
+            ->pluck('atividade_id')
+            ->toArray();
+
+        $atividades->each(function ($atividade) use ($acceptedActivityIds) {
+            if (in_array($atividade->id, $acceptedActivityIds)) {
+                $atividade->setAttribute('status', 'completed');
+            } elseif (now()->greaterThan($atividade->data_entrega)) {
+                $atividade->setAttribute('status', 'overdue');
+            } else {
+                $atividade->setAttribute('status', 'pending');
+            }
+        });
 
         return response()->json($atividades);
     }
