@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Editor from "@monaco-editor/react";
+import Editor, { type OnMount } from "@monaco-editor/react";
 import { RichTextViewer } from "@/components/RichTextEditor";
 import JamTimer from "@/components/jam/JamTimer";
 import type { JamSession, JamParticipant, JamStreamParticipant } from "@/types/jam";
@@ -13,6 +13,7 @@ interface JamStudentViewProps {
   participants: JamStreamParticipant[];
   submissionResult: JamSubmissionResult | null;
   onUpdateCode: (code: string) => void;
+  onUpdateCursor: (line: number, column: number) => void;
   onSubmitCode: () => void;
 }
 
@@ -24,10 +25,19 @@ export default function JamStudentView({
   participants,
   submissionResult,
   onUpdateCode,
+  onUpdateCursor,
   onSubmitCode,
 }: JamStudentViewProps) {
   const [code, setCode] = useState(myParticipant?.codigo || DEFAULT_CODE);
   const [submitting, setSubmitting] = useState(false);
+  const onUpdateCursorRef = useRef(onUpdateCursor);
+  onUpdateCursorRef.current = onUpdateCursor;
+
+  const handleEditorMount: OnMount = (editor) => {
+    editor.onDidChangeCursorPosition((e) => {
+      onUpdateCursorRef.current(e.position.lineNumber, e.position.column);
+    });
+  };
 
   // Find my stream data for real-time status/feedback
   const myStream = participants.find((p) => p.userId === myParticipant?.user_id);
@@ -147,6 +157,7 @@ export default function JamStudentView({
               language="c"
               value={code}
               onChange={handleCodeChange}
+              onMount={handleEditorMount}
               theme="vs-dark"
               options={{
                 minimap: { enabled: false },

@@ -65,6 +65,7 @@ export interface JamStreamParticipant {
   status: string;
   feedback: FeedbackEntry[];
   online: boolean;
+  cursor?: { line: number; column: number };
 }
 
 export interface JamStreamData {

@@ -11,6 +11,7 @@ export interface ParticipantState {
   status: string;
   feedback: FeedbackEntry[];
   online: boolean;
+  cursor?: { line: number; column: number };
 }
 
 export interface SessionState {
@@ -54,6 +55,15 @@ export function setParticipantOnline(jamId: number, userId: number, online: bool
   if (!session) return;
   const p = session.participants.get(userId);
   if (p) p.online = online;
+}
+
+export function updateParticipantCursor(jamId: number, userId: number, cursor: { line: number; column: number }): boolean {
+  const session = sessions.get(jamId);
+  if (!session) return false;
+  const p = session.participants.get(userId);
+  if (!p) return false;
+  p.cursor = cursor;
+  return true;
 }
 
 export function updateParticipantCode(jamId: number, userId: number, code: string): boolean {

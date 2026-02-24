@@ -29,6 +29,7 @@ export default function JamView() {
     connected,
     error,
     updateCode,
+    updateCursor,
     submitCode,
     startSession,
     endSession,
@@ -153,6 +154,7 @@ export default function JamView() {
               participants={participants}
               submissionResult={myParticipant ? submissionResults[myParticipant.user_id] || null : null}
               onUpdateCode={updateCode}
+              onUpdateCursor={updateCursor}
               onSubmitCode={submitCode}
             />
           )

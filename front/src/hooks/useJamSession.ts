@@ -21,6 +21,7 @@ interface UseJamSessionReturn {
   connected: boolean;
   error: string | null;
   updateCode: (code: string) => void;
+  updateCursor: (line: number, column: number) => void;
   submitCode: () => void;
   startSession: () => void;
   endSession: () => void;
@@ -38,6 +39,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const codeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cursorDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldReconnectRef = useRef(true);
   const sessionStatusRef = useRef<string | null>(null);
 
@@ -83,6 +85,14 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
                 return { ...prev, ...updates };
               });
             }
+            break;
+
+          case "CURSOR_UPDATE":
+            setParticipants((prev) =>
+              prev.map((p) =>
+                p.userId === msg.userId ? { ...p, cursor: msg.cursor } : p
+              )
+            );
             break;
 
           case "SUBMISSION_RESULT":
@@ -138,6 +148,9 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
       if (codeDebounceRef.current) {
         clearTimeout(codeDebounceRef.current);
       }
+      if (cursorDebounceRef.current) {
+        clearTimeout(cursorDebounceRef.current);
+      }
       if (wsRef.current) {
         wsRef.current.close();
       }
@@ -154,6 +167,17 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
         wsRef.current.send(JSON.stringify({ type: "UPDATE_CODE", code }));
       }
     }, 500);
+  }, []);
+
+  const updateCursor = useCallback((line: number, column: number) => {
+    if (cursorDebounceRef.current) {
+      clearTimeout(cursorDebounceRef.current);
+    }
+    cursorDebounceRef.current = setTimeout(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ type: "UPDATE_CURSOR", line, column }));
+      }
+    }, 100);
   }, []);
 
   const submitCode = useCallback(() => {
@@ -194,6 +218,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     connected,
     error,
     updateCode,
+    updateCursor,
     submitCode,
     startSession,
     endSession,

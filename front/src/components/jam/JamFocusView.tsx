@@ -1,9 +1,37 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, Send, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
-import Editor from "@monaco-editor/react";
+import Editor, { type OnMount } from "@monaco-editor/react";
+import type { editor as monacoEditor } from "monaco-editor";
 import { Button } from "@/components/ui/button";
 import type { JamStreamParticipant } from "@/types/jam";
 import type { JamSubmissionResult } from "@/hooks/useJamSession";
+
+function injectJamCursorStyles() {
+  const styleId = "jam-cursor-styles";
+  if (document.getElementById(styleId)) return;
+  const style = document.createElement("style");
+  style.id = styleId;
+  style.textContent = `
+    .jam-cursor-line {
+      background: rgba(250, 204, 21, 0.12);
+    }
+    .jam-cursor-caret {
+      border-left: 2px solid #facc15;
+      margin-left: -1px;
+      animation: jam-caret-blink 1s step-end infinite;
+    }
+    .jam-cursor-char {
+      outline: 1.5px solid rgba(250, 204, 21, 0.7);
+      border-radius: 1px;
+      background: rgba(250, 204, 21, 0.18);
+    }
+    @keyframes jam-caret-blink {
+      0%, 100% { border-left-color: #facc15; }
+      50% { border-left-color: transparent; }
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 interface JamFocusViewProps {
   participant: JamStreamParticipant;
@@ -23,7 +51,64 @@ const statusLabels: Record<string, string> = {
 
 export default function JamFocusView({ participant, submissionResult, onClose, onGiveFeedback }: JamFocusViewProps) {
   const [feedback, setFeedback] = useState("");
+  const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null);
+  const decorationsRef = useRef<monacoEditor.IEditorDecorationsCollection | null>(null);
   const compileError = submissionResult?.testResults?.find((t) => t.compile_output)?.compile_output || null;
+
+  const handleEditorMount: OnMount = (editor) => {
+    editorRef.current = editor;
+  };
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || !participant.cursor) return;
+
+    const { line, column } = participant.cursor;
+    editor.revealLineInCenter(line);
+
+    const newDecorations: monacoEditor.IModelDeltaDecoration[] = [
+      {
+        range: {
+          startLineNumber: line,
+          startColumn: 1,
+          endLineNumber: line,
+          endColumn: 1,
+        },
+        options: {
+          isWholeLine: true,
+          className: "jam-cursor-line",
+        },
+      },
+      {
+        range: {
+          startLineNumber: line,
+          startColumn: column,
+          endLineNumber: line,
+          endColumn: column,
+        },
+        options: {
+          beforeContentClassName: "jam-cursor-caret",
+        },
+      },
+      {
+        range: {
+          startLineNumber: line,
+          startColumn: column,
+          endLineNumber: line,
+          endColumn: column + 1,
+        },
+        options: {
+          inlineClassName: "jam-cursor-char",
+        },
+      },
+    ];
+
+    if (decorationsRef.current) {
+      decorationsRef.current.set(newDecorations);
+    } else {
+      decorationsRef.current = editor.createDecorationsCollection(newDecorations);
+    }
+  }, [participant.cursor?.line, participant.cursor?.column, participant.code]);
 
   const handleSendFeedback = () => {
     if (feedback.trim()) {
@@ -59,12 +144,16 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
               height="100%"
               language="c"
               value={participant.code || "// Sem código"}
+              onMount={handleEditorMount}
               theme="vs-dark"
               options={{
                 readOnly: true,
                 minimap: { enabled: true },
                 fontSize: 14,
                 scrollBeyondLastLine: false,
+              }}
+              beforeMount={() => {
+                injectJamCursorStyles();
               }}
             />
           </div>

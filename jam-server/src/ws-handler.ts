@@ -15,6 +15,7 @@ import {
   setParticipant,
   setParticipantOnline,
   updateParticipantCode,
+  updateParticipantCursor,
   updateParticipantStatus,
   updateParticipantFeedback,
   updateSessionStatus,
@@ -285,6 +286,21 @@ export async function handleConnection(ws: WebSocket) {
         if (session) {
           broadcastToJam(client.jamId, 'STATE_UPDATE', serializeSession(session));
         }
+        break;
+      }
+
+      case 'UPDATE_CURSOR': {
+        const client = clients.get(ws)!;
+        const { line, column } = msg;
+        if (typeof line !== 'number' || typeof column !== 'number') return;
+
+        updateParticipantCursor(client.jamId, client.user.id, { line, column });
+
+        // Lightweight broadcast — no STATE_UPDATE
+        broadcastToJam(client.jamId, 'CURSOR_UPDATE', {
+          userId: client.user.id,
+          cursor: { line, column },
+        });
         break;
       }
 

@@ -119,7 +119,7 @@ export default function JamProfessorView({
       </div>
 
       {/* Student Grid */}
-      <div className="grid flex-1 grid-cols-2 gap-4 overflow-y-auto md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid flex-1 auto-rows-min grid-cols-2 content-start gap-4 overflow-y-auto md:grid-cols-3 lg:grid-cols-4">
         {participants.map((p) => (
           <JamStudentCard
             key={p.userId}
