@@ -61,6 +61,13 @@ export default function JamView() {
 
   const isProfessor = hasAnyRole(["professor", "admin"]);
 
+  // When WS reports session finished, re-fetch REST data to get final state
+  useEffect(() => {
+    if (wsSession?.status === "finished" && jamIdNum) {
+      JamSessionService.getById(jamIdNum).then(setRestSession).catch(() => {});
+    }
+  }, [wsSession?.status, jamIdNum]);
+
   // Load session via REST and auto-join
   useEffect(() => {
     if (!jamIdNum) return;

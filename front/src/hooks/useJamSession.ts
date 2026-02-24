@@ -50,6 +50,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     wsRef.current = ws;
 
     ws.onopen = () => {
+      if (wsRef.current !== ws) return; // Stale WS, ignore
       setConnected(true);
       setError(null);
       // Authenticate
@@ -61,6 +62,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     };
 
     ws.onmessage = (event) => {
+      if (wsRef.current !== ws) return; // Stale WS, ignore
       try {
         const msg = JSON.parse(event.data);
 
@@ -123,6 +125,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     };
 
     ws.onclose = () => {
+      if (wsRef.current !== ws) return; // Stale WS, ignore
       setConnected(false);
       // Only reconnect if session is not finished and component is still mounted
       if (shouldReconnectRef.current && sessionStatusRef.current !== "finished") {
@@ -133,11 +136,13 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     };
 
     ws.onerror = () => {
+      if (wsRef.current !== ws) return; // Stale WS, ignore
       setError("Erro de conexão WebSocket");
     };
   }, [jamId]);
 
   useEffect(() => {
+    shouldReconnectRef.current = true;
     connect();
 
     return () => {
