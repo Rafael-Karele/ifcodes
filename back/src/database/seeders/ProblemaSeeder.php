@@ -200,7 +200,7 @@ class ProblemaSeeder extends Seeder
             ]);
         }
 
-        // Bruno - submissão pendente na atividade 3
+        // Bruno - submissão aceita na atividade 3
         if ($bruno && $a3) {
             Submissao::create([
                 'data_submissao' => now(),
@@ -208,7 +208,7 @@ class ProblemaSeeder extends Seeder
                 'linguagem' => 50, // C
                 'atividade_id' => $a3->id,
                 'user_id' => $bruno->id,
-                'status_correcao_id' => 1, // Na Fila
+                'status_correcao_id' => 3, // Aceita
             ]);
         }
 
