@@ -90,7 +90,7 @@ export default function JamStudentView({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-3">
         <div>
@@ -114,7 +114,7 @@ export default function JamStudentView({
       </div>
 
       {/* Main Content - 3 Panels */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left Panel - Problem Statement */}
         <div className="w-1/3 overflow-y-auto border-r border-stone-200 bg-white p-4">
           <h3 className="mb-3 text-sm font-semibold text-stone-700">Enunciado</h3>
@@ -134,8 +134,8 @@ export default function JamStudentView({
         </div>
 
         {/* Center Panel - Code Editor */}
-        <div className="flex flex-1 flex-col">
-          <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-4 py-2">
+        <div className="flex flex-1 min-h-0 flex-col">
+          <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-4 py-2 shrink-0">
             <span className="text-sm font-medium text-stone-600">Editor de Código</span>
             <Button
               onClick={handleSubmit}
@@ -152,7 +152,7 @@ export default function JamStudentView({
               Submeter
             </Button>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-h-0">
             <Editor
               height="100%"
               language="c"
