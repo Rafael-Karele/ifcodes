@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Atividade;
 use App\Models\CasoTeste;
+use App\Models\Correcao;
 use App\Models\Problema;
 use App\Models\Professor;
 use App\Models\Submissao;
@@ -176,9 +177,22 @@ class ProblemaSeeder extends Seeder
         $bruno = User::where('email', 'bruno.dias@email.com')->first();
         $carlos = User::where('email', 'carlos.eduardo@email.com')->first();
 
+        // Helper: cria correções para cada caso de teste do problema
+        $createCorrecoes = function (Submissao $submissao, Problema $problema, int $statusId) {
+            $casosTeste = CasoTeste::where('problema_id', $problema->id)->get();
+            foreach ($casosTeste as $caso) {
+                Correcao::create([
+                    'token' => 'seed-' . $submissao->id . '-' . $caso->id,
+                    'status_correcao_id' => $statusId,
+                    'submissao_id' => $submissao->id,
+                    'caso_teste_id' => $caso->id,
+                ]);
+            }
+        };
+
         // Ana - submissão aceita na atividade 1
         if ($ana && $a1) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now()->subDays(1),
                 'codigo' => "a = int(input())\nb = int(input())\nprint(a + b)",
                 'linguagem' => 71, // Python
@@ -186,11 +200,12 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $ana->id,
                 'status_correcao_id' => 3, // Aceita
             ]);
+            $createCorrecoes($sub, $p1, 3);
         }
 
-        // Ana - submissão com resposta errada na atividade 2
+        // Ana - submissão aceita na atividade 2
         if ($ana && $a2) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now()->subDays(2),
                 'codigo' => "n = int(input())\nif n % 2 == 0:\n    print('par')\nelse:\n    print('impar')",
                 'linguagem' => 71,
@@ -198,11 +213,12 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $ana->id,
                 'status_correcao_id' => 3, // Aceita
             ]);
+            $createCorrecoes($sub, $p2, 3);
         }
 
         // Bruno - submissão aceita na atividade 3
         if ($bruno && $a3) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now(),
                 'codigo' => "#include <stdio.h>\nint main() {\n    int n;\n    scanf(\"%d\", &n);\n    long long fat = 1;\n    for(int i = 2; i <= n; i++) fat *= i;\n    printf(\"%lld\", fat);\n    return 0;\n}",
                 'linguagem' => 50, // C
@@ -210,11 +226,12 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $bruno->id,
                 'status_correcao_id' => 3, // Aceita
             ]);
+            $createCorrecoes($sub, $p3, 3);
         }
 
         // Carlos - submissão aceita na atividade 4
         if ($carlos && $a4) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now()->subDays(5),
                 'codigo' => "n = int(input())\na, b = 0, 1\nfor _ in range(n):\n    a, b = b, a + b\nprint(a)",
                 'linguagem' => 71,
@@ -222,11 +239,12 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $carlos->id,
                 'status_correcao_id' => 3, // Aceita
             ]);
+            $createCorrecoes($sub, $p4, 3);
         }
 
         // Carlos - submissão com erro de compilação na atividade 6
         if ($carlos && $a6) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now()->subDays(1),
                 'codigo' => "#include <stdio.h>\nint main() {\n    int n;\n    scanf(\"%d\", &n)\n    int max = -999999;\n    for(int i=0;i<n;i++){int x;scanf(\"%d\",&x);if(x>max)max=x;}\n    printf(\"%d\",max);\n}",
                 'linguagem' => 50,
@@ -234,11 +252,12 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $carlos->id,
                 'status_correcao_id' => 6, // Erro de Compilação
             ]);
+            $createCorrecoes($sub, $p6, 6);
         }
 
         // Ana - submissão na atividade vencida (atividade 5)
         if ($ana && $a5) {
-            Submissao::create([
+            $sub = Submissao::create([
                 'data_submissao' => now()->subDays(5),
                 'codigo' => "s = input()\nprint(s[::-1])",
                 'linguagem' => 71,
@@ -246,6 +265,7 @@ class ProblemaSeeder extends Seeder
                 'user_id' => $ana->id,
                 'status_correcao_id' => 3, // Aceita
             ]);
+            $createCorrecoes($sub, $p5, 3);
         }
     }
 }
