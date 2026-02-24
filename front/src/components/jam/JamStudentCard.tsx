@@ -166,14 +166,22 @@ export default function JamStudentCard({
         interactEndRef.current = Date.now();
         card.style.zIndex = "";
         card.style.opacity = "";
-        card.style.left = "";
-        card.style.top = "";
 
-        onLayoutChange({
-          ...layout,
-          x: Math.max(0, startLeft + (ev.clientX - startX)),
-          y: Math.max(0, startTop + (ev.clientY - startY)),
-        });
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          card.style.left = "";
+          card.style.top = "";
+          onLayoutChange({
+            ...layout,
+            x: Math.max(0, startLeft + dx),
+            y: Math.max(0, startTop + dy),
+          });
+        } else {
+          // Restaura posição original (React não re-renderiza sem onLayoutChange)
+          card.style.left = `${startLeft}px`;
+          card.style.top = `${startTop}px`;
+        }
       };
 
       document.addEventListener("mousemove", onMouseMove);
