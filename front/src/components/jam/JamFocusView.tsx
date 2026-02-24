@@ -168,10 +168,29 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
                 </div>
                 <div className="space-y-2 p-4">
                   {participant.status === "passed" && (
-                    <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
-                      <CheckCircle2 className="h-4 w-4 shrink-0" />
-                      <span className="text-sm font-medium">Todos os testes passaram!</span>
-                    </div>
+                    <>
+                      <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-green-700">
+                        <CheckCircle2 className="h-4 w-4 shrink-0" />
+                        <span className="text-sm font-medium">Todos os testes passaram!</span>
+                      </div>
+                      {submissionResult?.testResults && (
+                        <div className="space-y-1">
+                          {submissionResult.testResults.map((t, i) => (
+                            <div
+                              key={i}
+                              className="rounded-lg border border-green-200 bg-green-50 p-2 text-xs text-green-700"
+                            >
+                              <div className="font-medium">Teste {i + 1}: {t.status}</div>
+                              {t.stdout && (
+                                <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-green-600 leading-relaxed">
+                                  {t.stdout}
+                                </pre>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                   {(participant.status === "failed" || participant.status === "error") && (
                     <>
@@ -203,7 +222,12 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
                                   : "border-red-200 bg-red-50 text-red-700"
                               }`}
                             >
-                              <span className="font-medium">Teste {i + 1}:</span> {t.status}
+                              <div className="font-medium">Teste {i + 1}: {t.status}</div>
+                              {t.stdout && (
+                                <pre className="mt-1 whitespace-pre-wrap break-words font-mono leading-relaxed">
+                                  {t.stdout}
+                                </pre>
+                              )}
                             </div>
                           ))}
                         </div>
