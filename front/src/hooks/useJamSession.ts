@@ -37,6 +37,8 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const codeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldReconnectRef = useRef(true);
+  const sessionStatusRef = useRef<string | null>(null);
 
   const connect = useCallback(() => {
     if (!jamId) return;
@@ -64,11 +66,13 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
             setSession(msg.session);
             setParticipants(msg.participants || []);
             setMyParticipant(msg.myParticipant);
+            sessionStatusRef.current = msg.session?.status || null;
             break;
 
           case "STATE_UPDATE":
             setParticipants(msg.participants || []);
             if (msg.status) {
+              sessionStatusRef.current = msg.status;
               setSession((prev) =>
                 prev ? { ...prev, status: msg.status, started_at: msg.startedAt } : prev
               );
@@ -104,10 +108,12 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
 
     ws.onclose = () => {
       setConnected(false);
-      // Reconnect after 3 seconds
-      reconnectTimeoutRef.current = setTimeout(() => {
-        connect();
-      }, 3000);
+      // Only reconnect if session is not finished and component is still mounted
+      if (shouldReconnectRef.current && sessionStatusRef.current !== "finished") {
+        reconnectTimeoutRef.current = setTimeout(() => {
+          connect();
+        }, 3000);
+      }
     };
 
     ws.onerror = () => {
@@ -119,6 +125,7 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     connect();
 
     return () => {
+      shouldReconnectRef.current = false;
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }

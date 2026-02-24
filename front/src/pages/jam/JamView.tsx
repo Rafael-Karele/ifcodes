@@ -4,6 +4,7 @@ import { ArrowLeft, Wifi, WifiOff } from "lucide-react";
 import { useJamSession } from "@/hooks/useJamSession";
 import { useUserRole } from "@/hooks/useUserRole";
 import { JamSessionService } from "@/services/JamSessionService";
+import type { JamSession } from "@/types/jam";
 import Loading from "@/components/Loading";
 import JamLobby from "./JamLobby";
 import JamProfessorView from "./JamProfessorView";
@@ -13,12 +14,15 @@ export default function JamView() {
   const { jamId } = useParams<{ jamId: string }>();
   const navigate = useNavigate();
   const { hasAnyRole } = useUserRole();
-  const [joining, setJoining] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [restSession, setRestSession] = useState<JamSession | null>(null);
 
   const jamIdNum = jamId ? Number(jamId) : null;
+  const isFinished = restSession?.status === "finished";
 
+  // Only connect WS if session is not finished
   const {
-    session,
+    session: wsSession,
     participants,
     myParticipant,
     submissionResults,
@@ -29,31 +33,61 @@ export default function JamView() {
     startSession,
     endSession,
     giveFeedback,
-  } = useJamSession(jamIdNum);
+  } = useJamSession(isFinished ? null : jamIdNum);
+
+  // Use WS session when available, fall back to REST session
+  const session = wsSession || restSession;
 
   const isProfessor = hasAnyRole(["professor", "admin"]);
 
-  // Auto-join on mount (for students)
+  // Load session via REST and auto-join
   useEffect(() => {
     if (!jamIdNum) return;
 
-    const joinSession = async () => {
+    const init = async () => {
       try {
-        await JamSessionService.join(jamIdNum);
+        // Load session data via REST first
+        const sessionData = await JamSessionService.getById(jamIdNum);
+        setRestSession(sessionData);
+
+        // Only try to join if session is not finished
+        if (sessionData.status !== "finished") {
+          try {
+            await JamSessionService.join(jamIdNum);
+          } catch {
+            // May already be joined, that's ok
+          }
+        }
       } catch {
-        // May already be joined, that's ok
+        // Session not found or error
       } finally {
-        setJoining(false);
+        setLoading(false);
       }
     };
 
-    joinSession();
+    init();
   }, [jamIdNum]);
 
-  if (joining || !session) {
+  if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
         <Loading />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500">Sessão não encontrada.</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 text-sm text-blue-600 hover:underline"
+          >
+            Voltar
+          </button>
+        </div>
       </div>
     );
   }

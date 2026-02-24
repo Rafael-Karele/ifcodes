@@ -1,22 +1,22 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('jam_participants', function (Blueprint $table) {
-            $table->json('feedback')->nullable()->change();
-        });
+        // Clear any non-JSON feedback values first
+        DB::table('jam_participants')
+            ->whereNotNull('feedback')
+            ->update(['feedback' => null]);
+
+        DB::statement('ALTER TABLE jam_participants ALTER COLUMN feedback TYPE json USING feedback::json');
     }
 
     public function down(): void
     {
-        Schema::table('jam_participants', function (Blueprint $table) {
-            $table->text('feedback')->nullable()->change();
-        });
+        DB::statement('ALTER TABLE jam_participants ALTER COLUMN feedback TYPE text USING feedback::text');
     }
 };
