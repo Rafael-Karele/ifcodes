@@ -23,7 +23,6 @@ import {
   Target,
   ArrowRight,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -425,7 +424,7 @@ export default function Submissions() {
               className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
               style={{ background: palette.accentLight }}
             >
-              <Sparkles className="w-9 h-9" style={{ color: palette.accent }} />
+              <FileText className="w-9 h-9" style={{ color: palette.accent }} />
             </div>
             <p className="text-lg font-semibold text-stone-700">
               {searchTerm || statusFilter !== "all"
