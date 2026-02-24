@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import type { editor as monacoEditor } from "monaco-editor";
 import { GripHorizontal, Move } from "lucide-react";
@@ -74,9 +74,24 @@ export default function JamStudentCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const interactingRef = useRef(false);
   const interactEndRef = useRef(0);
+  const fontSizeRef = useRef(10);
+  const [fontSize, setFontSize] = useState(10);
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
+
+    // Capture wheel on Monaco's DOM to zoom font size
+    const domNode = editor.getDomNode();
+    if (domNode) {
+      domNode.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const next = Math.min(24, Math.max(6, fontSizeRef.current + (e.deltaY < 0 ? 1 : -1)));
+        fontSizeRef.current = next;
+        setFontSize(next);
+        editor.updateOptions({ fontSize: next });
+      }, { passive: false });
+    }
   };
 
   // Re-layout Monaco when card size changes
@@ -86,6 +101,7 @@ export default function JamStudentCard({
     }, 50);
     return () => clearTimeout(timer);
   }, [layout.w, layout.h]);
+
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -300,7 +316,7 @@ export default function JamStudentCard({
             minimap: { enabled: false },
             lineNumbers: "off",
             scrollBeyondLastLine: false,
-            fontSize: 10,
+            fontSize,
             folding: false,
             glyphMargin: false,
             lineDecorationsWidth: 0,
