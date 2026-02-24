@@ -376,21 +376,11 @@ export default function SubmissionsDetails() {
 
       setLoading(true);
       try {
-        const submissionResultCall = getResultBySubmissionId(
+        const submissionResult = await getResultBySubmissionId(
           Number(submissionId)
         );
 
-        const [submissionResult] = await Promise.all([submissionResultCall]);
-
         setResults(submissionResult);
-
-        // Se o problema não estiver no cache e temos a atividade, busca diretamente
-        if (selectedActivity && !mapProblems.get(selectedActivity.problemId)) {
-          const problem = await getProblemById(String(selectedActivity.problemId));
-          if (problem) {
-            setFetchedProblem(problem);
-          }
-        }
       } catch (error) {
         console.error("Failed to fetch submission details:", error);
       } finally {
@@ -398,7 +388,18 @@ export default function SubmissionsDetails() {
       }
     };
     fetchData();
-  }, [submissionId, selectedActivity, mapProblems]);
+  }, [submissionId]);
+
+  // Busca o problema separadamente quando a atividade estiver disponível
+  useEffect(() => {
+    if (selectedActivity && !mapProblems.get(selectedActivity.problemId)) {
+      getProblemById(String(selectedActivity.problemId)).then((problem) => {
+        if (problem) {
+          setFetchedProblem(problem);
+        }
+      });
+    }
+  }, [selectedActivity?.problemId]);
 
   if (loading) {
     return (

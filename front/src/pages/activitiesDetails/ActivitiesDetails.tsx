@@ -165,6 +165,7 @@ export default function ActivitiesDetails() {
     mapProblems,
     loading,
     updateSubmissions,
+    submissions,
   } = useData();
 
   const [activitySubmissions, setActivitySubmissions] = useState<Submission[]>([]);
@@ -214,7 +215,19 @@ export default function ActivitiesDetails() {
     if (selectedActivity) {
       fetchSubmissions(selectedActivity);
     }
-  }, [selectedActivity]);
+  }, [selectedActivity?.id]);
+
+  // Sincroniza a lista local quando o polling global atualiza submissions
+  useEffect(() => {
+    const hasPending = activitySubmissions.some(
+      (s) => s.status === "pending" || s.status === "processing"
+    );
+    if (hasPending && selectedActivity) {
+      getSubmissionsByActivityId(String(selectedActivity.id)).then((data) => {
+        setActivitySubmissions(data);
+      });
+    }
+  }, [submissions]);
 
   // Redireciona para o detalhe da submissão ao clicar na linha da tabela
   function redirectToSubmission(submission: Submission) {
@@ -223,22 +236,29 @@ export default function ActivitiesDetails() {
 
   async function handleSubmit(code: string, activityId: number) {
     try {
-      setLocalLoading(true);
-      await postSubmission({
+      const response = await postSubmission({
         code: code,
         activityId: activityId,
       });
-      await updateSubmissions();
-      // refresh local activity submissions as well
-      if (selectedActivity) {
-        await fetchSubmissions(selectedActivity);
-      }
-      navigate(`/submissions`);
+
+      // Optimistic update: add new submission with "pending" status immediately
+      // postSubmission returns raw backend data (Portuguese field names)
+      const raw = response as any;
+      const newSubmission: Submission = {
+        id: raw?.id ?? Date.now(),
+        activityId: raw?.atividade_id ?? activityId,
+        dateSubmitted: raw?.data_submissao ?? new Date().toISOString(),
+        language: raw?.linguagem ?? "c",
+        status: "pending",
+      };
+
+      setActivitySubmissions((prev) => [newSubmission, ...prev]);
+
+      // Fire-and-forget: update global submissions in background
+      updateSubmissions();
     } catch (error) {
       alert("Erro ao submeter o código. Tente novamente.");
       console.error("Error submitting code:", error);
-    } finally {
-      setLocalLoading(false);
     }
   }
 

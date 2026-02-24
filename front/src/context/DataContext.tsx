@@ -4,6 +4,8 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useRef,
+  useCallback,
   useMemo,
 } from "react";
 import type { Activity, Problem, Submission } from "@/types";
@@ -57,23 +59,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   }, [submissions]);
 
-  const updateSubmissions = async () => {
+  const updateSubmissions = useCallback(async () => {
     try {
       const submissions = await getAllSubmissions();
       setSubmissions(submissions);
     } catch (error) {
       console.error("DataContext: Erro ao atualizar submissões:", error);
     }
-  };
+  }, []);
 
-  const updateActivities = async () => {
+  const updateActivities = useCallback(async () => {
     try {
       const activitiesData = await getAllActivities();
       setActivities(activitiesData.items);
     } catch (error) {
       console.error("DataContext: Erro ao atualizar atividades:", error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,42 +113,44 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user, userLoading]);
 
   // Polling para atualizar submissões pendentes/processando a cada 10 segundos
+  const hasPendingSubmissions = useRef(false);
   useEffect(() => {
-    const hasPendingSubmissions = submissions.some(
+    hasPendingSubmissions.current = submissions.some(
       (s) => s.status === "pending" || s.status === "processing"
     );
-
-    if (!hasPendingSubmissions) {
-      return;
-    }
-
-    const intervalId = setInterval(async () => {
-      await updateSubmissions();
-    }, 10000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
   }, [submissions]);
 
-  // Polling para atualizar atividades pendentes a cada 10 segundos
   useEffect(() => {
-    const hasPendingActivities = activities.some(
-      (a: Activity) => a.status === "pending"
-    );
-
-    if (!hasPendingActivities) {
-      return;
-    }
-
     const intervalId = setInterval(async () => {
-      await updateActivities();
+      if (hasPendingSubmissions.current) {
+        await updateSubmissions();
+      }
     }, 10000);
 
     return () => {
       clearInterval(intervalId);
     };
+  }, [updateSubmissions]);
+
+  // Polling para atualizar atividades pendentes a cada 10 segundos
+  const hasPendingActivities = useRef(false);
+  useEffect(() => {
+    hasPendingActivities.current = activities.some(
+      (a: Activity) => a.status === "pending"
+    );
   }, [activities]);
+
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      if (hasPendingActivities.current) {
+        await updateActivities();
+      }
+    }, 10000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [updateActivities]);
 
   return (
     <DataContext.Provider
