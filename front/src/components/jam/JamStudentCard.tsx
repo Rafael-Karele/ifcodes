@@ -35,10 +35,8 @@ interface JamStudentCardProps {
   participant: JamStreamParticipant;
   onClick: () => void;
   editorHeight?: string;
-  customSize?: { colSpan: number; height: number };
-  onResize?: (size: { colSpan: number; height: number }) => void;
-  gridColWidth?: number;
-  maxCols?: number;
+  customSize?: { width: number; height: number };
+  onResize?: (size: { width: number; height: number }) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -65,13 +63,12 @@ export default function JamStudentCard({
   editorHeight = "h-32",
   customSize,
   onResize,
-  gridColWidth = 0,
-  maxCols = 4,
 }: JamStudentCardProps) {
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null);
   const decorationsRef = useRef<monacoEditor.IEditorDecorationsCollection | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
+  const dragEndTimeRef = useRef(0);
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -83,7 +80,7 @@ export default function JamStudentCard({
       editorRef.current?.layout();
     }, 50);
     return () => clearTimeout(timer);
-  }, [editorHeight, customSize?.height, customSize?.colSpan]);
+  }, [editorHeight, customSize?.height, customSize?.width]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -148,65 +145,54 @@ export default function JamStudentCard({
       const startY = e.clientY;
       const startWidth = rect.width;
       const startHeight = rect.height;
-      const colWidth = gridColWidth > 0 ? gridColWidth : startWidth;
-      const startColSpan = customSize?.colSpan ?? 1;
 
       const card = cardRef.current;
 
       const onMouseMove = (ev: MouseEvent) => {
-        const deltaX = ev.clientX - startX;
-        const deltaY = ev.clientY - startY;
-
-        const newHeight = Math.max(120, startHeight + deltaY);
-        card.style.height = `${newHeight}px`;
-
-        // Largura acompanha o mouse pixel a pixel durante o drag
-        const newWidth = Math.max(colWidth, startWidth + deltaX);
+        const newWidth = Math.max(150, startWidth + (ev.clientX - startX));
+        const newHeight = Math.max(120, startHeight + (ev.clientY - startY));
         card.style.width = `${newWidth}px`;
         card.style.minWidth = `${newWidth}px`;
-        // Remover grid-column span durante o drag para que a largura manual prevaleça
-        card.style.gridColumn = "span 1";
+        card.style.height = `${newHeight}px`;
       };
 
       const onMouseUp = (ev: MouseEvent) => {
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
         isDraggingRef.current = false;
+        dragEndTimeRef.current = Date.now();
 
-        const deltaX = ev.clientX - startX;
-        const deltaY = ev.clientY - startY;
-
-        const finalHeight = Math.max(120, startHeight + deltaY);
-        const finalColSpan = Math.max(
-          1,
-          Math.min(maxCols, Math.round((startWidth + deltaX) / colWidth))
-        );
+        const finalWidth = Math.max(150, startWidth + (ev.clientX - startX));
+        const finalHeight = Math.max(120, startHeight + (ev.clientY - startY));
 
         // Clear inline styles — React will re-apply via props
-        card.style.height = "";
         card.style.width = "";
         card.style.minWidth = "";
-        card.style.gridColumn = "";
+        card.style.height = "";
 
-        onResize({ colSpan: finalColSpan, height: Math.round(finalHeight) });
+        onResize({ width: Math.round(finalWidth), height: Math.round(finalHeight) });
       };
 
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [onResize, gridColWidth, maxCols, customSize?.colSpan]
+    [onResize]
   );
 
   const handleCardClick = () => {
-    if (!isDraggingRef.current) {
+    if (!isDraggingRef.current && Date.now() - dragEndTimeRef.current > 200) {
       onClick();
     }
   };
 
+  const hasCustomHeight = customSize && customSize.height > 0;
   const cardStyle: React.CSSProperties = {};
   if (customSize) {
-    cardStyle.height = customSize.height;
-    cardStyle.gridColumn = `span ${customSize.colSpan}`;
+    cardStyle.width = customSize.width;
+    cardStyle.minWidth = customSize.width;
+    if (hasCustomHeight) {
+      cardStyle.height = customSize.height;
+    }
   }
 
   return (
@@ -215,7 +201,7 @@ export default function JamStudentCard({
       onClick={handleCardClick}
       style={cardStyle}
       className={`relative cursor-pointer rounded-lg border p-3 shadow-sm transition-shadow hover:shadow-md ${
-        customSize ? "flex flex-col" : ""
+        hasCustomHeight ? "flex flex-col" : ""
       } ${
         participant.online
           ? "border-stone-200 bg-white"
@@ -247,7 +233,7 @@ export default function JamStudentCard({
           </span>
         </div>
       </div>
-      <div className={`${customSize ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
+      <div className={`${hasCustomHeight ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
         <Editor
           height="100%"
           language="c"

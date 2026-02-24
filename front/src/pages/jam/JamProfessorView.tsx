@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Users, CheckCircle2, Code2, Square, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JamStudentCard from "@/components/jam/JamStudentCard";
@@ -27,10 +27,8 @@ export default function JamProfessorView({
   onUpdateSettings,
 }: JamProfessorViewProps) {
   const [cardSize, setCardSize] = useState<CardSize>("sm");
-  const [cardSizes, setCardSizes] = useState<Record<number, { colSpan: number; height: number }>>({});
+  const [cardSizes, setCardSizes] = useState<Record<number, { width: number; height: number }>>({});
   const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [gridColWidth, setGridColWidth] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsTitulo, setSettingsTitulo] = useState(session.titulo || "");
   const [settingsInstrucoes, setSettingsInstrucoes] = useState(session.instrucoes || "");
@@ -55,13 +53,11 @@ export default function JamProfessorView({
     });
     setShowSettings(false);
   };
-  const gridClasses: Record<CardSize, string> = {
-    sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-    md: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    lg: "grid-cols-1 md:grid-cols-1 lg:grid-cols-2",
+  const defaultCardWidths: Record<CardSize, string> = {
+    sm: "250px",
+    md: "380px",
+    lg: "500px",
   };
-
-  const maxColsMap: Record<CardSize, number> = { sm: 4, md: 3, lg: 2 };
 
   const editorHeights: Record<CardSize, string> = {
     sm: "h-32",
@@ -69,23 +65,8 @@ export default function JamProfessorView({
     lg: "h-64",
   };
 
-  // Measure grid column width for snap-to-column resize
-  useEffect(() => {
-    const measure = () => {
-      if (!gridRef.current) return;
-      const style = window.getComputedStyle(gridRef.current);
-      const cols = style.gridTemplateColumns.split(" ");
-      if (cols.length > 0) {
-        setGridColWidth(parseFloat(cols[0]) || 0);
-      }
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [cardSize, participants.length]);
-
   const handleCardResize = useCallback(
-    (userId: number, size: { colSpan: number; height: number }) => {
+    (userId: number, size: { width: number; height: number }) => {
       setCardSizes((prev) => ({ ...prev, [userId]: size }));
     },
     []
@@ -177,19 +158,21 @@ export default function JamProfessorView({
       </div>
 
       {/* Student Grid */}
-      <div ref={gridRef} className={`grid flex-1 auto-rows-min content-start gap-4 overflow-y-auto [grid-auto-flow:dense] ${gridClasses[cardSize]}`}>
-        {participants.map((p) => (
-          <JamStudentCard
-            key={p.userId}
-            participant={p}
-            onClick={() => setFocusedUserId(p.userId)}
-            editorHeight={editorHeights[cardSize]}
-            customSize={cardSizes[p.userId]}
-            onResize={(size) => handleCardResize(p.userId, size)}
-            gridColWidth={gridColWidth}
-            maxCols={maxColsMap[cardSize]}
-          />
-        ))}
+      <div className="flex flex-1 flex-wrap content-start gap-4 overflow-y-auto">
+        {participants.map((p) => {
+          const custom = cardSizes[p.userId];
+          const defaultWidth = defaultCardWidths[cardSize];
+          return (
+            <JamStudentCard
+              key={p.userId}
+              participant={p}
+              onClick={() => setFocusedUserId(p.userId)}
+              editorHeight={editorHeights[cardSize]}
+              customSize={custom || { width: parseInt(defaultWidth), height: 0 }}
+              onResize={(size) => handleCardResize(p.userId, size)}
+            />
+          );
+        })}
         {participants.length === 0 && (
           <div className="col-span-full flex items-center justify-center text-stone-400">
             Nenhum participante conectado ainda.
