@@ -147,12 +147,12 @@ export default function JamStudentCard({
       const startHeight = rect.height;
 
       const card = cardRef.current;
+      card.style.zIndex = "20";
 
       const onMouseMove = (ev: MouseEvent) => {
         const newWidth = Math.max(150, startWidth + (ev.clientX - startX));
         const newHeight = Math.max(120, startHeight + (ev.clientY - startY));
         card.style.width = `${newWidth}px`;
-        card.style.minWidth = `${newWidth}px`;
         card.style.height = `${newHeight}px`;
       };
 
@@ -167,8 +167,8 @@ export default function JamStudentCard({
 
         // Clear inline styles — React will re-apply via props
         card.style.width = "";
-        card.style.minWidth = "";
         card.style.height = "";
+        card.style.zIndex = "";
 
         onResize({ width: Math.round(finalWidth), height: Math.round(finalHeight) });
       };
@@ -185,14 +185,16 @@ export default function JamStudentCard({
     }
   };
 
-  const hasCustomHeight = customSize && customSize.height > 0;
+  const hasCustomSize = customSize && (customSize.width > 0 || customSize.height > 0);
   const cardStyle: React.CSSProperties = {};
-  if (customSize) {
-    cardStyle.width = customSize.width;
-    cardStyle.minWidth = customSize.width;
-    if (hasCustomHeight) {
+  if (hasCustomSize) {
+    if (customSize.width > 0) {
+      cardStyle.width = customSize.width;
+    }
+    if (customSize.height > 0) {
       cardStyle.height = customSize.height;
     }
+    cardStyle.zIndex = 10;
   }
 
   return (
@@ -201,7 +203,7 @@ export default function JamStudentCard({
       onClick={handleCardClick}
       style={cardStyle}
       className={`relative cursor-pointer rounded-lg border p-3 shadow-sm transition-shadow hover:shadow-md ${
-        hasCustomHeight ? "flex flex-col" : ""
+        hasCustomSize ? "flex flex-col" : ""
       } ${
         participant.online
           ? "border-stone-200 bg-white"
@@ -233,7 +235,7 @@ export default function JamStudentCard({
           </span>
         </div>
       </div>
-      <div className={`${hasCustomHeight ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
+      <div className={`${hasCustomSize ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
         <Editor
           height="100%"
           language="c"

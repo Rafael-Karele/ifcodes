@@ -53,10 +53,10 @@ export default function JamProfessorView({
     });
     setShowSettings(false);
   };
-  const defaultCardWidths: Record<CardSize, string> = {
-    sm: "250px",
-    md: "380px",
-    lg: "500px",
+  const gridClasses: Record<CardSize, string> = {
+    sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+    md: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+    lg: "grid-cols-1 md:grid-cols-1 lg:grid-cols-2",
   };
 
   const editorHeights: Record<CardSize, string> = {
@@ -158,21 +158,17 @@ export default function JamProfessorView({
       </div>
 
       {/* Student Grid */}
-      <div className="flex flex-1 flex-wrap content-start gap-4 overflow-y-auto">
-        {participants.map((p) => {
-          const custom = cardSizes[p.userId];
-          const defaultWidth = defaultCardWidths[cardSize];
-          return (
-            <JamStudentCard
-              key={p.userId}
-              participant={p}
-              onClick={() => setFocusedUserId(p.userId)}
-              editorHeight={editorHeights[cardSize]}
-              customSize={custom || { width: parseInt(defaultWidth), height: 0 }}
-              onResize={(size) => handleCardResize(p.userId, size)}
-            />
-          );
-        })}
+      <div className={`grid flex-1 auto-rows-min content-start gap-4 overflow-y-auto ${gridClasses[cardSize]}`}>
+        {participants.map((p) => (
+          <JamStudentCard
+            key={p.userId}
+            participant={p}
+            onClick={() => setFocusedUserId(p.userId)}
+            editorHeight={editorHeights[cardSize]}
+            customSize={cardSizes[p.userId]}
+            onResize={(size) => handleCardResize(p.userId, size)}
+          />
+        ))}
         {participants.length === 0 && (
           <div className="col-span-full flex items-center justify-center text-stone-400">
             Nenhum participante conectado ainda.
