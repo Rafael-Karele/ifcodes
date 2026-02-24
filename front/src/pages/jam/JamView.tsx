@@ -95,7 +95,7 @@ export default function JamView() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] flex-col">
+    <div className="flex h-[calc(100vh-56px-2.5rem)] flex-col -mx-[7.5rem] -mt-10">
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-2">
         <div className="flex items-center gap-3">
