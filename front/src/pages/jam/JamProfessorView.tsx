@@ -146,16 +146,37 @@ export default function JamProfessorView({
   );
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col p-3">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-stone-800">{session.titulo}</h2>
           <p className="text-sm text-stone-500">
             Problema: {session.problema?.titulo}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1 text-sm">
+            <Users className="h-3.5 w-3.5 text-stone-500" />
+            <span className="font-semibold text-stone-800">{stats.total}</span>
+            <span className="text-stone-400">participantes</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-sm">
+            <Code2 className="h-3.5 w-3.5 text-blue-500" />
+            <span className="font-semibold text-blue-700">{stats.coding}</span>
+            <span className="text-blue-400">codificando</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
+            <Square className="h-3.5 w-3.5 text-yellow-500" />
+            <span className="font-semibold text-yellow-700">{stats.submitted}</span>
+            <span className="text-yellow-400">submetidos</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-green-100 bg-green-50 px-3 py-1 text-sm">
+            <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+            <span className="font-semibold text-green-700">{stats.passed}</span>
+            <span className="text-green-400">aprovados</span>
+          </span>
+          <div className="mx-1 h-6 w-px bg-stone-200" />
           <JamTimer
             startedAt={session.started_at}
             timeLimitMinutes={session.tempo_limite}
@@ -185,30 +206,6 @@ export default function JamProfessorView({
             <Square className="h-4 w-4" />
             Encerrar
           </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="mb-6 grid grid-cols-4 gap-4">
-        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
-          <Users className="mx-auto mb-1 h-5 w-5 text-stone-500" />
-          <p className="text-2xl font-bold text-stone-800">{stats.total}</p>
-          <p className="text-xs text-stone-500">Participantes</p>
-        </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
-          <Code2 className="mx-auto mb-1 h-5 w-5 text-blue-500" />
-          <p className="text-2xl font-bold text-blue-600">{stats.coding}</p>
-          <p className="text-xs text-stone-500">Codificando</p>
-        </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
-          <Square className="mx-auto mb-1 h-5 w-5 text-yellow-500" />
-          <p className="text-2xl font-bold text-yellow-600">{stats.submitted}</p>
-          <p className="text-xs text-stone-500">Submetidos</p>
-        </div>
-        <div className="rounded-xl border border-stone-200 bg-white p-4 text-center">
-          <CheckCircle2 className="mx-auto mb-1 h-5 w-5 text-green-500" />
-          <p className="text-2xl font-bold text-green-600">{stats.passed}</p>
-          <p className="text-xs text-stone-500">Aprovados</p>
         </div>
       </div>
 
