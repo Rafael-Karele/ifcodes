@@ -20,7 +20,8 @@ export default function JamView() {
   const jamIdNum = jamId ? Number(jamId) : null;
   const isFinished = restSession?.status === "finished";
 
-  // Only connect WS if session is not finished
+  // Only connect WS if session is loaded and not finished
+  const shouldConnect = restSession !== null && !isFinished;
   const {
     session: wsSession,
     participants,
@@ -35,7 +36,7 @@ export default function JamView() {
     endSession,
     giveFeedback,
     updateSettings,
-  } = useJamSession(isFinished ? null : jamIdNum);
+  } = useJamSession(shouldConnect ? jamIdNum : null);
 
   // Use WS session when available, fall back to REST session
   const session = wsSession || restSession;

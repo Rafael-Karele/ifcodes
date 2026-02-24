@@ -56,7 +56,8 @@ export default function JamStudentView({
 
   // Find my stream data for real-time status/feedback
   const myStream = participants.find((p) => p.userId === myParticipant?.user_id);
-  const myStatus = myStream?.status || myParticipant?.status || "joined";
+  const rawStatus = myStream?.status || myParticipant?.status || "joined";
+  const myStatus = rawStatus === "joined" && session.status === "finished" ? "finished" : rawStatus;
   const myFeedback = myStream?.feedback?.length ? myStream.feedback : myParticipant?.feedback || [];
 
   // Submission result details
@@ -97,6 +98,7 @@ export default function JamStudentView({
 
   const statusLabel: Record<string, string> = {
     joined: "Conectado",
+    finished: "Encerrada",
     coding: "Codificando",
     submitted: "Avaliando...",
     passed: "Aprovado!",
