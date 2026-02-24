@@ -92,6 +92,22 @@ export async function giveFeedback(jamId: number, studentId: number, feedback: s
   }
 }
 
+export async function updateSessionSettings(
+  jamId: number,
+  updates: { titulo?: string; instrucoes?: string | null; tempo_limite?: number | null },
+  token: string,
+): Promise<any> {
+  try {
+    const res = await client.put(`/api/jam-sessions/${jamId}`, updates, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (e: any) {
+    console.error('Failed to update session settings:', e.message);
+    return null;
+  }
+}
+
 export async function getSessionData(jamId: number, token: string): Promise<any> {
   try {
     const res = await client.get(`/api/jam-sessions/${jamId}`, {

@@ -33,6 +33,7 @@ export default function JamView() {
     startSession,
     endSession,
     giveFeedback,
+    updateSettings,
   } = useJamSession(isFinished ? null : jamIdNum);
 
   // Use WS session when available, fall back to REST session
@@ -143,6 +144,7 @@ export default function JamView() {
               submissionResults={submissionResults}
               onEndSession={endSession}
               onGiveFeedback={giveFeedback}
+              onUpdateSettings={updateSettings}
             />
           ) : (
             <JamStudentView

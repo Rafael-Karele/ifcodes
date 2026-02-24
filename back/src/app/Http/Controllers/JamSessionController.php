@@ -47,6 +47,29 @@ class JamSessionController extends Controller
         return response()->json($session, 201);
     }
 
+    public function update(Request $request, int $id)
+    {
+        $session = JamSession::find($id);
+        if (!$session) {
+            return response()->json(['message' => 'Sessão não encontrada.'], 404);
+        }
+
+        if ($session->professor_id !== Auth::id()) {
+            return response()->json(['message' => 'Apenas o professor da sessão pode editá-la.'], 403);
+        }
+
+        $validated = $request->validate([
+            'titulo' => 'sometimes|string|max:255',
+            'instrucoes' => 'sometimes|nullable|string',
+            'tempo_limite' => 'sometimes|nullable|integer|min:1',
+        ]);
+
+        $session->update($validated);
+        $session->load(['problema', 'participants.user']);
+
+        return response()->json($session);
+    }
+
     public function show(int $id)
     {
         $session = JamSession::with(['problema.casosTeste', 'professor', 'participants.user'])

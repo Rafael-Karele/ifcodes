@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Users, CheckCircle2, Code2, Square } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, CheckCircle2, Code2, Square, Settings, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JamStudentCard from "@/components/jam/JamStudentCard";
 import JamFocusView from "@/components/jam/JamFocusView";
@@ -13,6 +13,7 @@ interface JamProfessorViewProps {
   submissionResults: Record<number, JamSubmissionResult>;
   onEndSession: () => void;
   onGiveFeedback: (studentId: number, feedback: string) => void;
+  onUpdateSettings: (settings: { titulo?: string; instrucoes?: string | null; tempoLimite?: number | null }) => void;
 }
 
 export default function JamProfessorView({
@@ -21,8 +22,33 @@ export default function JamProfessorView({
   submissionResults,
   onEndSession,
   onGiveFeedback,
+  onUpdateSettings,
 }: JamProfessorViewProps) {
   const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsTitulo, setSettingsTitulo] = useState(session.titulo || "");
+  const [settingsInstrucoes, setSettingsInstrucoes] = useState(session.instrucoes || "");
+  const [settingsTempoLimite, setSettingsTempoLimite] = useState<string>(
+    session.tempo_limite != null ? String(session.tempo_limite) : ""
+  );
+
+  // Sync form state when session changes (e.g. from a broadcast)
+  useEffect(() => {
+    if (!showSettings) {
+      setSettingsTitulo(session.titulo || "");
+      setSettingsInstrucoes(session.instrucoes || "");
+      setSettingsTempoLimite(session.tempo_limite != null ? String(session.tempo_limite) : "");
+    }
+  }, [session.titulo, session.instrucoes, session.tempo_limite, showSettings]);
+
+  const handleSaveSettings = () => {
+    onUpdateSettings({
+      titulo: settingsTitulo,
+      instrucoes: settingsInstrucoes || null,
+      tempoLimite: settingsTempoLimite ? Number(settingsTempoLimite) : null,
+    });
+    setShowSettings(false);
+  };
   const focusedParticipant = focusedUserId !== null
     ? participants.find((p) => p.userId === focusedUserId) || null
     : null;
@@ -49,6 +75,14 @@ export default function JamProfessorView({
             startedAt={session.started_at}
             timeLimitMinutes={session.tempo_limite}
           />
+          <Button
+            onClick={() => setShowSettings(true)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Configurações
+          </Button>
           <Button
             onClick={onEndSession}
             variant="outline"
@@ -108,6 +142,63 @@ export default function JamProfessorView({
           onClose={() => setFocusedUserId(null)}
           onGiveFeedback={onGiveFeedback}
         />
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-800">Configurações da Sessão</h3>
+              <button onClick={() => setShowSettings(false)} className="rounded p-1 hover:bg-gray-100">
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Título</label>
+                <input
+                  type="text"
+                  value={settingsTitulo}
+                  onChange={(e) => setSettingsTitulo(e.target.value)}
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Instruções</label>
+                <textarea
+                  value={settingsInstrucoes}
+                  onChange={(e) => setSettingsInstrucoes(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">Tempo limite (minutos)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={settingsTempoLimite}
+                  onChange={(e) => setSettingsTempoLimite(e.target.value)}
+                  placeholder="Sem limite"
+                  className="w-full rounded-md border px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setShowSettings(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveSettings}>
+                Salvar
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

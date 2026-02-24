@@ -7,6 +7,7 @@ import {
   endSession,
   giveFeedback,
   getSessionData,
+  updateSessionSettings as restUpdateSettings,
   LaravelUser,
 } from './laravel-client';
 import {
@@ -17,6 +18,7 @@ import {
   updateParticipantStatus,
   updateParticipantFeedback,
   updateSessionStatus,
+  updateSessionSettings,
   serializeSession,
   getSession,
 } from './jam-state';
@@ -117,6 +119,9 @@ export async function handleConnection(ws: WebSocket) {
         const session = getOrCreateSession(jamId);
         session.status = sessionData.status;
         session.startedAt = sessionData.started_at;
+        session.titulo = sessionData.titulo || '';
+        session.instrucoes = sessionData.instrucoes || null;
+        session.tempoLimite = sessionData.tempo_limite ?? null;
 
         if (sessionData.participants) {
           for (const p of sessionData.participants) {
@@ -249,6 +254,33 @@ export async function handleConnection(ws: WebSocket) {
         }
 
         updateParticipantFeedback(client.jamId, studentId, feedback);
+        const session = getSession(client.jamId);
+        if (session) {
+          broadcastToJam(client.jamId, 'STATE_UPDATE', serializeSession(session));
+        }
+        break;
+      }
+
+      case 'UPDATE_SETTINGS': {
+        const client = clients.get(ws)!;
+        if (!client.isProfessor) {
+          send(ws, 'ERROR', { message: 'Only professors can update settings' });
+          return;
+        }
+
+        const { titulo, instrucoes, tempoLimite } = msg;
+        const restPayload: any = {};
+        if (titulo !== undefined) restPayload.titulo = titulo;
+        if (instrucoes !== undefined) restPayload.instrucoes = instrucoes;
+        if (tempoLimite !== undefined) restPayload.tempo_limite = tempoLimite;
+
+        const result = await restUpdateSettings(client.jamId, restPayload, client.token);
+        if (!result) {
+          send(ws, 'ERROR', { message: 'Failed to update settings' });
+          return;
+        }
+
+        updateSessionSettings(client.jamId, { titulo, instrucoes, tempoLimite });
         const session = getSession(client.jamId);
         if (session) {
           broadcastToJam(client.jamId, 'STATE_UPDATE', serializeSession(session));

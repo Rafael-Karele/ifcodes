@@ -17,6 +17,9 @@ export interface SessionState {
   jamId: number;
   status: string;
   startedAt: string | null;
+  titulo: string;
+  instrucoes: string | null;
+  tempoLimite: number | null;
   participants: Map<number, ParticipantState>;
 }
 
@@ -28,6 +31,9 @@ export function getOrCreateSession(jamId: number): SessionState {
       jamId,
       status: 'waiting',
       startedAt: null,
+      titulo: '',
+      instrucoes: null,
+      tempoLimite: null,
       participants: new Map(),
     });
   }
@@ -85,11 +91,24 @@ export function updateSessionStatus(jamId: number, status: string, startedAt?: s
   if (startedAt) session.startedAt = startedAt;
 }
 
+export function updateSessionSettings(
+  jamId: number,
+  updates: { titulo?: string; instrucoes?: string | null; tempoLimite?: number | null },
+): void {
+  const session = getOrCreateSession(jamId);
+  if (updates.titulo !== undefined) session.titulo = updates.titulo;
+  if (updates.instrucoes !== undefined) session.instrucoes = updates.instrucoes;
+  if (updates.tempoLimite !== undefined) session.tempoLimite = updates.tempoLimite;
+}
+
 export function serializeSession(session: SessionState) {
   return {
     jamId: session.jamId,
     status: session.status,
     startedAt: session.startedAt,
+    titulo: session.titulo,
+    instrucoes: session.instrucoes,
+    tempoLimite: session.tempoLimite,
     participants: Array.from(session.participants.values()),
   };
 }

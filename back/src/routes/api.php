@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/jam-sessions', [JamSessionController::class, 'index']);
     Route::post('/jam-sessions', [JamSessionController::class, 'store']);
     Route::get('/jam-sessions/{id}', [JamSessionController::class, 'show']);
+    Route::put('/jam-sessions/{id}', [JamSessionController::class, 'update']);
     Route::post('/jam-sessions/{id}/start', [JamSessionController::class, 'start']);
     Route::post('/jam-sessions/{id}/finish', [JamSessionController::class, 'finish']);
     Route::post('/jam-sessions/{id}/join', [JamSessionController::class, 'join']);

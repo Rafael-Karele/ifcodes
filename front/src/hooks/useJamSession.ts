@@ -25,6 +25,7 @@ interface UseJamSessionReturn {
   startSession: () => void;
   endSession: () => void;
   giveFeedback: (studentId: number, feedback: string) => void;
+  updateSettings: (settings: { titulo?: string; instrucoes?: string | null; tempoLimite?: number | null }) => void;
 }
 
 export function useJamSession(jamId: number | null): UseJamSessionReturn {
@@ -73,9 +74,14 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
             setParticipants(msg.participants || []);
             if (msg.status) {
               sessionStatusRef.current = msg.status;
-              setSession((prev) =>
-                prev ? { ...prev, status: msg.status, started_at: msg.startedAt } : prev
-              );
+              setSession((prev) => {
+                if (!prev) return prev;
+                const updates: Partial<JamSession> = { status: msg.status, started_at: msg.startedAt };
+                if (msg.titulo !== undefined) updates.titulo = msg.titulo;
+                if (msg.instrucoes !== undefined) updates.instrucoes = msg.instrucoes;
+                if (msg.tempoLimite !== undefined) updates.tempo_limite = msg.tempoLimite;
+                return { ...prev, ...updates };
+              });
             }
             break;
 
@@ -174,6 +180,12 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     }
   }, []);
 
+  const updateSettings = useCallback((settings: { titulo?: string; instrucoes?: string | null; tempoLimite?: number | null }) => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "UPDATE_SETTINGS", ...settings }));
+    }
+  }, []);
+
   return {
     session,
     participants,
@@ -186,5 +198,6 @@ export function useJamSession(jamId: number | null): UseJamSessionReturn {
     startSession,
     endSession,
     giveFeedback,
+    updateSettings,
   };
 }
