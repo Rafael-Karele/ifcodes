@@ -113,7 +113,7 @@ services:
     container_name: jam_server
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3001:3001"
+      - "127.0.0.1:3002:3001"
     environment:
       - LARAVEL_API_URL=http://laravel_app:8000
       - PORT=3001
@@ -124,6 +124,13 @@ services:
     image: axllent/mailpit
     container_name: mailpit
     restart: unless-stopped
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "2a02:4780:6e:1617:1::/80"
 
 volumes:
   postgres_data:
