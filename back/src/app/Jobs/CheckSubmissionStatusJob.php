@@ -78,6 +78,9 @@ class CheckSubmissionStatusJob implements ShouldQueue
             $compileOutput = isset($resultado['compile_output'])
                 ? base64_decode($resultado['compile_output'])
                 : null;
+            $stdout = isset($resultado['stdout'])
+                ? base64_decode($resultado['stdout'])
+                : null;
 
             if (in_array($statusId, self::PENDING_STATUSES, true)) {
                 $possuiPendentes = true;
@@ -91,6 +94,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
                     'caso_teste_id' => $correcao->caso_teste_id,
                     'status' => $statusInfo['nome'] ?? 'Erro',
                     'compile_output' => $compileOutput,
+                    'stdout' => $stdout,
                 ];
 
                 $this->notifyJamSidecarIfNeeded($submissao, 'failed', $statusInfo['nome'] ?? 'Erro', $testResults);
@@ -104,6 +108,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
                 'caso_teste_id' => $correcao->caso_teste_id,
                 'status' => 'Aceita',
                 'compile_output' => null,
+                'stdout' => $stdout,
             ];
         }
 

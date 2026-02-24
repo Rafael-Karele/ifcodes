@@ -79,7 +79,7 @@ class Judge0ApiService
     {
         $url = '/submissions/batch?tokens='
             . implode(',', collect($submissao->correcoes)->pluck('token')->all())
-            . '&base64_encoded=true&fields=token,status_id,compile_output';
+            . '&base64_encoded=true&fields=token,status_id,compile_output,stdout';
 
         $response = $this->client->get($url);
         $response->throw();

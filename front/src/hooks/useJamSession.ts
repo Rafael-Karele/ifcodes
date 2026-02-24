@@ -10,6 +10,7 @@ export interface JamSubmissionResult {
     caso_teste_id: number;
     status: string;
     compile_output: string | null;
+    stdout: string | null;
   }>;
 }
 

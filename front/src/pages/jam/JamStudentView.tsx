@@ -271,11 +271,30 @@ export default function JamStudentView({
 
           <div className="p-5 space-y-4">
             {myStatus === "passed" && (
-              <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                <div className="flex items-center gap-2 text-green-700">
-                  <CheckCircle2 className="h-4 w-4 shrink-0" />
-                  <span className="text-sm font-semibold">Todos os testes passaram!</span>
+              <div className="space-y-3">
+                <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+                  <div className="flex items-center gap-2 text-green-700">
+                    <CheckCircle2 className="h-4 w-4 shrink-0" />
+                    <span className="text-sm font-semibold">Todos os testes passaram!</span>
+                  </div>
                 </div>
+                {myResult?.testResults && (
+                  <div className="space-y-1.5">
+                    {myResult.testResults.map((t, i) => (
+                      <div
+                        key={i}
+                        className="rounded-md border border-green-200 bg-green-50 p-2 text-xs font-medium text-green-700"
+                      >
+                        <div>Teste {i + 1}: {t.status}</div>
+                        {t.stdout && (
+                          <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-green-600 leading-relaxed">
+                            {t.stdout}
+                          </pre>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
