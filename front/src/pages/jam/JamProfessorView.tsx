@@ -1,13 +1,29 @@
-import { useState, useEffect, useCallback } from "react";
-import { Users, CheckCircle2, Code2, Square, Settings, X } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Users, CheckCircle2, Code2, Square, Settings, X, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import JamStudentCard from "@/components/jam/JamStudentCard";
+import type { CardLayout } from "@/components/jam/JamStudentCard";
 import JamFocusView from "@/components/jam/JamFocusView";
 import JamTimer from "@/components/jam/JamTimer";
 import type { JamSession, JamStreamParticipant } from "@/types/jam";
 import type { JamSubmissionResult } from "@/hooks/useJamSession";
 
-type CardSize = "sm" | "md" | "lg";
+const DEFAULT_CARD_W = 280;
+const DEFAULT_CARD_H = 220;
+const GAP = 16;
+
+function autoLayout(
+  count: number,
+  containerWidth: number,
+): CardLayout[] {
+  const cols = Math.max(1, Math.floor((containerWidth + GAP) / (DEFAULT_CARD_W + GAP)));
+  return Array.from({ length: count }, (_, i) => ({
+    x: (i % cols) * (DEFAULT_CARD_W + GAP),
+    y: Math.floor(i / cols) * (DEFAULT_CARD_H + GAP),
+    w: DEFAULT_CARD_W,
+    h: DEFAULT_CARD_H,
+  }));
+}
 
 interface JamProfessorViewProps {
   session: JamSession;
@@ -26,8 +42,7 @@ export default function JamProfessorView({
   onGiveFeedback,
   onUpdateSettings,
 }: JamProfessorViewProps) {
-  const [cardSize, setCardSize] = useState<CardSize>("sm");
-  const [cardSizes, setCardSizes] = useState<Record<number, { width: number; height: number }>>({});
+  const [layouts, setLayouts] = useState<Record<number, CardLayout>>({});
   const [focusedUserId, setFocusedUserId] = useState<number | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [settingsTitulo, setSettingsTitulo] = useState(session.titulo || "");
@@ -35,8 +50,9 @@ export default function JamProfessorView({
   const [settingsTempoLimite, setSettingsTempoLimite] = useState<string>(
     session.tempo_limite != null ? String(session.tempo_limite) : ""
   );
+  const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Sync form state when session changes (e.g. from a broadcast)
+  // Sync form state when session changes
   useEffect(() => {
     if (!showSettings) {
       setSettingsTitulo(session.titulo || "");
@@ -44,6 +60,44 @@ export default function JamProfessorView({
       setSettingsTempoLimite(session.tempo_limite != null ? String(session.tempo_limite) : "");
     }
   }, [session.titulo, session.instrucoes, session.tempo_limite, showSettings]);
+
+  // Auto-assign layout to new participants
+  useEffect(() => {
+    const containerW = canvasRef.current?.clientWidth || 900;
+    setLayouts((prev) => {
+      const next = { ...prev };
+      // IDs that already have a layout
+      const existingIds = new Set(Object.keys(next).map(Number));
+      // IDs that need a new layout
+      const newParticipants = participants.filter((p) => !existingIds.has(p.userId));
+      if (newParticipants.length === 0) return prev;
+
+      // Find the next free grid slots
+      const allPositions = autoLayout(
+        participants.length,
+        containerW,
+      );
+      // Assign used slots
+      const usedSlots = new Set<number>();
+      participants.forEach((p, i) => {
+        if (existingIds.has(p.userId)) usedSlots.add(i);
+      });
+      // Find free slots for new participants
+      let slotIdx = 0;
+      for (const p of newParticipants) {
+        while (usedSlots.has(slotIdx)) slotIdx++;
+        next[p.userId] = allPositions[slotIdx] || {
+          x: slotIdx * (DEFAULT_CARD_W + GAP),
+          y: 0,
+          w: DEFAULT_CARD_W,
+          h: DEFAULT_CARD_H,
+        };
+        usedSlots.add(slotIdx);
+        slotIdx++;
+      }
+      return next;
+    });
+  }, [participants.length]);
 
   const handleSaveSettings = () => {
     onUpdateSettings({
@@ -53,24 +107,23 @@ export default function JamProfessorView({
     });
     setShowSettings(false);
   };
-  const gridClasses: Record<CardSize, string> = {
-    sm: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-    md: "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-    lg: "grid-cols-1 md:grid-cols-1 lg:grid-cols-2",
-  };
 
-  const editorHeights: Record<CardSize, string> = {
-    sm: "h-32",
-    md: "h-48",
-    lg: "h-64",
-  };
-
-  const handleCardResize = useCallback(
-    (userId: number, size: { width: number; height: number }) => {
-      setCardSizes((prev) => ({ ...prev, [userId]: size }));
+  const handleLayoutChange = useCallback(
+    (userId: number, layout: CardLayout) => {
+      setLayouts((prev) => ({ ...prev, [userId]: layout }));
     },
     []
   );
+
+  const handleResetLayout = () => {
+    const containerW = canvasRef.current?.clientWidth || 900;
+    const positions = autoLayout(participants.length, containerW);
+    const next: Record<number, CardLayout> = {};
+    participants.forEach((p, i) => {
+      next[p.userId] = positions[i];
+    });
+    setLayouts(next);
+  };
 
   const focusedParticipant = focusedUserId !== null
     ? participants.find((p) => p.userId === focusedUserId) || null
@@ -82,6 +135,15 @@ export default function JamProfessorView({
     submitted: participants.filter((p) => ["submitted", "passed", "failed"].includes(p.status)).length,
     passed: participants.filter((p) => p.status === "passed").length,
   };
+
+  // Compute canvas height to allow scrolling
+  const canvasHeight = Math.max(
+    600,
+    ...participants.map((p) => {
+      const l = layouts[p.userId];
+      return l ? l.y + l.h + GAP : 0;
+    })
+  );
 
   return (
     <div className="flex h-full flex-col p-6">
@@ -98,22 +160,15 @@ export default function JamProfessorView({
             startedAt={session.started_at}
             timeLimitMinutes={session.tempo_limite}
           />
-          <div className="flex items-center rounded-md border border-stone-300">
-            {(["sm", "md", "lg"] as const).map((size) => (
-              <button
-                key={size}
-                onClick={() => setCardSize(size)}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
-                  cardSize === size
-                    ? "text-white"
-                    : "text-stone-600 hover:bg-stone-100"
-                } ${size === "sm" ? "rounded-l-md" : ""} ${size === "lg" ? "rounded-r-md" : ""}`}
-                style={cardSize === size ? { backgroundColor: "#0d9488" } : undefined}
-              >
-                {size === "sm" ? "P" : size === "md" ? "M" : "G"}
-              </button>
-            ))}
-          </div>
+          <Button
+            onClick={handleResetLayout}
+            variant="outline"
+            className="flex items-center gap-2 border-stone-300"
+            title="Reorganizar cards"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reorganizar
+          </Button>
           <Button
             onClick={() => setShowSettings(true)}
             variant="outline"
@@ -157,23 +212,28 @@ export default function JamProfessorView({
         </div>
       </div>
 
-      {/* Student Grid */}
-      <div className={`grid flex-1 auto-rows-min content-start gap-4 overflow-y-auto ${gridClasses[cardSize]}`}>
-        {participants.map((p) => (
-          <JamStudentCard
-            key={p.userId}
-            participant={p}
-            onClick={() => setFocusedUserId(p.userId)}
-            editorHeight={editorHeights[cardSize]}
-            customSize={cardSizes[p.userId]}
-            onResize={(size) => handleCardResize(p.userId, size)}
-          />
-        ))}
-        {participants.length === 0 && (
-          <div className="col-span-full flex items-center justify-center text-stone-400">
-            Nenhum participante conectado ainda.
-          </div>
-        )}
+      {/* Canvas */}
+      <div ref={canvasRef} className="relative flex-1 overflow-auto rounded-lg border border-stone-200 bg-stone-50">
+        <div style={{ position: "relative", minHeight: canvasHeight }}>
+          {participants.map((p) => {
+            const l = layouts[p.userId];
+            if (!l) return null;
+            return (
+              <JamStudentCard
+                key={p.userId}
+                participant={p}
+                layout={l}
+                onClick={() => setFocusedUserId(p.userId)}
+                onLayoutChange={(newLayout) => handleLayoutChange(p.userId, newLayout)}
+              />
+            );
+          })}
+          {participants.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center text-stone-400">
+              Nenhum participante conectado ainda.
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Focus View Modal */}

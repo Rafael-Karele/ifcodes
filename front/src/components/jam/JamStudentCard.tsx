@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from "react";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import type { editor as monacoEditor } from "monaco-editor";
-import { GripHorizontal } from "lucide-react";
+import { GripHorizontal, Move } from "lucide-react";
 import type { JamStreamParticipant } from "@/types/jam";
 
 function injectJamCursorStyles() {
@@ -31,12 +31,18 @@ function injectJamCursorStyles() {
   document.head.appendChild(style);
 }
 
+export interface CardLayout {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 interface JamStudentCardProps {
   participant: JamStreamParticipant;
+  layout: CardLayout;
   onClick: () => void;
-  editorHeight?: string;
-  customSize?: { width: number; height: number };
-  onResize?: (size: { width: number; height: number }) => void;
+  onLayoutChange: (layout: CardLayout) => void;
 }
 
 const statusColors: Record<string, string> = {
@@ -59,16 +65,15 @@ const statusLabels: Record<string, string> = {
 
 export default function JamStudentCard({
   participant,
+  layout,
   onClick,
-  editorHeight = "h-32",
-  customSize,
-  onResize,
+  onLayoutChange,
 }: JamStudentCardProps) {
   const editorRef = useRef<monacoEditor.IStandaloneCodeEditor | null>(null);
   const decorationsRef = useRef<monacoEditor.IEditorDecorationsCollection | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-  const dragEndTimeRef = useRef(0);
+  const interactingRef = useRef(false);
+  const interactEndRef = useRef(0);
 
   const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
@@ -80,7 +85,7 @@ export default function JamStudentCard({
       editorRef.current?.layout();
     }, 50);
     return () => clearTimeout(timer);
-  }, [editorHeight, customSize?.height, customSize?.width]);
+  }, [layout.w, layout.h]);
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -133,85 +138,122 @@ export default function JamStudentCard({
     }
   }, [participant.cursor?.line, participant.cursor?.column, participant.code]);
 
-  const handleResizeStart = useCallback(
+  // --- Drag to move ---
+  const handleMoveStart = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
       e.preventDefault();
-      if (!cardRef.current || !onResize) return;
+      if (!cardRef.current) return;
 
-      isDraggingRef.current = true;
-      const rect = cardRef.current.getBoundingClientRect();
+      interactingRef.current = true;
       const startX = e.clientX;
       const startY = e.clientY;
-      const startWidth = rect.width;
-      const startHeight = rect.height;
-
+      const startLeft = layout.x;
+      const startTop = layout.y;
       const card = cardRef.current;
-      card.style.zIndex = "20";
+      card.style.zIndex = "30";
+      card.style.opacity = "0.9";
 
       const onMouseMove = (ev: MouseEvent) => {
-        const newWidth = Math.max(150, startWidth + (ev.clientX - startX));
-        const newHeight = Math.max(120, startHeight + (ev.clientY - startY));
-        card.style.width = `${newWidth}px`;
-        card.style.height = `${newHeight}px`;
+        card.style.left = `${startLeft + (ev.clientX - startX)}px`;
+        card.style.top = `${startTop + (ev.clientY - startY)}px`;
       };
 
       const onMouseUp = (ev: MouseEvent) => {
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
-        isDraggingRef.current = false;
-        dragEndTimeRef.current = Date.now();
-
-        const finalWidth = Math.max(150, startWidth + (ev.clientX - startX));
-        const finalHeight = Math.max(120, startHeight + (ev.clientY - startY));
-
-        // Clear inline styles — React will re-apply via props
-        card.style.width = "";
-        card.style.height = "";
+        interactingRef.current = false;
+        interactEndRef.current = Date.now();
         card.style.zIndex = "";
+        card.style.opacity = "";
+        card.style.left = "";
+        card.style.top = "";
 
-        onResize({ width: Math.round(finalWidth), height: Math.round(finalHeight) });
+        onLayoutChange({
+          ...layout,
+          x: Math.max(0, startLeft + (ev.clientX - startX)),
+          y: Math.max(0, startTop + (ev.clientY - startY)),
+        });
       };
 
       document.addEventListener("mousemove", onMouseMove);
       document.addEventListener("mouseup", onMouseUp);
     },
-    [onResize]
+    [layout, onLayoutChange]
+  );
+
+  // --- Drag to resize ---
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!cardRef.current) return;
+
+      interactingRef.current = true;
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startW = layout.w;
+      const startH = layout.h;
+      const card = cardRef.current;
+      card.style.zIndex = "30";
+
+      const onMouseMove = (ev: MouseEvent) => {
+        card.style.width = `${Math.max(180, startW + (ev.clientX - startX))}px`;
+        card.style.height = `${Math.max(140, startH + (ev.clientY - startY))}px`;
+      };
+
+      const onMouseUp = (ev: MouseEvent) => {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        interactingRef.current = false;
+        interactEndRef.current = Date.now();
+        card.style.zIndex = "";
+        card.style.width = "";
+        card.style.height = "";
+
+        onLayoutChange({
+          ...layout,
+          w: Math.max(180, Math.round(startW + (ev.clientX - startX))),
+          h: Math.max(140, Math.round(startH + (ev.clientY - startY))),
+        });
+      };
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    },
+    [layout, onLayoutChange]
   );
 
   const handleCardClick = () => {
-    if (!isDraggingRef.current && Date.now() - dragEndTimeRef.current > 200) {
+    if (!interactingRef.current && Date.now() - interactEndRef.current > 200) {
       onClick();
     }
   };
-
-  const hasCustomSize = customSize && (customSize.width > 0 || customSize.height > 0);
-  const cardStyle: React.CSSProperties = {};
-  if (hasCustomSize) {
-    if (customSize.width > 0) {
-      cardStyle.width = customSize.width;
-    }
-    if (customSize.height > 0) {
-      cardStyle.height = customSize.height;
-    }
-    cardStyle.zIndex = 10;
-  }
 
   return (
     <div
       ref={cardRef}
       onClick={handleCardClick}
-      style={cardStyle}
-      className={`relative cursor-pointer rounded-lg border p-3 shadow-sm transition-shadow hover:shadow-md ${
-        hasCustomSize ? "flex flex-col" : ""
-      } ${
+      style={{
+        position: "absolute",
+        left: layout.x,
+        top: layout.y,
+        width: layout.w,
+        height: layout.h,
+      }}
+      className={`flex flex-col cursor-pointer rounded-lg border p-3 shadow-sm transition-shadow hover:shadow-md ${
         participant.online
           ? "border-stone-200 bg-white"
           : "border-stone-200 bg-stone-50 opacity-60"
       }`}
     >
-      <div className="mb-2 flex items-center justify-between">
+      {/* Header - drag handle */}
+      <div
+        onMouseDown={handleMoveStart}
+        className="mb-2 flex items-center justify-between cursor-move"
+      >
         <div className="flex items-center gap-2 truncate">
+          <Move className="h-3 w-3 shrink-0 text-stone-300" />
           <span
             className={`inline-block h-2 w-2 rounded-full ${
               participant.online ? "bg-green-500" : "bg-stone-400"
@@ -235,7 +277,9 @@ export default function JamStudentCard({
           </span>
         </div>
       </div>
-      <div className={`${hasCustomSize ? "flex-1" : editorHeight} overflow-hidden rounded border border-stone-100`}>
+
+      {/* Editor */}
+      <div className="flex-1 min-h-0 overflow-hidden rounded border border-stone-100">
         <Editor
           height="100%"
           language="c"
@@ -258,20 +302,22 @@ export default function JamStudentCard({
           }}
         />
       </div>
+
+      {/* Feedback badge */}
       {participant.feedback?.length > 0 && (
         <div className="mt-2 rounded bg-teal-50 p-2 text-xs text-teal-700">
           <span className="font-medium">Feedbacks:</span> {participant.feedback.length}
         </div>
       )}
-      {onResize && (
-        <div
-          onMouseDown={handleResizeStart}
-          className="absolute bottom-1 right-1 cursor-nwse-resize rounded p-0.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100"
-          title="Arrastar para redimensionar"
-        >
-          <GripHorizontal className="h-4 w-4" />
-        </div>
-      )}
+
+      {/* Resize handle */}
+      <div
+        onMouseDown={handleResizeStart}
+        className="absolute bottom-1 right-1 cursor-nwse-resize rounded p-0.5 text-stone-400 hover:text-stone-600 hover:bg-stone-100"
+        title="Redimensionar"
+      >
+        <GripHorizontal className="h-4 w-4" />
+      </div>
     </div>
   );
 }
