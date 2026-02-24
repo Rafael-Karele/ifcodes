@@ -25,9 +25,9 @@ class CorrecaoController extends Controller
             DB::update("update correcao set status_correcao_id = $id where token = '$token'");
             $correcao['status'] = Status::get($id)['nome'];
             
-            $correcao['stdout'] = isset($resultado['stdout']) ? base64_decode($resultado['stdout']) : null;
-            $correcao['stderr'] = isset($resultado['stderr']) ? base64_decode($resultado['stderr']) : null;
-            $correcao['compile_output'] = isset($resultado['compile_output']) ? base64_decode($resultado['compile_output']) : null;
+            $correcao['stdout'] = isset($resultado['stdout']) ? mb_convert_encoding(base64_decode($resultado['stdout']), 'UTF-8', 'UTF-8') : null;
+            $correcao['stderr'] = isset($resultado['stderr']) ? mb_convert_encoding(base64_decode($resultado['stderr']), 'UTF-8', 'UTF-8') : null;
+            $correcao['compile_output'] = isset($resultado['compile_output']) ? mb_convert_encoding(base64_decode($resultado['compile_output']), 'UTF-8', 'UTF-8') : null;
 
             unset($correcao['token']);
         }
