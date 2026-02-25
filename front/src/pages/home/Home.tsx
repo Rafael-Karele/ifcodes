@@ -1,32 +1,34 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
-  ArrowRight,
   BookOpen,
   CheckCircle2,
-  Clock,
-  AlertTriangle,
+  Flame,
+  LayoutDashboard,
+  Loader2,
   Send,
   Terminal,
-  Loader2,
-  Sparkles,
-  LayoutDashboard,
+  Users,
+  Code,
 } from "lucide-react";
+import { startOfDay, subDays, startOfWeek, addDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/context/DataContext";
 import { useUser } from "@/context/UserContext";
 import { StatCard } from "@/components/StatCard";
-import { ActivityCard } from "@/components/ActivityCard";
+import { SectionCard } from "@/components/SectionCard";
+import { CircularProgress } from "./components/CircularProgress";
+import { WeeklyHeatmap, type HeatmapCell } from "./components/WeeklyHeatmap";
+import { LanguageBar, type LanguageStat } from "./components/LanguageBar";
+import { SubmissionFeed } from "./components/SubmissionFeed";
+import { ContinueCard } from "./components/ContinueCard";
+import type { Submission } from "@/types";
 
 /* ── palette ──────────────────────────────────────────── */
 
 const palette = {
   accent: "#0d9488",
   accentDark: "#065f46",
-  accentLight: "#ccfbf1",
-  accentSoft: "#f0fdfa",
-  surface: "#fafaf9",
-  textPrimary: "#1c1917",
-  textSecondary: "#78716c",
 };
 
 /* ── helpers ─────────────────────────────────────────── */
@@ -37,6 +39,28 @@ function getGreeting(): string {
   if (h < 18) return "Boa tarde";
   return "Boa noite";
 }
+
+function getMotivation(streak: number, successRate: number): string {
+  if (streak >= 7) return "Incrível! Uma semana inteira de dedicação.";
+  if (streak >= 3) return "Você está em uma ótima sequência!";
+  if (successRate >= 80) return "Excelente taxa de acerto, continue assim!";
+  if (successRate >= 50) return "Bom progresso. Cada submissão conta!";
+  return "Acompanhe suas atividades e submissões em um só lugar.";
+}
+
+const LANG_COLORS: Record<string, string> = {
+  c: "#3b82f6",
+  cpp: "#8b5cf6",
+  java: "#f97316",
+  python: "#22c55e",
+};
+
+const LANG_DISPLAY: Record<string, string> = {
+  c: "C",
+  cpp: "C++",
+  java: "Java",
+  python: "Python",
+};
 
 /* ── loading ─────────────────────────────────────────── */
 
@@ -51,37 +75,144 @@ function LoadingDashboard() {
   );
 }
 
+/* ── data hooks ──────────────────────────────────────── */
+
+function useHomeData() {
+  const { activities, submissions, mapProblems } = useData();
+
+  const successRate = useMemo(() => {
+    if (submissions.length === 0) return 0;
+    const passed = submissions.filter((s) => s.status === "passed").length;
+    return (passed / submissions.length) * 100;
+  }, [submissions]);
+
+  const streak = useMemo(() => {
+    if (submissions.length === 0) return 0;
+    const days = new Set(
+      submissions.map((s) => startOfDay(new Date(s.dateSubmitted)).getTime())
+    );
+    let count = 0;
+    let cursor = startOfDay(new Date());
+    // If no submission today, start from yesterday
+    if (!days.has(cursor.getTime())) {
+      cursor = subDays(cursor, 1);
+    }
+    while (days.has(cursor.getTime())) {
+      count++;
+      cursor = subDays(cursor, 1);
+    }
+    return count;
+  }, [submissions]);
+
+  const heatmapCells = useMemo((): HeatmapCell[] => {
+    const today = startOfDay(new Date());
+    // Find the Monday of the current week
+    const thisMonday = startOfWeek(today, { weekStartsOn: 1 });
+    // Start from 3 weeks before this Monday
+    const start = subDays(thisMonday, 21);
+
+    // Build count map
+    const countMap = new Map<number, number>();
+    for (const s of submissions) {
+      const d = startOfDay(new Date(s.dateSubmitted)).getTime();
+      countMap.set(d, (countMap.get(d) ?? 0) + 1);
+    }
+
+    const cells: HeatmapCell[] = [];
+    for (let i = 0; i < 28; i++) {
+      const date = addDays(start, i);
+      cells.push({ date, count: countMap.get(date.getTime()) ?? 0 });
+    }
+    return cells;
+  }, [submissions]);
+
+  const languageStats = useMemo((): LanguageStat[] => {
+    if (submissions.length === 0) return [];
+    const counts = new Map<string, number>();
+    for (const s of submissions) {
+      counts.set(s.language, (counts.get(s.language) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([lang, count]) => ({
+        language: LANG_DISPLAY[lang] ?? lang,
+        count,
+        percentage: (count / submissions.length) * 100,
+        color: LANG_COLORS[lang] ?? "#a8a29e",
+      }));
+  }, [submissions]);
+
+  const urgentActivity = useMemo(() => {
+    const now = new Date();
+    return [...activities]
+      .filter((a) => a.status !== "completed")
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+      .at(0) ?? null;
+  }, [activities]);
+
+  const recentSubmissions = useMemo((): Submission[] => {
+    return [...submissions]
+      .sort((a, b) => new Date(b.dateSubmitted).getTime() - new Date(a.dateSubmitted).getTime())
+      .slice(0, 5);
+  }, [submissions]);
+
+  const dueThisWeek = useMemo(() => {
+    const now = new Date();
+    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return activities.filter(
+      (a) => a.status !== "completed" && new Date(a.dueDate) >= now && new Date(a.dueDate) <= weekFromNow
+    ).length;
+  }, [activities]);
+
+  const pendingCount = useMemo(() => {
+    return activities.filter((a) => a.status !== "completed").length;
+  }, [activities]);
+
+  const solvedProblems = useMemo(() => {
+    const passedActivityIds = new Set(
+      submissions.filter((s) => s.status === "passed").map((s) => s.activityId)
+    );
+    return passedActivityIds.size;
+  }, [submissions]);
+
+  return {
+    successRate,
+    streak,
+    heatmapCells,
+    languageStats,
+    urgentActivity,
+    recentSubmissions,
+    dueThisWeek,
+    pendingCount,
+    solvedProblems,
+    mapProblems,
+    submissions,
+  };
+}
+
 /* ── main component ──────────────────────────────────── */
 
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { activities, submissions, loading, mapProblems } = useData();
+  const { loading } = useData();
+  const {
+    successRate,
+    streak,
+    heatmapCells,
+    languageStats,
+    urgentActivity,
+    recentSubmissions,
+    dueThisWeek,
+    pendingCount,
+    solvedProblems,
+    mapProblems,
+    submissions,
+  } = useHomeData();
 
-  if (loading) {
-    return <LoadingDashboard />;
-  }
+  if (loading) return <LoadingDashboard />;
 
-  const now = new Date();
-  const pendingActivities = activities.filter(
-    (a) => a.status !== "completed" && new Date(a.dueDate) >= now
-  );
-  const overdueActivities = activities.filter(
-    (a) => a.status !== "completed" && new Date(a.dueDate) < now
-  );
-  const completedActivities = activities.filter(
-    (a) => a.status === "completed"
-  );
-
-  const upcomingActivities = [...activities]
-    .filter((a) => a.status !== "completed")
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-    .slice(0, 6);
-
-  const recentCompleted = [...activities]
-    .filter((a) => a.status === "completed")
-    .slice(0, 3);
-
+  const userName = user?.name?.split(" ")[0] || "Estudante";
   const currentDate = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
@@ -89,17 +220,32 @@ export default function Home() {
     year: "numeric",
   });
 
-  const userName = user?.name?.split(" ")[0] || "Estudante";
-
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
+      <style>{`
+        @keyframes home-fade-up {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .home-section {
+          animation: home-fade-up 0.4s ease-out both;
+        }
+        .heatmap-cell {
+          animation: home-fade-up 0.3s ease-out both;
+        }
+        .feed-row {
+          animation: home-fade-up 0.35s ease-out both;
+        }
+        .circular-progress-ring {
+          transition: stroke-dashoffset 0.8s ease-out;
+        }
+      `}</style>
 
-      {/* ── hero header ── */}
+      {/* ── 1. Smart Hero Header ── */}
       <div
-        className="relative rounded-2xl px-8 py-10 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)` }}
+        className="home-section relative rounded-2xl px-8 py-10 overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)`, animationDelay: "0ms" }}
       >
-        {/* decorative circles */}
         <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
         <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
 
@@ -110,8 +256,16 @@ export default function Home() {
               <LayoutDashboard className="w-8 h-8" />
               {getGreeting()}, {userName}
             </h1>
-            <p className="text-teal-100 text-sm mt-2">
-              Acompanhe suas atividades e submissões em um só lugar.
+            <p className="text-teal-100 text-sm mt-2 max-w-lg">
+              {pendingCount > 0 && (
+                <span>
+                  {pendingCount} pendente{pendingCount !== 1 && "s"}
+                  {dueThisWeek > 0 && <>, {dueThisWeek} vence{dueThisWeek !== 1 && "m"} esta semana</>}.
+                  {submissions.length > 0 && <> Taxa de acerto: {Math.round(successRate)}%</>}
+                  {" — "}
+                </span>
+              )}
+              {getMotivation(streak, successRate)}
             </p>
           </div>
           <div className="flex gap-2">
@@ -136,82 +290,87 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ── stats ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Pendentes" value={pendingActivities.length} icon={Clock} />
+      {/* ── 2. Stats Row ── */}
+      <div className="home-section grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ animationDelay: "80ms" }}>
+        <div className="col-span-2 lg:col-span-1 rounded-xl border border-stone-200 bg-white px-5 py-5">
+          <CircularProgress percentage={successRate} />
+        </div>
         <StatCard
-          label="Atrasadas"
-          value={overdueActivities.length}
-          icon={AlertTriangle}
-          accent={overdueActivities.length > 0}
+          label="Sequência"
+          value={streak}
+          icon={Flame}
+          accent={false}
+          className={streak >= 3 ? "!bg-orange-50/60 !border-orange-200/80 [&_svg]:text-orange-500 [&_.bg-teal-50]:bg-orange-50 [&_.text-teal-600]:text-orange-500" : ""}
         />
-        <StatCard label="Concluídas" value={completedActivities.length} icon={CheckCircle2} />
+        <StatCard label="Resolvidos" value={solvedProblems} icon={CheckCircle2} />
         <StatCard label="Submissões" value={submissions.length} icon={Terminal} />
       </div>
 
-      {/* ── upcoming activities ── */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-stone-700">Próximas atividades</h2>
-          <button
-            onClick={() => navigate("/activities")}
-            className="text-xs font-medium transition-colors flex items-center gap-1"
-            style={{ color: palette.accent }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = palette.accentDark)}
-            onMouseLeave={(e) => (e.currentTarget.style.color = palette.accent)}
-          >
-            Ver todas
-            <ArrowRight className="w-3 h-3" />
-          </button>
+      {/* ── 3. Heatmap + Language Distribution ── */}
+      <div
+        className="home-section grid grid-cols-1 lg:grid-cols-2 gap-4"
+        style={{ animationDelay: "160ms" }}
+      >
+        <WeeklyHeatmap cells={heatmapCells} streak={streak} />
+        <SectionCard title="Linguagens" icon={Terminal}>
+          <div className="px-5 py-5">
+            <LanguageBar stats={languageStats} />
+          </div>
+        </SectionCard>
+      </div>
+
+      {/* ── 4. Continue Where You Left Off ── */}
+      {urgentActivity && (
+        <div className="home-section" style={{ animationDelay: "240ms" }}>
+          <ContinueCard
+            activity={urgentActivity}
+            problemTitle={
+              mapProblems.get(urgentActivity.problemId)?.title ?? `Atividade #${urgentActivity.id}`
+            }
+          />
         </div>
-
-        {upcomingActivities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 border border-dashed border-stone-200 rounded-xl bg-stone-50">
-            <div
-              className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4"
-              style={{ backgroundColor: palette.accentLight }}
-            >
-              <Sparkles className="w-7 h-7" style={{ color: palette.accent }} />
-            </div>
-            <p className="text-sm font-medium text-stone-600">Tudo em dia</p>
-            <p className="text-xs text-stone-400 mt-1">Nenhuma atividade pendente no momento.</p>
-          </div>
-        ) : (
-          <div className="grid gap-2">
-            {upcomingActivities.map((activity, i) => (
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                problemTitle={
-                  mapProblems.get(activity.problemId)?.title || `Atividade #${activity.id}`
-                }
-                onClick={() => navigate(`/activities/${activity.id}`)}
-                index={i}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* ── recently completed ── */}
-      {recentCompleted.length > 0 && (
-        <section>
-          <h2 className="text-sm font-semibold text-stone-700 mb-4">Concluídas recentemente</h2>
-          <div className="grid gap-2">
-            {recentCompleted.map((activity, i) => (
-              <ActivityCard
-                key={activity.id}
-                activity={activity}
-                problemTitle={
-                  mapProblems.get(activity.problemId)?.title || `Atividade #${activity.id}`
-                }
-                onClick={() => navigate(`/activities/${activity.id}`)}
-                index={i}
-              />
-            ))}
-          </div>
-        </section>
       )}
+
+      {/* ── 5. Recent Submissions ── */}
+      <div className="home-section" style={{ animationDelay: "320ms" }}>
+        <SectionCard title="Submissões Recentes" icon={Code}>
+          <SubmissionFeed submissions={recentSubmissions} />
+        </SectionCard>
+      </div>
+
+      {/* ── 6. Quick Actions ── */}
+      <div
+        className="home-section border-t border-stone-200 pt-6 flex flex-wrap gap-3"
+        style={{ animationDelay: "400ms" }}
+      >
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/activities")}
+          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
+        >
+          <BookOpen className="w-4 h-4" />
+          Ver Atividades
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/submissions")}
+          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
+        >
+          <Send className="w-4 h-4" />
+          Ver Submissões
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/classes")}
+          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
+        >
+          <Users className="w-4 h-4" />
+          Minhas Turmas
+        </Button>
+      </div>
     </div>
   );
 }
