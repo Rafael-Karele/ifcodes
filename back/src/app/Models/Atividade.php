@@ -72,15 +72,15 @@ class Atividade extends Model
         $problema = $this->problema;
 
         return array_filter([
-            'cpu_time_limit'  => ($this->tempo_limite ?? $problema->tempo_limite) / 1000,
-            'memory_limit'    => $this->memoria_limite ?? $problema->memoria_limite,
+            'cpu_time_limit'  => min(($this->tempo_limite ?? $problema->tempo_limite) / 1000, 10),
+            'memory_limit'    => min($this->memoria_limite ?? $problema->memoria_limite, 256000),
             'compiler_options'             => $this->compiler_options,
             'command_line_arguments'        => $this->command_line_arguments,
             'redirect_stderr_to_stdout'    => $this->redirect_stderr_to_stdout,
-            'wall_time_limit'              => $this->wall_time_limit,
-            'stack_limit'                  => $this->stack_limit,
-            'max_file_size'                => $this->max_file_size,
-            'max_processes_and_or_threads' => $this->max_processes_and_or_threads,
+            'wall_time_limit'              => min($this->wall_time_limit ?? 10, 20),
+            'stack_limit'                  => min($this->stack_limit ?? 64000, 128000),
+            'max_file_size'                => min($this->max_file_size ?? 1024, 2048),
+            'max_processes_and_or_threads' => min($this->max_processes_and_or_threads ?? 30, 60),
         ], fn ($value) => $value !== null);
     }
 }

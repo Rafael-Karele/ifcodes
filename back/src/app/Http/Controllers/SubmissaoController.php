@@ -106,6 +106,16 @@ class SubmissaoController extends Controller
      */
     public function store(SubmissaoRequest $request)
     {
+        $recentCount = Submissao::where('user_id', auth()->id())
+            ->where('created_at', '>=', now()->subMinute())
+            ->count();
+
+        if ($recentCount >= 5) {
+            return response()->json([
+                'message' => 'Limite de submissões atingido. Aguarde 1 minuto.'
+            ], 429);
+        }
+
         $submissaoService = new SubmissaoService($request);
 
         if (!$submissaoService->salvar()) {

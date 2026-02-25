@@ -25,7 +25,9 @@ class CheckSubmissionStatusJob implements ShouldQueue
 
     private const PENDING_STATUSES = [1, 2];
     private const POLLING_DELAY_SECONDS = 1;
-    private const MAX_ATTEMPTS = 15;
+    private const POLLING_DELAY_SLOW_SECONDS = 2;
+    private const SLOW_THRESHOLD = 15;
+    private const MAX_ATTEMPTS = 25;
 
     private int $submissaoId;
     private int $remainingAttempts;
@@ -124,8 +126,12 @@ class CheckSubmissionStatusJob implements ShouldQueue
                 return;
             }
 
+            $delay = $this->remainingAttempts <= self::SLOW_THRESHOLD
+                ? self::POLLING_DELAY_SLOW_SECONDS
+                : self::POLLING_DELAY_SECONDS;
+
             CheckSubmissionStatusJob::dispatch($this->submissaoId, $this->remainingAttempts - 1)
-                ->delay(now()->addSeconds(self::POLLING_DELAY_SECONDS));
+                ->delay(now()->addSeconds($delay));
         } else {
             $submissao->status_correcao_id = Status::ACEITA;
             $submissao->save();

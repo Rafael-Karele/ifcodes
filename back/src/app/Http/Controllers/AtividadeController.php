@@ -106,15 +106,15 @@ class AtividadeController extends Controller
             'data_entrega' => 'required|date',
             'problema_id' => 'required|integer|exists:problema,id',
             'turma_id' => 'required|integer|exists:turma,id',
-            'tempo_limite' => 'nullable|integer|min:100|max:60000',
-            'memoria_limite' => 'nullable|integer|min:1024|max:1048576',
+            'tempo_limite' => 'nullable|integer|min:100|max:10000',
+            'memoria_limite' => 'nullable|integer|min:1024|max:256000',
             'compiler_options' => 'nullable|string|max:255',
             'command_line_arguments' => 'nullable|string|max:255',
             'redirect_stderr_to_stdout' => 'nullable|boolean',
-            'wall_time_limit' => 'nullable|numeric|min:0.1|max:120',
-            'stack_limit' => 'nullable|integer|min:0|max:1048576',
-            'max_file_size' => 'nullable|integer|min:0|max:1048576',
-            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:256',
+            'wall_time_limit' => 'nullable|numeric|min:0.1|max:20',
+            'stack_limit' => 'nullable|integer|min:0|max:128000',
+            'max_file_size' => 'nullable|integer|min:0|max:2048',
+            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:60',
         ]);
 
         $atividade = Atividade::create($validated);
@@ -182,15 +182,15 @@ class AtividadeController extends Controller
             'data_entrega' => 'sometimes|required|date',
             'problema_id' => 'sometimes|required|integer|exists:problema,id',
             'turma_id' => 'sometimes|required|integer|exists:turma,id',
-            'tempo_limite' => 'nullable|integer|min:100|max:60000',
-            'memoria_limite' => 'nullable|integer|min:1024|max:1048576',
+            'tempo_limite' => 'nullable|integer|min:100|max:10000',
+            'memoria_limite' => 'nullable|integer|min:1024|max:256000',
             'compiler_options' => 'nullable|string|max:255',
             'command_line_arguments' => 'nullable|string|max:255',
             'redirect_stderr_to_stdout' => 'nullable|boolean',
-            'wall_time_limit' => 'nullable|numeric|min:0.1|max:120',
-            'stack_limit' => 'nullable|integer|min:0|max:1048576',
-            'max_file_size' => 'nullable|integer|min:0|max:1048576',
-            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:256',
+            'wall_time_limit' => 'nullable|numeric|min:0.1|max:20',
+            'stack_limit' => 'nullable|integer|min:0|max:128000',
+            'max_file_size' => 'nullable|integer|min:0|max:2048',
+            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:60',
         ]);
 
         $atividade->update($validated);
