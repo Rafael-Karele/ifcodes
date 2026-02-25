@@ -112,9 +112,9 @@ class AtividadeController extends Controller
             'command_line_arguments' => 'nullable|string|max:255',
             'redirect_stderr_to_stdout' => 'nullable|boolean',
             'wall_time_limit' => 'nullable|numeric|min:0.1|max:20',
-            'stack_limit' => 'nullable|integer|min:0|max:128000',
-            'max_file_size' => 'nullable|integer|min:0|max:2048',
-            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:60',
+            'stack_limit' => 'nullable|integer|min:8000|max:128000',
+            'max_file_size' => 'nullable|integer|min:64|max:2048',
+            'max_processes_and_or_threads' => 'nullable|integer|min:5|max:60',
         ]);
 
         $atividade = Atividade::create($validated);
@@ -188,9 +188,9 @@ class AtividadeController extends Controller
             'command_line_arguments' => 'nullable|string|max:255',
             'redirect_stderr_to_stdout' => 'nullable|boolean',
             'wall_time_limit' => 'nullable|numeric|min:0.1|max:20',
-            'stack_limit' => 'nullable|integer|min:0|max:128000',
-            'max_file_size' => 'nullable|integer|min:0|max:2048',
-            'max_processes_and_or_threads' => 'nullable|integer|min:1|max:60',
+            'stack_limit' => 'nullable|integer|min:8000|max:128000',
+            'max_file_size' => 'nullable|integer|min:64|max:2048',
+            'max_processes_and_or_threads' => 'nullable|integer|min:5|max:60',
         ]);
 
         $atividade->update($validated);
