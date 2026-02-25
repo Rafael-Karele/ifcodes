@@ -1,6 +1,18 @@
 import type { Activity, Problem } from "@/types";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Plus, MoreVertical, Pencil, Trash2, Eye, FileText } from "lucide-react";
+import {
+  BookOpen,
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  FileText,
+  Clock,
+  HardDrive,
+  Calendar,
+  Terminal,
+  Settings2,
+} from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 
 interface ActivitiesTabProps {
@@ -15,26 +27,53 @@ interface ActivitiesTabProps {
   onToggleMenu: (activityId: number) => void;
 }
 
+const stripColours = [
+  "linear-gradient(90deg, #14b8a6, #34d399)",
+  "linear-gradient(90deg, #f59e0b, #fb923c)",
+  "linear-gradient(90deg, #38bdf8, #22d3ee)",
+  "linear-gradient(90deg, #fb7185, #f472b6)",
+  "linear-gradient(90deg, #a78bfa, #c084fc)",
+  "linear-gradient(90deg, #a3e635, #4ade80)",
+];
+
+const statusConfig = {
+  overdue: { label: "Atrasada", bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500" },
+  pending: { label: "Pendente", bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
+  completed: { label: "Concluída", bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
+};
+
+function getStatus(activity: Activity): "overdue" | "pending" | "completed" {
+  if (activity.status === "completed") return "completed";
+  return new Date(activity.dueDate) < new Date() ? "overdue" : "pending";
+}
+
+function hasAdvancedConfig(a: Activity): boolean {
+  return !!(a.compilerOptions || a.commandLineArguments || a.redirectStderrToStdout ||
+    a.wallTimeLimit != null || a.stackLimit != null || a.maxFileSize != null || a.maxProcessesAndOrThreads != null);
+}
+
 export default function ActivitiesTab({
-  activities,
-  allProblems,
-  openMenuId,
-  onNewActivity,
-  onViewActivity,
-  onEditActivity,
-  onDeleteActivity,
-  onViewSubmissions,
-  onToggleMenu,
+  activities, allProblems, openMenuId,
+  onNewActivity, onViewActivity, onEditActivity, onDeleteActivity, onViewSubmissions, onToggleMenu,
 }: ActivitiesTabProps) {
   const { hasAnyRole } = useUserRole();
+  const isProfessor = hasAnyRole(["professor", "admin"]);
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
+      <style>{`
+        @keyframes activities-fade-up {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <div className="flex justify-between items-center mb-5">
         <h2 className="text-lg font-semibold text-stone-800">Atividades da Turma</h2>
-        {hasAnyRole(["professor", "admin"]) && (
+        {isProfessor && (
           <Button onClick={onNewActivity}
-            className="text-white rounded-xl hover:opacity-90 font-semibold transition-opacity h-11 px-6" style={{ backgroundColor: "#0d9488" }}>
+            className="text-white rounded-xl hover:opacity-90 font-semibold transition-opacity h-11 px-6"
+            style={{ backgroundColor: "#0d9488" }}>
             <Plus className="w-4 h-4 mr-2" />
             Nova Atividade
           </Button>
@@ -51,126 +90,87 @@ export default function ActivitiesTab({
             <p className="text-xs text-stone-400 mt-1">Crie a primeira atividade para esta turma</p>
           </div>
         ) : (
-          activities.map((activity) => {
+          activities.map((activity, index) => {
+            const problem = allProblems.find((p) => p.id === activity.problemId);
+            const status = getStatus(activity);
+            const cfg = statusConfig[status];
             const dueDate = new Date(activity.dueDate);
-            const now = new Date();
-            const isOverdue = dueDate < now;
-            const isPending = !isOverdue;
-            const problem = allProblems.find(p => p.id === activity.problemId);
+            const advanced = hasAdvancedConfig(activity);
 
             return (
               <div
                 key={activity.id}
-                className={`p-4 pb-14 rounded-xl border-l-4 transition-all hover:shadow-md relative ${isOverdue
-                  ? "bg-red-50 border-red-500"
-                  : isPending
-                    ? "bg-amber-50 border-amber-500"
-                    : "bg-emerald-50 border-emerald-500"
-                  }`}
+                className="group bg-white rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
+                style={{ animation: "activities-fade-up 0.5s cubic-bezier(.22,1,.36,1) both", animationDelay: `${index * 60}ms` }}
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">
-                      {problem?.title || "Atividade"}
-                    </h3>
-                    <p className="text-sm text-stone-600 mt-1">
-                      Prazo: {dueDate.toLocaleDateString("pt-BR")} às{" "}
-                      {dueDate.toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  {hasAnyRole(["professor", "admin"]) && (
-                    <div className="relative ml-4 activity-menu">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleMenu(activity.id);
-                        }}
-                        className="p-2 rounded-full hover:bg-stone-100"
-                      >
-                        <MoreVertical size={20} />
-                      </button>
+                <div className="h-1.5" style={{ background: stripColours[index % stripColours.length] }} />
 
-                      {openMenuId === activity.id && (
-                        <div
-                          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-stone-200"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="py-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onEditActivity(activity);
-                              }}
-                              className="flex items-center w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-stone-100"
-                            >
-                              <Pencil className="mr-2 h-4 w-4" />
-                              <span>Editar</span>
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteActivity(activity);
-                              }}
-                              className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-stone-100"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              <span>Apagar</span>
-                            </button>
-                          </div>
-                        </div>
+                <div className="px-5 py-3.5 flex items-center gap-4">
+                  {/* Left: info */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2.5">
+                      <h3 className="text-[1.05rem] font-bold text-stone-800 truncate">
+                        {problem?.title || "Atividade"}
+                      </h3>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold flex-shrink-0 ${cfg.bg} ${cfg.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                        {cfg.label}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 mt-1.5 text-xs text-stone-500">
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {dueDate.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} às{" "}
+                        {dueDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {activity.tempoLimite ?? problem?.timeLimitMs ?? "—"} ms
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <HardDrive className="w-3 h-3" />
+                        {activity.memoriaLimite ?? problem?.memoryLimitKb ?? "—"} KB
+                      </span>
+                      {activity.compilerOptions && (
+                        <span className="inline-flex items-center gap-1 font-mono text-stone-600">
+                          <Terminal className="w-3 h-3" />
+                          {activity.compilerOptions}
+                        </span>
+                      )}
+                      {advanced && (
+                        <span className="inline-flex items-center gap-1 text-teal-600">
+                          <Settings2 className="w-3 h-3" />
+                          Avançado
+                        </span>
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="absolute bottom-3 left-3 flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onViewActivity(activity);
-                    }}
-                    className="h-8 text-xs gap-2"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    Ver Problema
-                  </Button>
-                  {hasAnyRole(["professor", "admin"]) && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewSubmissions(activity);
-                      }}
-                      className="h-8 text-xs gap-2"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      Ver Submissões
-                    </Button>
-                  )}
+                  {/* Right: actions */}
+                  <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={(e) => { e.stopPropagation(); onViewActivity(activity); }}
+                      className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors" title="Ver Problema">
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    {isProfessor && (
+                      <>
+                        <button onClick={(e) => { e.stopPropagation(); onViewSubmissions(activity); }}
+                          className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors" title="Ver Submissões">
+                          <FileText className="w-4 h-4" />
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); onEditActivity(activity); }}
+                          className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors" title="Editar">
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); onDeleteActivity(activity); }}
+                          className="rounded-lg p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Apagar">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-
-                <span
-                  className={`absolute bottom-3 right-10 px-2.5 py-1 rounded-lg text-xs font-medium ${isOverdue
-                    ? "bg-red-100 text-red-700"
-                    : isPending
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-emerald-100 text-emerald-700"
-                    }`}
-                >
-                  {isOverdue
-                    ? "Atrasada"
-                    : isPending
-                      ? "Pendente"
-                      : "Concluída"}
-                </span>
               </div>
             );
           })

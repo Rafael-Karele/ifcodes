@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
-import { Search, X, Codesandbox } from "lucide-react";
+import { Search, X, Codesandbox, ChevronDown } from "lucide-react";
 import type { ActivityFormData } from "./types";
 import { formatDateForApi } from "./types";
 
@@ -27,12 +27,61 @@ export default function ActivityFormModal({ isOpen, onClose, onSave, problems, o
     activity ? new Date(activity.dueDate.replace(' ', 'T')) : null
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Judge0 override states
+  const [tempoLimite, setTempoLimite] = useState<string>(
+    activity?.tempoLimite != null ? String(activity.tempoLimite) : ""
+  );
+  const [memoriaLimite, setMemoriaLimite] = useState<string>(
+    activity?.memoriaLimite != null ? String(activity.memoriaLimite) : ""
+  );
+  const [compilerOptions, setCompilerOptions] = useState<string>(
+    activity?.compilerOptions ?? ""
+  );
+  const [commandLineArguments, setCommandLineArguments] = useState<string>(
+    activity?.commandLineArguments ?? ""
+  );
+  const [redirectStderrToStdout, setRedirectStderrToStdout] = useState<boolean>(
+    activity?.redirectStderrToStdout ?? false
+  );
+  const [wallTimeLimit, setWallTimeLimit] = useState<string>(
+    activity?.wallTimeLimit != null ? String(activity.wallTimeLimit) : ""
+  );
+  const [stackLimit, setStackLimit] = useState<string>(
+    activity?.stackLimit != null ? String(activity.stackLimit) : ""
+  );
+  const [maxFileSize, setMaxFileSize] = useState<string>(
+    activity?.maxFileSize != null ? String(activity.maxFileSize) : ""
+  );
+  const [maxProcessesAndOrThreads, setMaxProcessesAndOrThreads] = useState<string>(
+    activity?.maxProcessesAndOrThreads != null ? String(activity.maxProcessesAndOrThreads) : ""
+  );
 
   const filteredProblems = problems.filter(problem =>
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const selectedProblem = problems.find(p => p.id === selectedProblemId);
+
+  const toNullableInt = (v: string): number | null => {
+    const trimmed = v.trim();
+    if (trimmed === "") return null;
+    const n = parseInt(trimmed, 10);
+    return isNaN(n) ? null : n;
+  };
+
+  const toNullableFloat = (v: string): number | null => {
+    const trimmed = v.trim();
+    if (trimmed === "") return null;
+    const n = parseFloat(trimmed);
+    return isNaN(n) ? null : n;
+  };
+
+  const toNullableString = (v: string): string | null => {
+    const trimmed = v.trim();
+    return trimmed === "" ? null : trimmed;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,14 +90,23 @@ export default function ActivityFormModal({ isOpen, onClose, onSave, problems, o
     onSave({
       problema_id: selectedProblemId,
       data_entrega: formatDateForApi(dueDate),
+      tempo_limite: toNullableInt(tempoLimite),
+      memoria_limite: toNullableInt(memoriaLimite),
+      compiler_options: toNullableString(compilerOptions),
+      command_line_arguments: toNullableString(commandLineArguments),
+      redirect_stderr_to_stdout: redirectStderrToStdout || null,
+      wall_time_limit: toNullableFloat(wallTimeLimit),
+      stack_limit: toNullableInt(stackLimit),
+      max_file_size: toNullableInt(maxFileSize),
+      max_processes_and_or_threads: toNullableInt(maxProcessesAndOrThreads),
     });
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           <div className="flex items-center justify-between border-b border-stone-200 pb-4">
             <h2 className="text-xl font-bold text-stone-900">
@@ -140,6 +198,148 @@ export default function ActivityFormModal({ isOpen, onClose, onSave, problems, o
                 required
                 className="mt-2"
               />
+            </div>
+
+            {/* Advanced Judge0 Settings */}
+            <div className="border border-stone-200 rounded-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="w-full flex items-center justify-between px-4 py-3 bg-stone-50 hover:bg-stone-100 transition-colors text-left"
+              >
+                <span className="text-sm font-medium text-stone-700">Configurações Avançadas</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-stone-500 transition-transform duration-200 ${showAdvanced ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {showAdvanced && (
+                <div className="p-4 space-y-4 border-t border-stone-200">
+                  <p className="text-xs text-stone-500">
+                    Deixe em branco para usar os valores padrão do problema.
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="tempo_limite" className="text-xs">Tempo Limite (ms)</Label>
+                      <Input
+                        id="tempo_limite"
+                        type="number"
+                        min={100}
+                        max={60000}
+                        value={tempoLimite}
+                        onChange={(e) => setTempoLimite(e.target.value)}
+                        placeholder={selectedProblem ? String(selectedProblem.timeLimitMs) : ""}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="memoria_limite" className="text-xs">Memória Limite (KB)</Label>
+                      <Input
+                        id="memoria_limite"
+                        type="number"
+                        min={1024}
+                        max={1048576}
+                        value={memoriaLimite}
+                        onChange={(e) => setMemoriaLimite(e.target.value)}
+                        placeholder={selectedProblem ? String(selectedProblem.memoryLimitKb) : ""}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="wall_time_limit" className="text-xs">Wall Time Limit (s)</Label>
+                      <Input
+                        id="wall_time_limit"
+                        type="number"
+                        min={0.1}
+                        max={120}
+                        step={0.1}
+                        value={wallTimeLimit}
+                        onChange={(e) => setWallTimeLimit(e.target.value)}
+                        placeholder=""
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="stack_limit" className="text-xs">Stack Limit (KB)</Label>
+                      <Input
+                        id="stack_limit"
+                        type="number"
+                        min={0}
+                        max={1048576}
+                        value={stackLimit}
+                        onChange={(e) => setStackLimit(e.target.value)}
+                        placeholder=""
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="max_file_size" className="text-xs">Tamanho Máx. Arquivo (KB)</Label>
+                      <Input
+                        id="max_file_size"
+                        type="number"
+                        min={0}
+                        max={1048576}
+                        value={maxFileSize}
+                        onChange={(e) => setMaxFileSize(e.target.value)}
+                        placeholder=""
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="max_processes" className="text-xs">Máx Processos/Threads</Label>
+                      <Input
+                        id="max_processes"
+                        type="number"
+                        min={1}
+                        max={256}
+                        value={maxProcessesAndOrThreads}
+                        onChange={(e) => setMaxProcessesAndOrThreads(e.target.value)}
+                        placeholder=""
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="compiler_options" className="text-xs">Opções do Compilador</Label>
+                      <Input
+                        id="compiler_options"
+                        type="text"
+                        value={compilerOptions}
+                        onChange={(e) => setCompilerOptions(e.target.value)}
+                        placeholder="Ex: -lm -std=c99 -Wall"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="command_line_arguments" className="text-xs">Argumentos de Linha de Comando</Label>
+                      <Input
+                        id="command_line_arguments"
+                        type="text"
+                        value={commandLineArguments}
+                        onChange={(e) => setCommandLineArguments(e.target.value)}
+                        placeholder=""
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="redirect_stderr"
+                      type="checkbox"
+                      checked={redirectStderrToStdout}
+                      onChange={(e) => setRedirectStderrToStdout(e.target.checked)}
+                      className="h-4 w-4 rounded border-stone-300 text-teal-600 focus:ring-teal-500"
+                    />
+                    <Label htmlFor="redirect_stderr" className="text-xs cursor-pointer">
+                      Redirecionar stderr para stdout
+                    </Label>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-4">

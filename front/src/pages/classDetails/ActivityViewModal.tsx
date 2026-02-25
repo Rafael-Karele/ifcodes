@@ -1,6 +1,6 @@
 import type { Activity, Problem } from "@/types";
 import { Label } from "@/components/ui/label";
-import { Codesandbox, Calendar, Clock, HardDrive, X } from "lucide-react";
+import { Codesandbox, Calendar, Clock, HardDrive, X, Settings2 } from "lucide-react";
 import { useUserRole } from "@/hooks/useUserRole";
 import { RichTextViewer } from "@/components/RichTextEditor";
 
@@ -18,8 +18,8 @@ export default function ActivityViewModal({ isOpen, onClose, activity, problem }
   const dueDate = new Date(activity.dueDate);
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           <div className="flex items-center justify-between border-b border-stone-200 pb-4">
             <h2 className="text-xl font-bold text-stone-900 flex items-center">
@@ -64,17 +64,80 @@ export default function ActivityViewModal({ isOpen, onClose, activity, problem }
                 <h3 className="font-semibold mb-2">Tempo Limite</h3>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span>{problem.timeLimitMs} milissegundos</span>
+                  <span>
+                    {activity.tempoLimite ?? problem.timeLimitMs} ms
+                    {activity.tempoLimite != null && (
+                      <span className="text-xs text-teal-600 ml-1">(override)</span>
+                    )}
+                  </span>
                 </div>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Memória Limite</h3>
                 <div className="flex items-center gap-2">
                   <HardDrive className="w-4 h-4" />
-                  <span>{problem.memoryLimitKb} KB</span>
+                  <span>
+                    {activity.memoriaLimite ?? problem.memoryLimitKb} KB
+                    {activity.memoriaLimite != null && (
+                      <span className="text-xs text-teal-600 ml-1">(override)</span>
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
+
+            {(activity.compilerOptions || activity.commandLineArguments || activity.redirectStderrToStdout || activity.wallTimeLimit != null || activity.stackLimit != null || activity.maxFileSize != null || activity.maxProcessesAndOrThreads != null) && (
+              <div className="border border-stone-200 rounded-lg p-4">
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <Settings2 className="w-5 h-5 mr-2 text-stone-600" />
+                  Configurações Avançadas
+                </h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {activity.wallTimeLimit != null && (
+                    <div>
+                      <span className="text-stone-500">Wall Time Limit:</span>{" "}
+                      <span className="font-medium">{activity.wallTimeLimit}s</span>
+                    </div>
+                  )}
+                  {activity.stackLimit != null && (
+                    <div>
+                      <span className="text-stone-500">Stack Limit:</span>{" "}
+                      <span className="font-medium">{activity.stackLimit} KB</span>
+                    </div>
+                  )}
+                  {activity.maxFileSize != null && (
+                    <div>
+                      <span className="text-stone-500">Tamanho Máx. Arquivo:</span>{" "}
+                      <span className="font-medium">{activity.maxFileSize} KB</span>
+                    </div>
+                  )}
+                  {activity.maxProcessesAndOrThreads != null && (
+                    <div>
+                      <span className="text-stone-500">Máx Processos/Threads:</span>{" "}
+                      <span className="font-medium">{activity.maxProcessesAndOrThreads}</span>
+                    </div>
+                  )}
+                  {activity.compilerOptions && (
+                    <div className="col-span-2">
+                      <span className="text-stone-500">Opções do Compilador:</span>{" "}
+                      <code className="bg-stone-100 px-2 py-0.5 rounded text-xs">{activity.compilerOptions}</code>
+                    </div>
+                  )}
+                  {activity.commandLineArguments && (
+                    <div className="col-span-2">
+                      <span className="text-stone-500">Argumentos de Linha de Comando:</span>{" "}
+                      <code className="bg-stone-100 px-2 py-0.5 rounded text-xs">{activity.commandLineArguments}</code>
+                    </div>
+                  )}
+                  {activity.redirectStderrToStdout && (
+                    <div className="col-span-2">
+                      <span className="text-stone-500">Redirecionar stderr para stdout:</span>{" "}
+                      <span className="font-medium">Sim</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {problem.testCases && problem.testCases.length > 0 && (
               <div>

@@ -38,15 +38,15 @@ class Judge0ApiService
     {
         $data['submissions'] = [];
         $casosIds = [];
+        $judge0Params = $submissao->atividade->getJudge0Params();
+
         foreach ($submissao->atividade->problema->casosTeste as $caso) {
-            $data['submissions'][] = [
+            $data['submissions'][] = array_merge([
                 'source_code' => base64_encode($submissao->codigo),
                 'language_id' => self::LINGUAGEM_C,
                 'stdin' => base64_encode($caso->entrada ?? ''),
                 'expected_output' => base64_encode($caso->saida ?? ''),
-                'cpu_time_limit' => $submissao->atividade->problema->tempo_limite / 1000,
-                'memory_limit' => $submissao->atividade->problema->memory_limite
-            ];
+            ], $judge0Params);
             $casosIds[] = $caso->id;
         }
 

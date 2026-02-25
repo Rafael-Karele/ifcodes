@@ -14,6 +14,15 @@ export interface StudentSubmission {
 export interface ActivityFormData {
   problema_id: number;
   data_entrega: string;
+  tempo_limite?: number | null;
+  memoria_limite?: number | null;
+  compiler_options?: string | null;
+  command_line_arguments?: string | null;
+  redirect_stderr_to_stdout?: boolean | null;
+  wall_time_limit?: number | null;
+  stack_limit?: number | null;
+  max_file_size?: number | null;
+  max_processes_and_or_threads?: number | null;
 }
 
 export const submissionStatusConfig = {
