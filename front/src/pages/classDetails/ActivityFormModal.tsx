@@ -226,25 +226,27 @@ export default function ActivityFormModal({ isOpen, onClose, onSave, problems, o
                         id="tempo_limite"
                         type="number"
                         min={100}
-                        max={60000}
+                        max={10000}
                         value={tempoLimite}
                         onChange={(e) => setTempoLimite(e.target.value)}
                         placeholder={selectedProblem ? String(selectedProblem.timeLimitMs) : ""}
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 100ms | Max: 10.000ms (10s)</p>
                     </div>
                     <div>
-                      <Label htmlFor="memoria_limite" className="text-xs">Memória Limite (KB)</Label>
+                      <Label htmlFor="memoria_limite" className="text-xs">Memoria Limite (KB)</Label>
                       <Input
                         id="memoria_limite"
                         type="number"
                         min={1024}
-                        max={1048576}
+                        max={256000}
                         value={memoriaLimite}
                         onChange={(e) => setMemoriaLimite(e.target.value)}
                         placeholder={selectedProblem ? String(selectedProblem.memoryLimitKb) : ""}
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 1.024KB (1MB) | Max: 256.000KB (256MB)</p>
                     </div>
                     <div>
                       <Label htmlFor="wall_time_limit" className="text-xs">Wall Time Limit (s)</Label>
@@ -252,52 +254,56 @@ export default function ActivityFormModal({ isOpen, onClose, onSave, problems, o
                         id="wall_time_limit"
                         type="number"
                         min={0.1}
-                        max={120}
+                        max={20}
                         step={0.1}
                         value={wallTimeLimit}
                         onChange={(e) => setWallTimeLimit(e.target.value)}
                         placeholder=""
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 0.1s | Max: 20s</p>
                     </div>
                     <div>
                       <Label htmlFor="stack_limit" className="text-xs">Stack Limit (KB)</Label>
                       <Input
                         id="stack_limit"
                         type="number"
-                        min={0}
-                        max={1048576}
+                        min={8000}
+                        max={128000}
                         value={stackLimit}
                         onChange={(e) => setStackLimit(e.target.value)}
                         placeholder=""
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 8.000KB (8MB) | Max: 128.000KB (128MB)</p>
                     </div>
                     <div>
-                      <Label htmlFor="max_file_size" className="text-xs">Tamanho Máx. Arquivo (KB)</Label>
+                      <Label htmlFor="max_file_size" className="text-xs">Tamanho Max. Arquivo (KB)</Label>
                       <Input
                         id="max_file_size"
                         type="number"
-                        min={0}
-                        max={1048576}
+                        min={64}
+                        max={2048}
                         value={maxFileSize}
                         onChange={(e) => setMaxFileSize(e.target.value)}
                         placeholder=""
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 64KB | Max: 2.048KB (2MB)</p>
                     </div>
                     <div>
-                      <Label htmlFor="max_processes" className="text-xs">Máx Processos/Threads</Label>
+                      <Label htmlFor="max_processes" className="text-xs">Max Processos/Threads</Label>
                       <Input
                         id="max_processes"
                         type="number"
-                        min={1}
-                        max={256}
+                        min={5}
+                        max={60}
                         value={maxProcessesAndOrThreads}
                         onChange={(e) => setMaxProcessesAndOrThreads(e.target.value)}
                         placeholder=""
                         className="mt-1"
                       />
+                      <p className="text-[10px] text-stone-400 mt-0.5">Min: 5 | Max: 60</p>
                     </div>
                   </div>
 
