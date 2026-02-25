@@ -606,6 +606,27 @@ export default function SubmissionsDetails() {
         </div>
       )}
 
+      {/* Erro de execução (runtime error, timeout, etc.) */}
+      {!results.some((r) => r.compileOutput) && results.some((r) => r.message || r.stderr) && (
+        <div className="bg-white rounded-lg border border-red-200 shadow-sm">
+          <div className="border-b border-red-200 p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-red-50 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-stone-800">
+                Erro de Execução
+              </h2>
+            </div>
+          </div>
+          <div className="p-6">
+            <pre className="bg-gray-900 text-gray-300 rounded-lg p-4 text-sm font-mono whitespace-pre-wrap overflow-auto max-h-80">
+              {results.find((r) => r.message)?.message || results.find((r) => r.stderr)?.stderr}
+            </pre>
+          </div>
+        </div>
+      )}
+
       {/* Casos de teste da submissão */}
       <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
         <div className="border-b border-stone-200 p-6">

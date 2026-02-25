@@ -28,6 +28,7 @@ class CorrecaoController extends Controller
             $correcao['stdout'] = isset($resultado['stdout']) ? mb_convert_encoding(base64_decode($resultado['stdout']), 'UTF-8', 'UTF-8') : null;
             $correcao['stderr'] = isset($resultado['stderr']) ? mb_convert_encoding(base64_decode($resultado['stderr']), 'UTF-8', 'UTF-8') : null;
             $correcao['compile_output'] = isset($resultado['compile_output']) ? mb_convert_encoding(base64_decode($resultado['compile_output']), 'UTF-8', 'UTF-8') : null;
+            $correcao['message'] = isset($resultado['message']) ? mb_convert_encoding(base64_decode($resultado['message']), 'UTF-8', 'UTF-8') : null;
 
             unset($correcao['token']);
         }
