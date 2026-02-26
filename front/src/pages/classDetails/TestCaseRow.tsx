@@ -1,13 +1,13 @@
 import { useState } from "react";
-import type { SubmissionStatus } from "@/types";
+import type { SubmissionStatus, TestCase, TestCaseResult } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Hash, Eye, EyeOff, Copy } from "lucide-react";
 import { TableRow, TableCell } from "@/components/table";
 import SubmissionStatusBadge from "./SubmissionStatusBadge";
 
 interface TestCaseRowProps {
-  testCase: any;
-  result: any;
+  testCase: TestCase;
+  result: TestCaseResult | undefined;
   index: number;
 }
 

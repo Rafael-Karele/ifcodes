@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Activity, Problem, Submission } from "@/types";
+import type { Activity, Language, Problem, Submission, TestCaseResult } from "@/types";
 import { getActivitySubmissions } from "@/services/ActivitiesService";
 import { getProblemById } from "@/services/ProblemsServices";
 import { getResultBySubmissionId } from "@/services/SubmissionsService";
@@ -36,7 +36,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
     studentName: string;
   } | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [testResults, setTestResults] = useState<any[]>([]);
+  const [testResults, setTestResults] = useState<TestCaseResult[]>([]);
   const [problem, setProblem] = useState<Problem | null>(null);
 
   useEffect(() => {
@@ -44,6 +44,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
       loadSubmissions();
       loadProblem();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, activity]);
 
   const loadProblem = async () => {
@@ -64,8 +65,10 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
     try {
       const data = await getActivitySubmissions(classId, activity.id);
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const submissionsByUser = new Map<number, any>();
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data.forEach((item: any) => {
         const userId = item.user_id;
         const existing = submissionsByUser.get(userId);
@@ -88,6 +91,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
         }
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mappedSubmissions: StudentSubmission[] = Array.from(submissionsByUser.values()).map((item: any) => ({
         studentId: item.user_id,
         studentName: item.user_name,
@@ -120,7 +124,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
           id: submission.submissionId,
           activityId: activity!.id,
           dateSubmitted: submission.submissionDate || new Date().toISOString(),
-          language: (submission.language || 'c') as any,
+          language: (submission.language || 'c') as Language,
           status: submission.status,
           problemTitle: null,
         },

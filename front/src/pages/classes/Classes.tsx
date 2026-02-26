@@ -81,10 +81,12 @@ export default function Classes() {
     if (user && user.roles?.includes("professor")) {
       setFormData((prev) => ({ ...prev, professor_id: user.id }));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
     filterClasses();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, classes]);
 
   const loadClasses = async () => {

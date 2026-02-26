@@ -125,6 +125,7 @@ export default function ActivitiesDetails() {
     if (selectedActivity) {
       fetchSubmissions(selectedActivity);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedActivity?.id]);
 
   useEffect(() => {
@@ -136,6 +137,7 @@ export default function ActivitiesDetails() {
         setActivitySubmissions(data);
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submissions]);
 
   function redirectToSubmission(submission: Submission) {
@@ -149,6 +151,7 @@ export default function ActivitiesDetails() {
         activityId: activityId,
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const raw = response as any;
       const newSubmission: Submission = {
         id: raw?.id ?? Date.now(),

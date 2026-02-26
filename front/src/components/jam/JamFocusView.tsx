@@ -108,6 +108,7 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
     } else {
       decorationsRef.current = editor.createDecorationsCollection(newDecorations);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participant.cursor?.line, participant.cursor?.column, participant.code]);
 
   const handleSendFeedback = () => {

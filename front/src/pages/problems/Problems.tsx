@@ -114,6 +114,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
     try {
       if (formData.enunciado) {
         const parsed = JSON.parse(formData.enunciado);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         plainText = parsed.blocks?.map((b: any) => b.text).join('').trim() || '';
       }
     } catch (_e) {

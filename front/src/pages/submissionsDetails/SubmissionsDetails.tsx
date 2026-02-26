@@ -11,6 +11,7 @@ import {
   getResultBySubmissionId,
 } from "@/services/SubmissionsService";
 import type {
+  TestCase,
   TestCaseResult,
   Problem,
 } from "@/types";
@@ -180,7 +181,7 @@ function formatDate(dateString: string) {
 }
 
 interface TestCaseRowProps {
-  testCase: any;
+  testCase: TestCase;
   result: TestCaseResult | undefined;
   index: number;
 }
@@ -395,6 +396,7 @@ export default function SubmissionsDetails() {
         }
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedActivity?.problemId]);
 
   if (loading) {

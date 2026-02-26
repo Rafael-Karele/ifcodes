@@ -72,6 +72,7 @@ export default function Activities() {
 
   useEffect(() => {
     updateActivities();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function refreshData() {

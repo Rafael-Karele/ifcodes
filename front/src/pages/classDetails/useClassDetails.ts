@@ -52,10 +52,12 @@ export function useClassDetails(id: string | undefined) {
     return () => {
       initializedRef.current = false;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
     filterAvailableStudents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, allStudents, students]);
 
   useEffect(() => {

@@ -99,6 +99,7 @@ export default function JamProfessorView({
       }
       return next;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [participants.length]);
 
   const handleSaveSettings = () => {

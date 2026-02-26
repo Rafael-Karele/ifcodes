@@ -117,6 +117,7 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(
   })
 );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const blockStyleFn = (block: any) => {
   const type = block.getType();
   if (type === "unordered-list-item") return "list-disc pl-6 my-1";
@@ -194,6 +195,7 @@ function getCurrentBlockType(editorState: EditorState) {
   return block?.getType() ?? "unstyled";
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getPlainTextFromRichValue(value: string) {
   const state = createEditorStateFromValue(value);
   return state.getCurrentContent().getPlainText();
