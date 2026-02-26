@@ -67,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('atividades', AtividadeController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('problemas', ProblemaController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('turmas', TurmaController::class)->only(['store', 'update', 'destroy']);
+        Route::apiResource('alunos', AlunoController::class)->only(['index', 'show']);
         Route::post('/turmas/{turma_id}/vincular-aluno/{aluno_id}', [TurmaController::class, 'vincularAluno']);
         Route::delete('/turmas/{turma_id}/desvincular-aluno/{aluno_id}', [TurmaController::class, 'desvincularAluno']);
         Route::get('/turmas/{turma_id}/atividades/{atividade_id}/submissoes', [SubmissaoController::class, 'getSubmissionsByActivity']);
@@ -83,7 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // ── Rotas restritas a admin ──
 
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('alunos', AlunoController::class);
+        Route::apiResource('alunos', AlunoController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('professores', ProfessorController::class)
             ->parameters(['professores' => 'professor']);
     });
