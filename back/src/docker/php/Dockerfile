@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install pdo pdo_pgsql pcntl bcmath
 
 # Instala o Composer.
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 # Define o diretório de trabalho.
 WORKDIR /var/www/html
