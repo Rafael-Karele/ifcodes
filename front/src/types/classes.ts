@@ -1,9 +1,19 @@
+export interface ClassAluno {
+  id: number;
+  name: string;
+  email: string;
+  created_at?: string;
+  matricula?: string;
+  curso?: { id: number; nome: string } | null;
+}
+
 export interface Class {
   id: number;
   nome: string;
   professor_id: number;
   teacherName?: string;
   studentsCount?: number;
+  alunos?: ClassAluno[];
   createdAt?: string;
   updatedAt?: string;
 }

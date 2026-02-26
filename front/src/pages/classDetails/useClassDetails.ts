@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Class, ClassStudent } from "@/types/classes";
-import type { Student, Activity } from "@/types";
+import type { Student, Activity, Problem } from "@/types";
 import ClassesService from "@/services/ClassesService";
 import { getAllStudents } from "@/services/StudentsService";
 import { getActivitiesByClass, createActivity, updateActivity, deleteActivity } from "@/services/ActivitiesService";
@@ -89,8 +89,7 @@ export function useClassDetails(id: string | undefined) {
 
       // Extract students from the same response to avoid a duplicate request
       const alunos = data.alunos || [];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setStudents(alunos.map((aluno: any) => ({
+      setStudents(alunos.map((aluno) => ({
         id: aluno.id,
         classId: data.id,
         studentId: aluno.id,
