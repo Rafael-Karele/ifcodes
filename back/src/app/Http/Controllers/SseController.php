@@ -9,6 +9,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Aluno;
 use App\Models\Professor;
 use Predis\Client as PredisClient;
+use Predis\Connection\ConnectionException;
 
 class SseController extends Controller
 {
@@ -58,46 +59,47 @@ class SseController extends Controller
                 ob_end_flush();
             }
 
-            // Create a dedicated predis client with read timeout for keepalive
-            $redis = new PredisClient([
-                'host' => config('database.redis.default.host', '127.0.0.1'),
-                'port' => config('database.redis.default.port', 6379),
-                'password' => config('database.redis.default.password'),
-                'read_write_timeout' => self::KEEPALIVE_INTERVAL,
-            ]);
+            while (!connection_aborted()) {
+                try {
+                    $redis = new PredisClient([
+                        'host' => config('database.redis.default.host', '127.0.0.1'),
+                        'port' => config('database.redis.default.port', 6379),
+                        'password' => config('database.redis.default.password'),
+                        'read_write_timeout' => self::KEEPALIVE_INTERVAL,
+                    ]);
 
-            $pubsub = $redis->pubSubLoop();
-            $pubsub->subscribe(...array_values($channels));
+                    $pubsub = $redis->pubSubLoop();
+                    $pubsub->subscribe(...array_values($channels));
 
-            $lastActivity = time();
+                    foreach ($pubsub as $message) {
+                        if (connection_aborted()) {
+                            $pubsub->stop();
+                            return;
+                        }
 
-            foreach ($pubsub as $message) {
-                if (connection_aborted()) {
-                    $pubsub->stop();
-                    break;
-                }
+                        if ($message->kind === 'message') {
+                            $data = json_decode($message->payload, true);
 
-                if ($message->kind === 'message') {
-                    $data = json_decode($message->payload, true);
+                            if ($data && isset($data['event'])) {
+                                echo "event: {$data['event']}\n";
+                                echo "data: {}\n\n";
+                            }
+                        }
 
-                    if ($data && isset($data['event'])) {
-                        echo "event: {$data['event']}\n";
-                        echo "data: {}\n\n";
+                        if (ob_get_level() > 0) {
+                            ob_flush();
+                        }
+                        flush();
                     }
-
-                    $lastActivity = time();
-                }
-
-                // Send keepalive if no activity for a while
-                if ((time() - $lastActivity) >= self::KEEPALIVE_INTERVAL) {
+                } catch (ConnectionException $e) {
+                    // Timeout — send keepalive and reconnect to pub/sub
                     echo ": keepalive\n\n";
-                    $lastActivity = time();
-                }
 
-                if (ob_get_level() > 0) {
-                    ob_flush();
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
                 }
-                flush();
             }
         }, 200, [
             'Content-Type' => 'text/event-stream',
