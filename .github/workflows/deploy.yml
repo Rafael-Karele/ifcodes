@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      jam: ${{ steps.filter.outputs.jam }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -18,6 +20,10 @@ jobs:
           filters: |
             backend:
               - 'back/**'
+            frontend:
+              - 'front/**'
+            jam:
+              - 'jam-server/**'
 
   tests:
     needs: changes
@@ -41,6 +47,26 @@ jobs:
             set -e
             cd "${{ secrets.VPS_PROJECT_PATH }}"
             git pull origin main
-            docker compose up -d --build
-            docker exec laravel_app php artisan migrate --force
-            docker exec laravel_app php artisan config:cache
+
+            SERVICES=""
+
+            if [ "${{ needs.changes.outputs.backend }}" = "true" ]; then
+              SERVICES="$SERVICES backend_app queue_worker"
+            fi
+
+            if [ "${{ needs.changes.outputs.frontend }}" = "true" ]; then
+              SERVICES="$SERVICES frontend_app"
+            fi
+
+            if [ "${{ needs.changes.outputs.jam }}" = "true" ]; then
+              SERVICES="$SERVICES jam_server"
+            fi
+
+            if [ -n "$SERVICES" ]; then
+              docker compose up -d --build $SERVICES
+            fi
+
+            if [ "${{ needs.changes.outputs.backend }}" = "true" ]; then
+              docker exec laravel_app php artisan migrate --force
+              docker exec laravel_app php artisan config:cache
+            fi
