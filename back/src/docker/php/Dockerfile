@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.4-cli
 
 # Instala dependências do sistema e extensões PHP.
 # Usamos 'apt-get' porque a imagem base é Debian.
