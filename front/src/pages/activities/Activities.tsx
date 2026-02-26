@@ -6,11 +6,9 @@ import {
   AlertTriangle,
   Search,
   Filter,
-  RefreshCw,
   FileText,
   BookOpen,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useData } from "@/context/DataContext";
 import { StatCard } from "@/components/StatCard";
 import { ActivityCard } from "@/components/ActivityCard";
@@ -68,21 +66,11 @@ export default function Activities() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     updateActivities();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  async function refreshData() {
-    setRefreshing(true);
-    try {
-      await updateActivities();
-    } finally {
-      setRefreshing(false);
-    }
-  }
 
   const filteredActivities = activities.filter((activity) => {
     const problemTitle = mapProblems.get(activity.problemId)?.title || "";
@@ -129,89 +117,64 @@ export default function Activities() {
               Gerencie e acompanhe suas atividades acadêmicas
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-teal-100">
-              {activities.length} atividade{activities.length !== 1 ? "s" : ""}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshData}
-              disabled={loading || refreshing}
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
-            >
-              <RefreshCw
-                className={`w-4 h-4 ${(loading || refreshing) ? "animate-spin" : ""}`}
-              />
-              Atualizar
-            </Button>
-          </div>
+          <span className="text-sm text-teal-100">
+            {activities.length} atividade{activities.length !== 1 ? "s" : ""}
+          </span>
         </div>
       </div>
 
       {/* ── search / filter ── */}
-      <div className="flex flex-col sm:flex-row items-center gap-4">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Buscar por título do problema..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 h-11 rounded-xl text-sm bg-white"
-            style={{
-              border: `1px solid ${palette.border}`,
-              outline: "none",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = palette.accent;
-              e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = palette.border;
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4" />
+        <input
+          type="text"
+          placeholder="Buscar por título..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-12 h-10 rounded-xl text-sm bg-white"
+          style={{
+            border: `1px solid ${palette.border}`,
+            outline: "none",
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = palette.accent;
+            e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = palette.border;
+            e.currentTarget.style.boxShadow = "none";
+          }}
+        />
+        <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none w-7 h-7 rounded-lg cursor-pointer opacity-0 absolute inset-0 z-10"
+            >
+              <option value="all">Todos os status</option>
+              {uniqueStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {activityStatusConfig[status as ActivityStatusKey]?.label || status}
+                </option>
+              ))}
+            </select>
+            <div
+              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                statusFilter !== "all"
+                  ? "text-teal-600 bg-teal-50"
+                  : "text-stone-400 hover:text-stone-600 hover:bg-stone-100"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+            </div>
+          </div>
         </div>
-        <div className="relative w-full sm:w-auto">
-          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full sm:w-auto pl-10 pr-8 h-11 rounded-xl text-sm bg-white min-w-[140px]"
-            style={{
-              border: `1px solid ${palette.border}`,
-              outline: "none",
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = palette.accent;
-              e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = palette.border;
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <option value="all">Todos os status</option>
-            {uniqueStatuses.map((status) => (
-              <option key={status} value={status}>
-                {activityStatusConfig[status as ActivityStatusKey]?.label || status}
-              </option>
-            ))}
-          </select>
-        </div>
-        {/* count badge */}
-        <span
-          className="text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap"
-          style={{ backgroundColor: palette.accentSoft, color: palette.accent }}
-        >
-          {filteredActivities.length} resultado{filteredActivities.length !== 1 ? "s" : ""}
-        </span>
       </div>
 
       {/* ── stats ── */}
       {!loading && activities.length > 0 && (
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <StatCard label="Pendentes" value={pendingCount} icon={Clock} />
           <StatCard
             label="Atrasadas"

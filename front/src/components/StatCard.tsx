@@ -15,7 +15,7 @@ export function StatCard({ label, value, icon: Icon, accent, className = "" }: S
           : "bg-white border-stone-200"
       } ${className}`}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <div className={`text-xl sm:text-3xl font-bold tabular-nums tracking-tight ${accent ? "text-red-700" : "text-stone-900"}`}>
             {value}
