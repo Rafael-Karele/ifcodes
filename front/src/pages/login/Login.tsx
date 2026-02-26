@@ -95,7 +95,7 @@ export default function Login() {
           onClose={() => setError(null)}
         />
       )}
-      <div className="w-full min-h-screen flex">
+      <div className="w-full h-screen h-dvh flex overflow-hidden">
         {/* Left panel — brand */}
         <div className="hidden lg:flex lg:w-[45%] bg-zinc-900 relative overflow-hidden flex-col justify-between p-12">
           {/* Subtle grid pattern */}
@@ -144,7 +144,7 @@ export default function Login() {
         </div>
 
         {/* Right panel — form */}
-        <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-white">
+        <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-white overflow-y-auto">
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="flex items-center gap-2.5 mb-10 lg:hidden">
