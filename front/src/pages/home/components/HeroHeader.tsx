@@ -26,20 +26,20 @@ export function HeroHeader({
   const navigate = useNavigate();
 
   return (
-    <div className="home-section home-delay-0 relative rounded-2xl px-8 py-10 overflow-hidden bg-gradient-to-br from-teal-600 to-emerald-800">
+    <div className="home-section home-delay-0 relative rounded-2xl px-5 py-5 sm:px-8 sm:py-10 overflow-hidden bg-gradient-to-br from-teal-600 to-emerald-800">
       <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
       <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
 
-      <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+      <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4">
         <div>
-          <p className="text-sm text-teal-100 font-medium capitalize">
+          <p className="text-xs sm:text-sm text-teal-100 font-medium capitalize">
             {currentDate}
           </p>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1 flex items-center gap-3">
-            <LayoutDashboard className="w-6 h-6 sm:w-8 sm:h-8" />
+          <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white mt-1 flex items-center gap-2 sm:gap-3">
+            <LayoutDashboard className="w-5 h-5 sm:w-8 sm:h-8" />
             {greeting}, {userName}
           </h1>
-          <p className="text-teal-100 text-sm mt-2 max-w-lg">
+          <p className="text-teal-100 text-xs sm:text-sm mt-1.5 sm:mt-2 max-w-lg">
             {pendingCount > 0 && (
               <span>
                 {pendingCount} pendente{pendingCount !== 1 && "s"}

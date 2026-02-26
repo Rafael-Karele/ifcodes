@@ -219,7 +219,7 @@ export default function Home() {
 
       {/* ── 2. Stats Row ── */}
       <div className="home-section home-delay-1 grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="col-span-2 lg:col-span-1 rounded-xl border border-stone-200 bg-white px-5 py-5">
+        <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 sm:px-5 sm:py-5">
           <CircularProgress percentage={successRate} />
         </div>
         <StatCard
