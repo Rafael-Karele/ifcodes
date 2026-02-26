@@ -114,12 +114,13 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html, body {
-    margin: 0;
-    padding: 0;
+  html {
     height: 100%;
   }
   body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
     @apply bg-background text-foreground;
   }
   #root {
