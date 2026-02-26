@@ -14,6 +14,7 @@ use Predis\Connection\ConnectionException;
 class SseController extends Controller
 {
     private const KEEPALIVE_INTERVAL = 30;
+    private const MAX_CONNECTION_TIME = 300; // 5 min, then browser reconnects
 
     public function stream(Request $request): StreamedResponse
     {
@@ -59,7 +60,9 @@ class SseController extends Controller
                 ob_end_flush();
             }
 
-            while (!connection_aborted()) {
+            $startTime = time();
+
+            while (!connection_aborted() && (time() - $startTime) < self::MAX_CONNECTION_TIME) {
                 try {
                     $redis = new PredisClient([
                         'host' => config('database.redis.default.host', '127.0.0.1'),
@@ -72,7 +75,7 @@ class SseController extends Controller
                     $pubsub->subscribe(...array_values($channels));
 
                     foreach ($pubsub as $message) {
-                        if (connection_aborted()) {
+                        if (connection_aborted() || (time() - $startTime) >= self::MAX_CONNECTION_TIME) {
                             $pubsub->stop();
                             return;
                         }
