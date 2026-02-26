@@ -121,6 +121,7 @@ export const ClassesService = {
       const alunos = classData.alunos || [];
       
       // Mapear os dados da API para o formato esperado pelo componente
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return alunos.map((aluno: any) => ({
         id: aluno.id,
         classId: classData.id,

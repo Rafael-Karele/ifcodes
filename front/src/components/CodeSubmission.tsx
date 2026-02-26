@@ -54,6 +54,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
    * Função chamada ao montar o editor Monaco.
    * Permite configurar atalhos e opções extras do editor.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
 

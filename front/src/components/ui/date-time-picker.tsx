@@ -47,6 +47,7 @@ const parseInputDate = (value: string | undefined): Date | null => {
   return null;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomInput = forwardRef<HTMLInputElement, any>(
   ({ value, onClick, placeholderText, onBlur, onDateChange }, ref) => {
     const [inputValue, setInputValue] = useState(value || "");
@@ -75,6 +76,7 @@ const CustomInput = forwardRef<HTMLInputElement, any>(
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       if (onClick) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         onClick(e as any);
       }
     };

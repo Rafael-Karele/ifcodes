@@ -13,6 +13,7 @@ export function StatusBadge({ label, className }: StatusBadgeProps) {
 
 /* ── pre-built config maps ────────────────────────── */
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const activityStatusConfig = {
   completed: {
     label: "Concluída",
@@ -38,6 +39,7 @@ export const activityStatusConfig = {
 
 export type ActivityStatusKey = keyof typeof activityStatusConfig;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const submissionStatusConfig = {
   passed: {
     label: "Aceito",
