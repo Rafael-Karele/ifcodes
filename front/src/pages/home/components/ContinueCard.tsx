@@ -17,22 +17,22 @@ export function ContinueCard({ activity, problemTitle }: ContinueCardProps) {
 
   return (
     <div
-      className={`rounded-xl border px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4 ${
+      className={`rounded-xl border px-4 py-3 sm:px-6 sm:py-5 flex items-center gap-3 sm:gap-4 ${
         isOverdue
           ? "bg-red-50/60 border-red-200/80"
           : "bg-amber-50/60 border-amber-200/80"
       }`}
     >
-      <div className={`p-2.5 rounded-lg self-start ${isOverdue ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
-        {isOverdue ? <AlertTriangle className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+      <div className={`p-2 sm:p-2.5 rounded-lg shrink-0 ${isOverdue ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-600"}`}>
+        {isOverdue ? <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Clock className="w-4 h-4 sm:w-5 sm:h-5" />}
       </div>
 
       <div className="flex-1 min-w-0">
         <p className={`text-xs font-semibold uppercase tracking-wide ${isOverdue ? "text-red-500" : "text-amber-600"}`}>
           {isOverdue ? "Atrasada" : "Próximo prazo"}
         </p>
-        <p className="text-sm font-semibold text-stone-800 mt-0.5 truncate">{problemTitle}</p>
-        <p className={`text-xs mt-0.5 ${isOverdue ? "text-red-500" : "text-amber-600"}`}>
+        <p className="text-sm font-semibold text-stone-800 truncate">{problemTitle}</p>
+        <p className={`text-xs ${isOverdue ? "text-red-500" : "text-amber-600"}`}>
           {isOverdue ? "Venceu " : "Vence "}
           {formatDistanceToNow(due, { addSuffix: true, locale: ptBR })}
         </p>
@@ -41,7 +41,7 @@ export function ContinueCard({ activity, problemTitle }: ContinueCardProps) {
       <Button
         size="sm"
         onClick={() => navigate(`/activities/${activity.id}`)}
-        className={`min-h-[44px] w-full sm:w-auto rounded-xl shadow-none font-semibold shrink-0 ${
+        className={`hidden sm:flex min-h-[44px] rounded-xl shadow-none font-semibold shrink-0 ${
           isOverdue
             ? "bg-red-600 hover:bg-red-700 text-white"
             : "bg-amber-500 hover:bg-amber-600 text-white"
@@ -49,6 +49,18 @@ export function ContinueCard({ activity, problemTitle }: ContinueCardProps) {
       >
         Continuar
         <ArrowRight className="w-4 h-4 ml-1" />
+      </Button>
+
+      <Button
+        size="icon"
+        onClick={() => navigate(`/activities/${activity.id}`)}
+        className={`sm:hidden h-8 w-8 rounded-lg shrink-0 shadow-none ${
+          isOverdue
+            ? "bg-red-600 text-white hover:bg-red-700"
+            : "bg-amber-500 text-white hover:bg-amber-600"
+        }`}
+      >
+        <ArrowRight className="w-4 h-4" />
       </Button>
     </div>
   );
