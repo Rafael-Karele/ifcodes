@@ -25,11 +25,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// SSE — stream de eventos em tempo real (fora do auth:sanctum, autentica via query token)
+Route::get('/sse/events', [SseController::class, 'stream']);
+
 // Todas as rotas da API exigem autenticação via Sanctum
 Route::middleware('auth:sanctum')->group(function () {
-
-    // SSE — stream de eventos em tempo real
-    Route::get('/sse/events', [SseController::class, 'stream']);
 
     // Rotas de informações do usuário autenticado
     Route::get('/user', [AuthController::class, 'user']);

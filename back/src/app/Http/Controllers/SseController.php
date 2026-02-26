@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Aluno;
 use App\Models\Professor;
 use Predis\Client as PredisClient;
@@ -15,15 +16,19 @@ class SseController extends Controller
 
     public function stream(Request $request): StreamedResponse
     {
-        if ($token = $request->query('token')) {
-            $request->headers->set('Authorization', 'Bearer ' . $token);
+        $token = $request->query('token');
+
+        if (!$token) {
+            abort(401, 'Token required');
         }
 
-        $user = auth()->user();
+        $accessToken = PersonalAccessToken::findToken($token);
 
-        if (!$user) {
-            abort(401);
+        if (!$accessToken) {
+            abort(401, 'Invalid token');
         }
+
+        $user = $accessToken->tokenable;
 
         $userId = $user->id;
         $channels = ["sse:user.{$userId}"];
