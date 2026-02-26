@@ -142,7 +142,7 @@ export default function Header() {
                 <Terminal className="h-4 w-4 text-white" />
               </div>
               <span className="text-stone-900 text-base font-bold tracking-tight">
-                IFCode
+                IFCodes
               </span>
             </Link>
 

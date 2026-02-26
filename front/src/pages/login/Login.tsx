@@ -126,7 +126,7 @@ export default function Login() {
                 <Terminal className="w-5 h-5 text-white" />
               </div>
               <span className="text-white text-2xl font-bold tracking-tight">
-                IFCode
+                IFCodes
               </span>
             </div>
           </div>
@@ -152,7 +152,7 @@ export default function Login() {
                 <Terminal className="w-4 h-4 text-white" />
               </div>
               <span className="text-zinc-900 text-lg font-bold tracking-tight">
-                IFCode
+                IFCodes
               </span>
             </div>
 
