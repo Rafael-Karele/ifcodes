@@ -4,7 +4,6 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useRef,
   useCallback,
   useMemo,
 } from "react";
@@ -112,25 +111,24 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchData();
   }, [user, userLoading]);
 
-  // Polling unificado: atualiza submissões e atividades quando há submissões pendentes
-  const hasPendingSubmissions = useRef(false);
+  // SSE: escuta eventos do backend para atualizar dados em tempo real
   useEffect(() => {
-    hasPendingSubmissions.current = submissions.some(
-      (s) => s.status === "pending" || s.status === "processing"
+    if (!user) return;
+
+    const token = localStorage.getItem("auth_token");
+    if (!token) return;
+
+    const es = new EventSource(
+      `${import.meta.env.VITE_API_URL}/api/sse/events?token=${token}`
     );
-  }, [submissions]);
 
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      if (hasPendingSubmissions.current) {
-        await Promise.all([updateSubmissions(), updateActivities()]);
-      }
-    }, 10000);
+    es.addEventListener("activity.created", () => updateActivities());
+    es.addEventListener("activity.updated", () => updateActivities());
+    es.addEventListener("activity.deleted", () => updateActivities());
+    es.addEventListener("submission.updated", () => updateSubmissions());
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [updateSubmissions, updateActivities]);
+    return () => es.close();
+  }, [user, updateActivities, updateSubmissions]);
 
   return (
     <DataContext.Provider

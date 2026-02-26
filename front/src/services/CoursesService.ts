@@ -19,7 +19,7 @@ function getAuthHeaders() {
 
 // Função auxiliar para tratamento de erros de autenticação
 function handleAuthError(error: unknown) {
-  if (axios.isAxiosError(error) && (error.response?.status === 401 || error.response?.status === 403)) {
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
     localStorage.removeItem("auth_token");
     window.location.href = "/login";
   }
