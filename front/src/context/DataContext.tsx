@@ -13,7 +13,7 @@ import { getAllProblems } from "@/services/ProblemsServices";
 import { getAllSubmissions } from "@/services/SubmissionsService";
 import { useUser } from "./UserContext";
 
-export type SseNotification = {
+export type RealtimeNotification = {
   id: number;
   message: string;
   type: "success" | "warning";
@@ -29,7 +29,7 @@ interface DataContextType {
   loading: boolean;
   updateSubmissions: () => Promise<void>;
   updateActivities: () => Promise<void>;
-  sseNotifications: SseNotification[];
+  notifications: RealtimeNotification[];
   dismissNotification: (id: number) => void;
 }
 
@@ -43,7 +43,7 @@ const DataContext = createContext<DataContextType>({
   loading: false,
   updateSubmissions: async () => {},
   updateActivities: async () => {},
-  sseNotifications: [],
+  notifications: [],
   dismissNotification: () => {},
 });
 
@@ -55,15 +55,15 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [problems, setProblems] = useState<Problem[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sseNotifications, setSseNotifications] = useState<SseNotification[]>([]);
+  const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
 
   const pushNotification = useCallback((message: string, type: "success" | "warning" = "success") => {
     const id = Date.now();
-    setSseNotifications((prev) => [...prev, { id, message, type }]);
+    setNotifications((prev) => [...prev, { id, message, type }]);
   }, []);
 
   const dismissNotification = useCallback((id: number) => {
-    setSseNotifications((prev) => prev.filter((n) => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   }, []);
   const mapProblems = useMemo(() => {
     return new Map(problems.map((problem) => [problem.id, problem]));
@@ -131,35 +131,73 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchData();
   }, [user, userLoading]);
 
-  // SSE: escuta eventos do backend para atualizar dados em tempo real
+  // WebSocket: escuta eventos do backend para atualizar dados em tempo real
   useEffect(() => {
     if (!user) return;
 
     const token = localStorage.getItem("auth_token");
     if (!token) return;
 
-    const es = new EventSource(
-      `${import.meta.env.VITE_API_URL}/api/sse/events?token=${encodeURIComponent(token)}`
-    );
+    const wsUrl = import.meta.env.VITE_WS_URL || "ws://localhost:3002";
+    let ws: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let disposed = false;
 
-    es.addEventListener("activity.created", () => {
-      updateActivities();
-      pushNotification("Uma nova atividade foi publicada!");
-    });
-    es.addEventListener("activity.updated", () => {
-      updateActivities();
-      pushNotification("Uma atividade foi atualizada.", "warning");
-    });
-    es.addEventListener("activity.deleted", () => {
-      updateActivities();
-      pushNotification("Uma atividade foi removida.", "warning");
-    });
-    es.addEventListener("submission.updated", () => {
-      updateSubmissions();
-      pushNotification("Sua submissão foi avaliada!");
-    });
+    function connect() {
+      if (disposed) return;
 
-    return () => es.close();
+      ws = new WebSocket(`${wsUrl}/notifications`);
+
+      ws.onopen = () => {
+        ws?.send(JSON.stringify({ type: "AUTH_NOTIFICATIONS", token }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "NOTIFICATION") {
+            switch (msg.event) {
+              case "activity.created":
+                updateActivities();
+                pushNotification("Uma nova atividade foi publicada!");
+                break;
+              case "activity.updated":
+                updateActivities();
+                pushNotification("Uma atividade foi atualizada.", "warning");
+                break;
+              case "activity.deleted":
+                updateActivities();
+                pushNotification("Uma atividade foi removida.", "warning");
+                break;
+              case "submission.updated":
+                updateSubmissions();
+                pushNotification("Sua submissão foi avaliada!");
+                break;
+            }
+          }
+        } catch {
+          // ignore parse errors
+        }
+      };
+
+      ws.onclose = () => {
+        if (!disposed) {
+          reconnectTimer = setTimeout(connect, 5000);
+        }
+      };
+
+      ws.onerror = () => {
+        ws?.close();
+      };
+    }
+
+    connect();
+
+    return () => {
+      disposed = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      ws?.close();
+    };
   }, [user, updateActivities, updateSubmissions, pushNotification]);
 
   return (
@@ -174,7 +212,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         submissions,
         updateSubmissions,
         updateActivities,
-        sseNotifications,
+        notifications,
         dismissNotification,
       }}
     >

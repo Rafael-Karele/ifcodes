@@ -11,7 +11,6 @@ use App\Http\Controllers\Auth\ForgotPasswordTempController;
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\TurmaController;
 use App\Http\Controllers\JamSessionController;
-use App\Http\Controllers\SseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,9 +23,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-// SSE — stream de eventos em tempo real (fora do auth:sanctum, autentica via query token)
-Route::get('/sse/events', [SseController::class, 'stream']);
 
 // Todas as rotas da API exigem autenticação via Sanctum
 Route::middleware('auth:sanctum')->group(function () {

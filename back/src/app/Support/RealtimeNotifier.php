@@ -4,7 +4,7 @@ namespace App\Support;
 
 use Predis\Client as PredisClient;
 
-class SseNotifier
+class RealtimeNotifier
 {
     private static function redis(): PredisClient
     {
@@ -17,11 +17,11 @@ class SseNotifier
 
     public static function toUser(int $userId, string $event): void
     {
-        self::redis()->publish("sse:user.{$userId}", json_encode(['event' => $event]));
+        self::redis()->publish("notify:user.{$userId}", json_encode(['event' => $event]));
     }
 
     public static function toTurma(int $turmaId, string $event): void
     {
-        self::redis()->publish("sse:turma.{$turmaId}", json_encode(['event' => $event]));
+        self::redis()->publish("notify:turma.{$turmaId}", json_encode(['event' => $event]));
     }
 }

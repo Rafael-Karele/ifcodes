@@ -11,7 +11,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
-      jam: ${{ steps.filter.outputs.jam }}
+      ws: ${{ steps.filter.outputs.ws }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -22,8 +22,8 @@ jobs:
               - 'back/**'
             frontend:
               - 'front/**'
-            jam:
-              - 'jam-server/**'
+            ws:
+              - 'ws-server/**'
 
   tests:
     needs: changes
@@ -58,8 +58,8 @@ jobs:
               SERVICES="$SERVICES frontend_app"
             fi
 
-            if [ "${{ needs.changes.outputs.jam }}" = "true" ]; then
-              SERVICES="$SERVICES jam_server"
+            if [ "${{ needs.changes.outputs.ws }}" = "true" ]; then
+              SERVICES="$SERVICES ws_server"
             fi
 
             if [ -n "$SERVICES" ]; then

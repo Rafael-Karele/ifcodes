@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
+import { validateToken } from '../../shared/auth';
+import { LaravelUser } from '../../shared/types';
 import {
-  validateToken,
   updateCode,
   submitCode,
   startSession,
@@ -8,8 +9,7 @@ import {
   giveFeedback,
   getSessionData,
   updateSessionSettings as restUpdateSettings,
-  LaravelUser,
-} from './laravel-client';
+} from './api-client';
 import {
   getOrCreateSession,
   setParticipant,
@@ -22,7 +22,7 @@ import {
   updateSessionSettings,
   serializeSession,
   getSession,
-} from './jam-state';
+} from './state';
 
 interface AuthenticatedClient {
   ws: WebSocket;

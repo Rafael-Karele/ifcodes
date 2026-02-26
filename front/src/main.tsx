@@ -4,7 +4,7 @@ import "./index.css";
 import AppRouter from "./routes/AppRouter.tsx";
 import DataProvider from "./context/DataContext.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
-import SseNotifications from "./components/SseNotifications.tsx";
+import RealtimeNotifications from "./components/RealtimeNotifications.tsx";
 import axios from "axios";
 
 // Configure axios defaults for the app: base URL and send credentials (for Sanctum)
@@ -17,7 +17,7 @@ createRoot(document.getElementById("root")!).render(
     <UserProvider>
       <DataProvider>
         <AppRouter />
-        <SseNotifications />
+        <RealtimeNotifications />
       </DataProvider>
     </UserProvider>
   </StrictMode>

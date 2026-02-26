@@ -43,10 +43,10 @@ class JamSubmissaoService
 
     public function notifySidecar(int $jamSessionId, int $userId, string $status, array $testResults = []): void
     {
-        $sidecarUrl = config('services.jam_server.url', 'http://jam_server:3001');
+        $sidecarUrl = config('services.ws_server.url', 'http://ws_server:3001');
 
         try {
-            Http::post("{$sidecarUrl}/result", [
+            Http::post("{$sidecarUrl}/jam/result", [
                 'jamSessionId' => $jamSessionId,
                 'userId' => $userId,
                 'status' => $status,

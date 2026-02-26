@@ -1,7 +1,7 @@
 {
-  "name": "jam-server",
+  "name": "ws-server",
   "version": "1.0.0",
-  "description": "WebSocket sidecar for IFCode Jam Sessions",
+  "description": "Generic WebSocket server for IFCodes (jam sessions + notifications)",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "express": "^4.18.2",
+    "ioredis": "^5.4.1",
     "ws": "^8.16.0",
     "axios": "^1.6.7"
   },

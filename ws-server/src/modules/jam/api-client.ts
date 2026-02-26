@@ -1,35 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
-
-const LARAVEL_API_URL = process.env.LARAVEL_API_URL || 'http://laravel_app:8000';
-
-const client: AxiosInstance = axios.create({
-  baseURL: LARAVEL_API_URL,
-  timeout: 10000,
-  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-});
-
-export interface LaravelUser {
-  id: number;
-  name: string;
-  email: string;
-  roles: string[];
-}
-
-export async function validateToken(token: string): Promise<LaravelUser | null> {
-  try {
-    const authHeaders = { Authorization: `Bearer ${token}` };
-    const [userRes, rolesRes] = await Promise.all([
-      client.get('/api/user', { headers: authHeaders }),
-      client.get('/api/user/roles', { headers: authHeaders }),
-    ]);
-    return {
-      ...userRes.data,
-      roles: rolesRes.data?.roles || [],
-    } as LaravelUser;
-  } catch {
-    return null;
-  }
-}
+import client from '../../shared/laravel-client';
 
 export async function updateCode(jamId: number, token: string, code: string, language?: string): Promise<void> {
   try {

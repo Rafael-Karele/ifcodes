@@ -1,13 +1,13 @@
 import { useData } from "@/context/DataContext";
 import Notification from "./Notification";
 
-export default function SseNotifications() {
-  const { sseNotifications, dismissNotification } = useData();
+export default function RealtimeNotifications() {
+  const { notifications, dismissNotification } = useData();
 
-  if (sseNotifications.length === 0) return null;
+  if (notifications.length === 0) return null;
 
   // Show only the most recent notification
-  const latest = sseNotifications[sseNotifications.length - 1];
+  const latest = notifications[notifications.length - 1];
 
   return (
     <Notification
