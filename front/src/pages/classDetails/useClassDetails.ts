@@ -51,8 +51,12 @@ export function useClassDetails(id: string | undefined) {
     }
     loadClassActivities();
     loadJamSessions();
+
+    return () => {
+      initializedRef.current = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, isProfessorOrAdmin]);
 
   useEffect(() => {
     filterAvailableStudents();
