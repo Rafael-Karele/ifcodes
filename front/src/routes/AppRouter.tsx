@@ -20,7 +20,7 @@ import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
 import JamCreate from "@/pages/jam/JamCreate";
 import JamView from "@/pages/jam/JamView";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 
 function NotFound() {
   const location = useLocation();
@@ -47,7 +47,7 @@ export default function AppRouter() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route element={<RequireAuth />}>
           <Route path="/" element={<AppLayout />}>
-            <Route index element={<App />} />
+            <Route index element={<Navigate to="/home" replace />} />
             <Route path="home" element={<Home />} />
             <Route element={<RequireRole allowedRoles={["student", "professor", "admin"]} />}>
               <Route path="change-password" element={<ChangePassword />} />
