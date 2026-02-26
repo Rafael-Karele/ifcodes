@@ -3,11 +3,40 @@ name: Tests
 on:
   pull_request:
     branches: [main]
-    paths:
-      - 'back/**'
-      - '.github/workflows/tests.yml'
-      - '.github/workflows/phpunit.yml'
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'back/**'
+              - '.github/workflows/tests.yml'
+              - '.github/workflows/phpunit.yml'
+
   phpunit:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     uses: ./.github/workflows/phpunit.yml
+
+  # Gate job — always runs and reports success so branch protection is satisfied
+  tests-gate:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: [changes, phpunit]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.phpunit.result }}" == "failure" ]]; then
+            echo "PHPUnit tests failed"
+            exit 1
+          fi
+          echo "All checks passed (tests ran: ${{ needs.changes.outputs.backend }})"
