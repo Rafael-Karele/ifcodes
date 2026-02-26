@@ -57,6 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/jam-sessions/{id}/submit', [JamSessionController::class, 'submitCode']);
     Route::get('/turmas/{id}/jam-session/active', [JamSessionController::class, 'activeForTurma']);
 
+    // ⚠️ ROTA VULNERÁVEL DE TESTE — qualquer autenticado pode deletar alunos!
+    // Isso simula um dev que esqueceu de proteger com role middleware.
+    Route::delete('/test-vulnerable/alunos/{id}', function ($id) {
+        return response()->json(['msg' => 'aluno deletado (sem proteção!)']);
+    });
+
     // ── Rotas restritas a professor e admin ──
 
     Route::middleware('role:professor|admin')->group(function () {
