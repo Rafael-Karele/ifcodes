@@ -51,7 +51,67 @@ Client → Nginx (porta 80) → PHP-FPM (porta 9000) → Laravel
 
 ---
 
-## 2. Migrar deploy para GitHub Container Registry (GHCR)
+## 2. Remover volume mounts de codigo em producao
+
+**Prioridade:** Media
+**Impacto:** Consistencia, seguranca e performance do deploy
+
+### Situacao atual
+
+O `docker-compose.prod.yml` monta o codigo do host como volume:
+
+```yaml
+backend_app:
+  volumes:
+    - ./back/src/:/var/www/html:z
+    - /var/www/html/vendor
+```
+
+Isso faz com que o `COPY src/ .` e o `composer install` do Dockerfile sejam ignorados em runtime — o container usa o codigo do filesystem do VPS. O deploy real e o `git pull`, nao o build da imagem.
+
+### Proposta
+
+Remover os volume mounts de codigo e deixar a imagem Docker ser a unica fonte de verdade:
+
+```yaml
+backend_app:
+  build:
+    context: ./back
+    dockerfile: src/docker/php/Dockerfile
+  container_name: laravel_app
+  # sem volume de codigo
+```
+
+### Comparacao
+
+| Aspecto | Com volume (atual) | Sem volume (recomendado) |
+|---|---|---|
+| Consistencia | Depende do estado do filesystem | Imagem imutavel e reproduzivel |
+| Rollback | Manual (`git checkout`) | Troca a tag da imagem |
+| Performance | I/O passa pelo bind mount | Filesystem nativo do container |
+| Seguranca | Codigo editavel em runtime | Codigo read-only na imagem |
+| Dockerfile | `COPY` e `install` sao desperdicio | `COPY` e `install` sao o deploy real |
+| Vendor | Volume anonimo pode ficar desatualizado | Sempre fresh do `composer install` |
+
+### Mudancas necessarias
+
+1. Remover `volumes` de codigo de `backend_app` e `queue_worker` no `docker-compose.prod.yml`
+2. Garantir que o Dockerfile copia tudo que e necessario (`COPY src/ .`)
+3. Ajustar deploy para fazer `docker compose build` + `up -d` (sem depender de `git pull` para o codigo)
+4. Manter volumes apenas para dados persistentes (ex: `postgres_data`)
+
+### Quando fazer
+
+- Idealmente junto com a migracao para GHCR (item 3 abaixo)
+- Pode ser feito antes, mas o maior beneficio vem quando o build acontece no CI e nao no VPS
+
+### Nota sobre desenvolvimento
+
+Em desenvolvimento local, volumes de codigo sao uteis para hot-reload. A solucao e ter um `docker-compose.yml` separado para dev (com volumes) e o `docker-compose.prod.yml` sem volumes.
+
+---
+
+## 3. Migrar deploy para GitHub Container Registry (GHCR)
 
 **Prioridade:** Baixa
 **Impacto:** Pipeline de deploy mais robusto
