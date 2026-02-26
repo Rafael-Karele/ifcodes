@@ -125,3 +125,4 @@ Considere migrar para GHCR quando:
 ## Veja tambem
 
 - [Melhorias Futuras](./melhorias-futuras.md) — Sugestoes de melhorias como migracao para Nginx + PHP-FPM
+- [Ambiente de Staging](./staging.md) — Proposta de ambiente intermediario entre dev e producao

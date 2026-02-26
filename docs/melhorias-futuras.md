@@ -111,7 +111,18 @@ Em desenvolvimento local, volumes de codigo sao uteis para hot-reload. A solucao
 
 ---
 
-## 3. Migrar deploy para GitHub Container Registry (GHCR)
+## 3. Ambiente de staging
+
+**Prioridade:** Media
+**Impacto:** Qualidade e confiabilidade dos deploys
+
+Hoje o deploy vai direto de `main` para producao sem validacao intermediaria. Um ambiente de staging permite testar features, migrations e integracoes antes de afetar usuarios reais.
+
+Detalhes completos em [docs/staging.md](./staging.md).
+
+---
+
+## 4. Migrar deploy para GitHub Container Registry (GHCR)
 
 **Prioridade:** Baixa
 **Impacto:** Pipeline de deploy mais robusto

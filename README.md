@@ -81,4 +81,7 @@ O projeto tem 4 workflows no GitHub Actions:
 
 O deploy so reconstroi os servicos Docker que foram alterados (back, front, jam-server).
 
-Para mais detalhes, veja [docs/CD.md](docs/CD.md) e [docs/melhorias-futuras.md](docs/melhorias-futuras.md).
+Para mais detalhes, veja:
+- [docs/CD.md](docs/CD.md) — Pipeline de deploy e configuracao de secrets
+- [docs/staging.md](docs/staging.md) — Proposta de ambiente de staging
+- [docs/melhorias-futuras.md](docs/melhorias-futuras.md) — Nginx+FPM, GHCR e outras melhorias
