@@ -13,6 +13,12 @@ import { getAllProblems } from "@/services/ProblemsServices";
 import { getAllSubmissions } from "@/services/SubmissionsService";
 import { useUser } from "./UserContext";
 
+export type SseNotification = {
+  id: number;
+  message: string;
+  type: "success" | "warning";
+};
+
 interface DataContextType {
   activities: Activity[];
   problems: Problem[];
@@ -23,6 +29,8 @@ interface DataContextType {
   loading: boolean;
   updateSubmissions: () => Promise<void>;
   updateActivities: () => Promise<void>;
+  sseNotifications: SseNotification[];
+  dismissNotification: (id: number) => void;
 }
 
 const DataContext = createContext<DataContextType>({
@@ -35,6 +43,8 @@ const DataContext = createContext<DataContextType>({
   loading: false,
   updateSubmissions: async () => {},
   updateActivities: async () => {},
+  sseNotifications: [],
+  dismissNotification: () => {},
 });
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -45,6 +55,16 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [problems, setProblems] = useState<Problem[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sseNotifications, setSseNotifications] = useState<SseNotification[]>([]);
+
+  const pushNotification = useCallback((message: string, type: "success" | "warning" = "success") => {
+    const id = Date.now();
+    setSseNotifications((prev) => [...prev, { id, message, type }]);
+  }, []);
+
+  const dismissNotification = useCallback((id: number) => {
+    setSseNotifications((prev) => prev.filter((n) => n.id !== id));
+  }, []);
   const mapProblems = useMemo(() => {
     return new Map(problems.map((problem) => [problem.id, problem]));
   }, [problems]);
@@ -122,13 +142,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       `${import.meta.env.VITE_API_URL}/api/sse/events?token=${token}`
     );
 
-    es.addEventListener("activity.created", () => updateActivities());
-    es.addEventListener("activity.updated", () => updateActivities());
-    es.addEventListener("activity.deleted", () => updateActivities());
-    es.addEventListener("submission.updated", () => updateSubmissions());
+    es.addEventListener("activity.created", () => {
+      updateActivities();
+      pushNotification("Uma nova atividade foi publicada!");
+    });
+    es.addEventListener("activity.updated", () => {
+      updateActivities();
+      pushNotification("Uma atividade foi atualizada.", "warning");
+    });
+    es.addEventListener("activity.deleted", () => {
+      updateActivities();
+      pushNotification("Uma atividade foi removida.", "warning");
+    });
+    es.addEventListener("submission.updated", () => {
+      updateSubmissions();
+      pushNotification("Sua submissão foi avaliada!");
+    });
 
     return () => es.close();
-  }, [user, updateActivities, updateSubmissions]);
+  }, [user, updateActivities, updateSubmissions, pushNotification]);
 
   return (
     <DataContext.Provider
@@ -142,6 +174,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         submissions,
         updateSubmissions,
         updateActivities,
+        sseNotifications,
+        dismissNotification,
       }}
     >
       {children}
