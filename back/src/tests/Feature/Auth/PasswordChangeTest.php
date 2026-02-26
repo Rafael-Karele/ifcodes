@@ -17,7 +17,7 @@ class PasswordChangeTest extends TestCase
             'password' => Hash::make('current-password'),
         ]);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
@@ -43,7 +43,7 @@ class PasswordChangeTest extends TestCase
         // Verify the flag is initially set
         $this->assertTrue($user->must_change_password);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
@@ -68,7 +68,7 @@ class PasswordChangeTest extends TestCase
 
         $this->assertCount(2, $user->tokens);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
@@ -87,7 +87,7 @@ class PasswordChangeTest extends TestCase
             'password' => Hash::make('current-password'),
         ]);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'wrong-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
@@ -105,7 +105,7 @@ class PasswordChangeTest extends TestCase
 
     public function test_password_change_requires_authentication(): void
     {
-        $response = $this->postJson('/user/change-password', [
+        $response = $this->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
@@ -120,7 +120,7 @@ class PasswordChangeTest extends TestCase
             'password' => Hash::make('current-password'),
         ]);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'short',
             'new_password_confirmation' => 'short',
@@ -136,7 +136,7 @@ class PasswordChangeTest extends TestCase
             'password' => Hash::make('current-password'),
         ]);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'different-password',
@@ -156,7 +156,7 @@ class PasswordChangeTest extends TestCase
         // Verify the flag is initially false
         $this->assertFalse($user->must_change_password);
 
-        $response = $this->actingAs($user)->postJson('/user/change-password', [
+        $response = $this->actingAs($user)->postJson('/api/user/change-password', [
             'current_password' => 'current-password',
             'new_password' => 'new-password',
             'new_password_confirmation' => 'new-password',
