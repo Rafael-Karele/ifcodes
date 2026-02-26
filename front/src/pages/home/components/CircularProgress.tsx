@@ -1,8 +1,9 @@
 interface CircularProgressProps {
   percentage: number;
+  label: string;
 }
 
-export function CircularProgress({ percentage }: CircularProgressProps) {
+export function CircularProgress({ percentage, label }: CircularProgressProps) {
   const size = 36;
   const strokeWidth = 4;
   const radius = (size - strokeWidth) / 2;
@@ -17,7 +18,7 @@ export function CircularProgress({ percentage }: CircularProgressProps) {
           {Math.round(percentage)}%
         </div>
         <p className="text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium text-stone-500">
-          Taxa de Acerto
+          {label}
         </p>
       </div>
       <svg

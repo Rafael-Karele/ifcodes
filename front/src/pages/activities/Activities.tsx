@@ -20,10 +20,6 @@ import { activityStatusConfig, type ActivityStatusKey } from "@/components/Statu
 const palette = {
   accent: "#0d9488",
   accentDark: "#065f46",
-  accentLight: "#ccfbf1",
-  accentSoft: "#f0fdfa",
-  textSecondary: "#78716c",
-  border: "#e7e5e4",
 };
 
 /* ── helpers ────────────────────────────────────────── */
@@ -131,19 +127,7 @@ export default function Activities() {
           placeholder="Buscar por título..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-12 h-10 rounded-xl text-sm bg-white"
-          style={{
-            border: `1px solid ${palette.border}`,
-            outline: "none",
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.borderColor = palette.accent;
-            e.currentTarget.style.boxShadow = `0 0 0 3px ${palette.accent}30`;
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.borderColor = palette.border;
-            e.currentTarget.style.boxShadow = "none";
-          }}
+          className="w-full pl-10 pr-12 h-10 rounded-xl text-sm bg-white border border-stone-200 focus:outline-none focus:border-teal-600 focus:ring focus:ring-teal-600/20 transition-colors"
         />
         <div className="absolute right-1.5 top-1/2 -translate-y-1/2">
           <div className="relative">
