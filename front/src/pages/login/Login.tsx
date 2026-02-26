@@ -95,7 +95,7 @@ export default function Login() {
           onClose={() => setError(null)}
         />
       )}
-      <div className="w-full h-dvh flex overflow-hidden">
+      <div className="w-full h-screen h-dvh flex overflow-hidden">
         {/* Left panel — brand */}
         <div className="hidden lg:flex lg:w-[45%] bg-zinc-900 relative overflow-hidden flex-col justify-between p-12">
           {/* Subtle grid pattern */}
