@@ -40,7 +40,7 @@ class SseController extends Controller
             }
         }
 
-        $professor = Professor::where('user_id', $userId)->first();
+        $professor = Professor::find($userId);
         if ($professor) {
             foreach ($professor->turmas()->pluck('turma.id') as $turmaId) {
                 $channels[] = "sse:turma.{$turmaId}";
