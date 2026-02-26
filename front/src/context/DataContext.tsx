@@ -139,7 +139,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!token) return;
 
     const es = new EventSource(
-      `${import.meta.env.VITE_API_URL}/api/sse/events?token=${token}`
+      `${import.meta.env.VITE_API_URL}/api/sse/events?token=${encodeURIComponent(token)}`
     );
 
     es.addEventListener("activity.created", () => {
