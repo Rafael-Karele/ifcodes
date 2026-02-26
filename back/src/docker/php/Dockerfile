@@ -24,8 +24,8 @@ WORKDIR /var/www/html
 
 COPY src/composer.json src/composer.lock ./
 
-RUN composer install --no-interaction --no-scripts --no-progress --prefer-dist
+RUN composer install --no-interaction --no-scripts --no-autoloader --no-progress --prefer-dist
 
 COPY src/ .
 
-RUN composer install --no-interaction --no-progress
+RUN composer dump-autoload --optimize
