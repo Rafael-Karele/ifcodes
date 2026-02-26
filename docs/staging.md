@@ -86,7 +86,7 @@ feature branch → PR → merge em staging → deploy staging → validacao → 
 
 1. Criar `docker-compose.staging.yml` (baseado no prod, com portas e banco diferentes)
 2. Criar workflow `.github/workflows/deploy-staging.yml`
-3. Adicionar secrets de staging no GitHub (`VPS_STAGING_PROJECT_PATH` ou reusar o mesmo VPS)
+3. Adicionar secrets de staging no GitHub (`VPS_STAGING_PROJECT_PATH` ou um novo caminho no mesmo VPS para isolamento)
 4. Criar banco `ifcodes_staging` no PostgreSQL
 5. Documentar o fluxo de staging no README
 
