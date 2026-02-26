@@ -8,6 +8,12 @@
 - [Docker](https://www.docker.com/) – Containerização do ambiente
 - [PostgreSQL](https://www.postgresql.org/) – Banco de dados relacional
 
+## CI/CD
+
+- **CI (Continuous Integration):** Testes PHPUnit rodam automaticamente em cada Pull Request. PRs com testes falhando nao podem ser mergeados.
+- **CD (Continuous Deployment):** Apos merge na `main`, o deploy e feito automaticamente no VPS via SSH + Docker Compose.
+
+Para mais detalhes sobre o pipeline de deploy, configuracao de secrets e evolucao futura, veja a [documentacao de CD](docs/CD.md).
 
 ---
 
