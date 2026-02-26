@@ -81,8 +81,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ${{ secrets.VPS_PROJECT_PATH }}
-            git pull origin main
-            docker compose up -d --build
-            docker exec laravel_app php artisan migrate --force
+            cd "${{ secrets.VPS_PROJECT_PATH }}" && \
+            git pull origin main && \
+            docker compose up -d --build && \
+            docker exec laravel_app php artisan migrate --force && \
             docker exec laravel_app php artisan config:cache
