@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, AlertTriangle, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical } from "lucide-react";
+import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { RichTextViewer } from "@/components/RichTextEditor";
@@ -175,7 +175,7 @@ export default function JamStudentView({
               {/* Problem statement */}
               <div className="text-sm leading-relaxed text-stone-600 [&_p]:mb-3 [&_strong]:text-stone-800 [&_em]:text-stone-700 [&_ul]:ml-4 [&_ul]:list-disc [&_ol]:ml-4 [&_ol]:list-decimal [&_li]:mb-1 [&_code]:rounded [&_code]:bg-stone-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-teal-700 [&_code]:font-mono [&_code]:text-xs [&_pre]:rounded-lg [&_pre]:bg-stone-50 [&_pre]:p-3 [&_pre]:text-xs [&_h1]:text-stone-800 [&_h2]:text-stone-800 [&_h3]:text-stone-700 [&_h1]:text-base [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-sm [&_h2]:font-semibold [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-medium [&_h3]:mb-1.5">
                 {session.problema?.enunciado ? (
-                  <RichTextViewer content={session.problema.enunciado} />
+                  <RichTextViewer value={session.problema.enunciado} />
                 ) : (
                   <p className="text-stone-400">Carregando enunciado...</p>
                 )}

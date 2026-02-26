@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Activity, Problem, Submission, SubmissionStatus } from "@/types";
+import type { Activity, Problem, Submission } from "@/types";
 import { getActivitySubmissions } from "@/services/ActivitiesService";
 import { getProblemById } from "@/services/ProblemsServices";
 import { getResultBySubmissionId } from "@/services/SubmissionsService";
@@ -51,7 +51,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
 
     try {
       const problemData = await getProblemById(String(activity.problemId));
-      setProblem(problemData);
+      setProblem(problemData ?? null);
     } catch (error) {
       console.error("Erro ao carregar problema:", error);
     }

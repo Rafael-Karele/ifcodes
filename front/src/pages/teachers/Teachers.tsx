@@ -414,7 +414,7 @@ export default function Teachers() {
     try {
       const data = await getAllProfessors();
       setProfessors(data);
-    } catch (error) {
+    } catch (_error) {
       setNotification({
         message: "Erro ao carregar professores",
         type: "error",
@@ -460,7 +460,7 @@ export default function Teachers() {
         message: "Professor removido com sucesso!",
         type: "success",
       });
-    } catch (error) {
+    } catch (_error) {
       setNotification({
         message: "Erro ao remover professor",
         type: "error",

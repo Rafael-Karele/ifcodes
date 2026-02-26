@@ -12,23 +12,20 @@ import type {
 // Fake Activities
 export const fakeActivities: Activity[] = [
   {
-    id: "1",
-    problemId: "p1",
-    title: "Soma Simples",
+    id: 1,
+    problemId: 1,
     dueDate: "2025-08-20T23:59:59Z",
     status: "pending",
   },
   {
-    id: "2",
-    problemId: "p2",
-    title: "Fatorial",
+    id: 2,
+    problemId: 2,
     dueDate: "2025-08-15T23:59:59Z",
     status: "completed",
   },
   {
-    id: "3",
-    problemId: "p3",
-    title: "Números Primos",
+    id: 3,
+    problemId: 3,
     dueDate: "2025-08-10T23:59:59Z",
     status: "overdue",
   },
@@ -37,21 +34,21 @@ export const fakeActivities: Activity[] = [
 // Fake Problems
 export const fakeProblems: Problem[] = [
   {
-    id: "p1",
+    id: 1,
     title: "Soma Simples",
     statement: "Some dois números inteiros.",
     timeLimitMs: 1000,
     memoryLimitKb: 65536,
   },
   {
-    id: "p2",
+    id: 2,
     title: "Fatorial",
     statement: "Calcule o fatorial de um número inteiro.",
     timeLimitMs: 2000,
     memoryLimitKb: 65536,
   },
   {
-    id: "p3",
+    id: 3,
     title: "Números Primos",
     statement: "Verifique se um número é primo.",
     timeLimitMs: 1500,
@@ -62,22 +59,22 @@ export const fakeProblems: Problem[] = [
 // Fake Submissions
 export const fakeSubmissions: Submission[] = [
   {
-    id: "s1",
-    activityId: "1",
+    id: 1,
+    activityId: 1,
     dateSubmitted: "2025-08-13T10:00:00Z",
     language: "python",
-    status: "approved",
+    status: "passed",
   },
   {
-    id: "s2",
-    activityId: "2",
+    id: 2,
+    activityId: 2,
     dateSubmitted: "2025-08-12T15:30:00Z",
     language: "java",
-    status: "partial",
+    status: "failed",
   },
   {
-    id: "s3",
-    activityId: "3",
+    id: 3,
+    activityId: 3,
     dateSubmitted: "2025-08-11T09:45:00Z",
     language: "cpp",
     status: "failed",
@@ -87,29 +84,29 @@ export const fakeSubmissions: Submission[] = [
 // Fake Evaluations
 export const fakeEvaluations: Evaluation[] = [
   {
-    id: "e1",
-    submissionId: "s1",
+    id: 1,
+    submissionId: 1,
     token: "token123",
-    status: "approved",
+    status: "passed",
   },
   {
-    id: "e2",
-    submissionId: "s2",
+    id: 2,
+    submissionId: 2,
     token: "token456",
-    status: "partial",
+    status: "failed",
   },
 ];
 
 // Fake Test Cases
 export const fakeTestCases: TestCase[] = [
   {
-    id: "tc1",
+    id: 1,
     input: "2 3",
     expectedOutput: "5",
     private: false,
   },
   {
-    id: "tc2",
+    id: 2,
     input: "10 20",
     expectedOutput: "30",
     private: true,
@@ -119,17 +116,15 @@ export const fakeTestCases: TestCase[] = [
 // Fake Test Case Results
 export const fakeTestCaseResults: TestCaseResult[] = [
   {
-    id: "tc1",
-    input: "2 3",
-    expectedOutput: "5",
-    actualOutput: "5",
+    id: 1,
+    testCaseId: 1,
+    submissionId: 1,
     status: "passed",
   },
   {
-    id: "tc2",
-    input: "10 20",
-    expectedOutput: "30",
-    actualOutput: "25",
+    id: 2,
+    testCaseId: 2,
+    submissionId: 1,
     status: "failed",
   },
 ];
@@ -137,29 +132,29 @@ export const fakeTestCaseResults: TestCaseResult[] = [
 // Fake Submission Reports
 export const fakeSubmissionReports: SubmissionReport[] = [
   {
-    submissionId: "s1",
+    submissionId: 1,
     activityTitle: "Soma Simples",
-    language: "C",
+    language: "c",
     dateSubmitted: "2025-08-13T10:00:00Z",
-    overallStatus: "approved",
+    overallStatus: "passed",
     testCases: fakeTestCaseResults,
     compileLog: undefined,
   },
   {
-    submissionId: "s2",
+    submissionId: 2,
     activityTitle: "Fatorial",
-    language: "C",
+    language: "c",
     dateSubmitted: "2025-08-12T15:30:00Z",
-    overallStatus: "partial",
+    overallStatus: "failed",
     testCases: fakeTestCaseResults,
     compileLog: "Warning: variável não utilizada.",
   },
   {
-    submissionId: "s3",
+    submissionId: 3,
     activityTitle: "Números Primos",
-    language: "C",
+    language: "c",
     dateSubmitted: "2025-08-12T15:30:00Z",
-    overallStatus: "partial",
+    overallStatus: "failed",
     testCases: fakeTestCaseResults,
     compileLog: "Warning: variável não utilizada.",
   },

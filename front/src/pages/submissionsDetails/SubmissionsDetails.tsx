@@ -6,17 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/table";
-import { getActivityById } from "@/services/ActivitiesService";
 import { getProblemById } from "@/services/ProblemsServices";
 import {
   getResultBySubmissionId,
-  getSubmissionById,
-  getSubmissionReportBySubmissionId,
 } from "@/services/SubmissionsService";
 import type {
-  Activity,
-  Submission,
-  SubmissionReport,
   TestCaseResult,
   Problem,
 } from "@/types";
@@ -29,7 +23,6 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
-  PlayCircle,
   FileText,
   User,
   Target,

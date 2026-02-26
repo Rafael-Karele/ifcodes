@@ -6,20 +6,16 @@ export async function sendForgotPasswordEmail(email: string): Promise<void> {
         withCredentials: true
     });
 
-    try {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/forgot-password-temp`, {
-            email
-        }, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
-            }
-        });
-    } catch (error) {
-        throw error;
-    }
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/forgot-password-temp`, {
+        email
+    }, {
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    });
 }
 
 export async function resetPassword(data: {

@@ -67,7 +67,7 @@ export default function ChangePassword() {
                 localStorage.removeItem("auth_token");
                 navigate("/login");
             }, 2000);
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {
                     setError(error.response?.data?.message || "A senha atual está incorreta.");
@@ -75,8 +75,7 @@ export default function ChangePassword() {
                     setError("Erro ao alterar senha. Tente novamente.");
                 }
             } else {
-                setError(`Um erro inesperado ocorreu: ${error.message}`);
-                console.log('erro: ', error);
+                setError(`Um erro inesperado ocorreu: ${error instanceof Error ? error.message : String(error)}`);
             }
         } finally {
             setSubmitting(false);

@@ -13,8 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Editor from "@monaco-editor/react";
-import { postSubmission } from "@/services/SubmissionsService";
-import type { Activity } from "@/types";
 
 /**
  * Componente de submissão de código com integração ao Monaco Editor.
@@ -34,13 +32,13 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   );
 
   // Estado para arquivo de submissão (suporte a upload futuro)
-  const [submissionCodeFile, setSubmissionCodeFile] = useState(null);
+  const [submissionCodeFile, _setSubmissionCodeFile] = useState<File | null>(null);
 
   // Estado para texto extraído do arquivo de submissão (suporte futuro)
-  const [submissionCodeText, setSubmissionCodeText] = useState("");
+  const [submissionCodeText, _setSubmissionCodeText] = useState("");
 
   // Estado de carregamento no envio
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, _setSubmitting] = useState(false);
 
   // Referência para o editor Monaco, possibilitando comandos diretos
   const editorRef = useRef(null);
@@ -56,7 +54,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
    * Função chamada ao montar o editor Monaco.
    * Permite configurar atalhos e opções extras do editor.
    */
-  const handleEditorDidMount = (editor, monaco) => {
+  const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
 
     // Configurações visuais e funcionais do editor
@@ -82,7 +80,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   /**
    * Atualiza o estado do código conforme o usuário digita.
    */
-  const handleEditorChange = (value) => {
+  const handleEditorChange = (value: string | undefined) => {
     setCodeValue(value || "");
   };
 
@@ -265,10 +263,9 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
             {submissionCodeText && (
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Prévia do código:</Label>
-                <CodePreview
-                  code={submissionCodeText}
-                  filename={submissionCodeFile.name}
-                />
+                <pre className="bg-gray-50 p-3 rounded-lg text-sm overflow-auto">
+                  {submissionCodeText}
+                </pre>
               </div>
             )}
           </div>

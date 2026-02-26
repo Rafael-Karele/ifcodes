@@ -9,22 +9,16 @@ export async function login({ email, password }: LoginRequest): Promise<string>{
     });
 
 
-    try{
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
-            email,
-            password
-        }, {
-            withCredentials: true,
-            // withXSRFToken: true,
-            headers: {
-                // 'x-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
-            }
-        })
-        return res.data.token;
-    }catch(error){
-        throw error;
-    }
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+        email,
+        password
+    }, {
+        withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN')
+        }
+    })
+    return res.data.token;
 }

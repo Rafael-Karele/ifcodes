@@ -125,24 +125,6 @@ function StatusBadge({ status }: StatusBadgeProps) {
 
 // note: relative formatting removed from this file; table shows only date
 
-// Skeleton de loading exibido enquanto os dados sao carregados
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-stone-200"
-        >
-          <div className="h-4 bg-stone-200 rounded w-1/3 animate-pulse"></div>
-          <div className="h-4 bg-stone-200 rounded w-24 animate-pulse"></div>
-          <div className="h-6 bg-stone-200 rounded-full w-20 animate-pulse"></div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default function Submissions() {
   const navigate = useNavigate();
 
