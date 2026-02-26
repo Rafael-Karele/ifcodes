@@ -144,7 +144,7 @@ export default function Login() {
         </div>
 
         {/* Right panel — form */}
-        <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-white overflow-y-auto">
+        <div className="flex-1 flex items-center justify-center p-6 sm:p-10 bg-white">
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="flex items-center gap-2.5 mb-10 lg:hidden">
