@@ -65,6 +65,10 @@ class CheckSubmissionStatusJob implements ShouldQueue
         $testResults = [];
 
         foreach ($resultados as $resultado) {
+            if (is_null($resultado) || !isset($resultado['token'])) {
+                continue;
+            }
+
             $correcao = $submissao->correcoes->firstWhere('token', $resultado['token']);
 
             if (is_null($correcao)) {

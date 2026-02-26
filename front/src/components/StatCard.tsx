@@ -9,7 +9,7 @@ interface StatCardProps {
 export function StatCard({ label, value, icon: Icon, accent, className = "" }: StatCardProps) {
   return (
     <div
-      className={`relative rounded-xl border px-5 py-5 transition-shadow hover:shadow-md ${
+      className={`relative rounded-xl border px-3 py-4 sm:px-5 sm:py-5 transition-shadow hover:shadow-md ${
         accent
           ? "bg-red-50/60 border-red-200/80"
           : "bg-white border-stone-200"
@@ -17,7 +17,7 @@ export function StatCard({ label, value, icon: Icon, accent, className = "" }: S
     >
       <div className="flex items-start justify-between">
         <div>
-          <div className={`text-3xl font-bold tabular-nums tracking-tight ${accent ? "text-red-700" : "text-stone-900"}`}>
+          <div className={`text-2xl sm:text-3xl font-bold tabular-nums tracking-tight ${accent ? "text-red-700" : "text-stone-900"}`}>
             {value}
           </div>
           <p className={`text-sm mt-1 font-medium ${accent ? "text-red-600/80" : "text-stone-500"}`}>

@@ -273,7 +273,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-md text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
+              className="md:hidden ml-auto p-2 rounded-md text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors"
               aria-expanded={isMobileMenuOpen}
               aria-label="Menu de navegação"
             >
@@ -284,123 +284,121 @@ export default function Header() {
               )}
             </button>
           </div>
+        </div>
+      </header>
 
-          {/* Mobile menu */}
-          <div
-            className={`md:hidden overflow-hidden transition-all duration-200 ease-in-out ${
-              isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-            }`}
-          >
-            <div className="border-t border-stone-100 py-3 space-y-1">
-              {navigationItems.map((item) => (
-                <div key={item.label}>
-                  {item.submenu ? (
-                    <>
-                      <button
-                        onClick={() =>
-                          setOpenDropdown(
-                            openDropdown === item.label ? null : item.label
-                          )
-                        }
-                        className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                          isActiveGroup(item)
-                            ? "text-teal-700 bg-teal-50"
-                            : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
-                        }`}
-                      >
-                        {item.label}
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform duration-150 ${
-                            openDropdown === item.label ? "rotate-180" : ""
-                          }`}
-                        />
-                      </button>
-                      <div
-                        className={`overflow-hidden transition-all duration-200 ${
-                          openDropdown === item.label ? "max-h-40" : "max-h-0"
-                        }`}
-                      >
-                        <div className="pl-3 py-1 space-y-0.5">
-                          {item.submenu.map((sub) => (
-                            <Link
-                              key={sub.to}
-                              to={sub.to}
-                              className={`block px-3 py-2 rounded-md text-sm transition-colors ${
-                                isActiveRoute(sub.to)
-                                  ? "text-teal-700 bg-teal-50 font-medium"
-                                  : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
-                              }`}
-                              onClick={closeMobileMenu}
-                            >
-                              {sub.label}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <Link
-                      to={item.to!}
-                      className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                        isActiveRoute(item.to!)
+      {/* Mobile menu overlay — rendered outside header so it doesn't push content */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 top-14 z-40 bg-white overflow-y-auto">
+          <div className="px-4 py-3 space-y-1">
+            {navigationItems.map((item) => (
+              <div key={item.label}>
+                {item.submenu ? (
+                  <>
+                    <button
+                      onClick={() =>
+                        setOpenDropdown(
+                          openDropdown === item.label ? null : item.label
+                        )
+                      }
+                      className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                        isActiveGroup(item)
                           ? "text-teal-700 bg-teal-50"
                           : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
                       }`}
-                      onClick={closeMobileMenu}
                     >
                       {item.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
-
-              {/* Mobile profile section */}
-              <div className="border-t border-stone-100 pt-3 mt-3 space-y-1">
-                <div className="flex items-center gap-3 px-3 py-2">
-                  <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center text-white text-sm font-bold">
-                    {userInitial}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-stone-900 truncate">
-                      {user?.name || "Usuário"}
-                    </p>
-                    <p className="text-xs text-stone-400 truncate">
-                      {user?.email || ""}
-                    </p>
-                  </div>
-                </div>
-
-                <Link
-                  to="/perfil"
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  <User className="w-4 h-4" />
-                  Meu Perfil
-                </Link>
-                <Link
-                  to="/change-password"
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  <KeyRound className="w-4 h-4" />
-                  Alterar Senha
-                </Link>
-                <button
-                  onClick={() => {
-                    closeMobileMenu();
-                    handleLogout();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-red-600 hover:bg-red-50 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sair
-                </button>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-150 ${
+                          openDropdown === item.label ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`overflow-hidden transition-all duration-200 ${
+                        openDropdown === item.label ? "max-h-40" : "max-h-0"
+                      }`}
+                    >
+                      <div className="pl-3 py-1 space-y-0.5">
+                        {item.submenu.map((sub) => (
+                          <Link
+                            key={sub.to}
+                            to={sub.to}
+                            className={`block px-3 py-2 rounded-md text-sm transition-colors ${
+                              isActiveRoute(sub.to)
+                                ? "text-teal-700 bg-teal-50 font-medium"
+                                : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
+                            }`}
+                            onClick={closeMobileMenu}
+                          >
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <Link
+                    to={item.to!}
+                    className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                      isActiveRoute(item.to!)
+                        ? "text-teal-700 bg-teal-50"
+                        : "text-stone-600 hover:text-stone-900 hover:bg-stone-50"
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </div>
+            ))}
+
+            {/* Mobile profile section */}
+            <div className="border-t border-stone-100 pt-3 mt-3 space-y-1">
+              <div className="flex items-center gap-3 px-3 py-2">
+                <div className="w-8 h-8 rounded-md bg-teal-600 flex items-center justify-center text-white text-sm font-bold">
+                  {userInitial}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-stone-900 truncate">
+                    {user?.name || "Usuário"}
+                  </p>
+                  <p className="text-xs text-stone-400 truncate">
+                    {user?.email || ""}
+                  </p>
+                </div>
+              </div>
+
+              <Link
+                to="/perfil"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+                onClick={closeMobileMenu}
+              >
+                <User className="w-4 h-4" />
+                Meu Perfil
+              </Link>
+              <Link
+                to="/change-password"
+                className="flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-stone-600 hover:text-stone-900 hover:bg-stone-50 transition-colors"
+                onClick={closeMobileMenu}
+              >
+                <KeyRound className="w-4 h-4" />
+                Alterar Senha
+              </Link>
+              <button
+                onClick={() => {
+                  closeMobileMenu();
+                  handleLogout();
+                }}
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-md text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sair
+              </button>
             </div>
           </div>
         </div>
-      </header>
+      )}
     </>
   );
 }

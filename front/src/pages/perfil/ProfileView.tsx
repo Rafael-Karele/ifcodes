@@ -28,7 +28,7 @@ export default function ProfileView() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
         <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
           <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
           <p className="text-sm text-stone-500 font-medium">Carregando perfil...</p>
@@ -39,7 +39,7 @@ export default function ProfileView() {
 
   if (!user) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">
         <div className="bg-stone-50 border border-dashed border-stone-200 rounded-xl py-12 text-center">
           <UserIcon className="w-8 h-8 text-stone-300 mx-auto mb-3" />
           <p className="text-sm font-medium text-stone-600 mb-1">Perfil não encontrado</p>
@@ -58,7 +58,7 @@ export default function ProfileView() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       {notification && (
         <Notification
           type={notification.type}
@@ -158,14 +158,14 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
               <button
                 onClick={onSave}
                 disabled={saving || name.trim() === ""}
-                className="p-1.5 rounded-lg bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2.5 rounded-lg bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 title="Salvar"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
               </button>
               <button
                 onClick={() => { setEditing(false); setNameState(user.name || ""); }}
-                className="p-1.5 rounded-lg bg-stone-100 text-stone-500 hover:bg-stone-200 transition-colors"
+                className="p-2.5 rounded-lg bg-stone-100 text-stone-500 hover:bg-stone-200 transition-colors"
                 title="Cancelar"
               >
                 <X className="w-4 h-4" />
@@ -186,9 +186,9 @@ function ProfileHeader({ user, setUser, setNotification }: ProfileHeaderProps) {
         </div>
 
         {/* Email */}
-        <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-stone-500">
-          <Mail className="w-4 h-4 text-stone-400" />
-          {user.email}
+        <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-stone-500 min-w-0">
+          <Mail className="w-4 h-4 text-stone-400 shrink-0" />
+          <span className="truncate">{user.email}</span>
         </div>
 
         {/* Roles */}

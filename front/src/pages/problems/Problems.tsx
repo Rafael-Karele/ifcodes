@@ -220,7 +220,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
             </h2>
             <button
               onClick={onClose}
-              className="text-stone-400 hover:text-stone-600 transition-colors"
+              className="p-2 -mr-2 rounded-lg text-stone-400 hover:text-stone-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -263,7 +263,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="tempo_limite" className="text-sm font-medium text-stone-600">Tempo Limite (ms) *</Label>
                 <Input
@@ -593,7 +593,7 @@ export default function Problems() {
   }
 
   return (
-    <div className="min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes problems-fade-up {
@@ -612,7 +612,7 @@ export default function Problems() {
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
       <div
-        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
       >
         {/* decorative circles */}
@@ -627,8 +627,8 @@ export default function Problems() {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <Codesandbox className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <Codesandbox className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
               Gerenciamento de Problemas
             </h1>
             <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
@@ -641,7 +641,7 @@ export default function Problems() {
               setEditingProblem(null);
               setIsFormModalOpen(true);
             }}
-            className="shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+            className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Adicionar Problema

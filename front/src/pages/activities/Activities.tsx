@@ -107,11 +107,11 @@ export default function Activities() {
   ).length;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
 
       {/* ── hero header ── */}
       <div
-        className="relative rounded-2xl px-8 py-10 overflow-hidden"
+        className="relative rounded-2xl px-5 py-8 sm:px-8 sm:py-10 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)` }}
       >
         {/* decorative circles */}
@@ -120,8 +120,8 @@ export default function Activities() {
 
         <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <BookOpen className="w-8 h-8" />
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
               Atividades
             </h1>
             <p className="text-teal-100 text-sm mt-2">
@@ -172,12 +172,12 @@ export default function Activities() {
             }}
           />
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400 w-4 h-4" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="pl-10 pr-8 h-11 rounded-xl text-sm bg-white min-w-[140px]"
+            className="w-full sm:w-auto pl-10 pr-8 h-11 rounded-xl text-sm bg-white min-w-[140px]"
             style={{
               border: `1px solid ${palette.border}`,
               outline: "none",

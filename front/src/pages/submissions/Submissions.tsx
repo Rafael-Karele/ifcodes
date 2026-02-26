@@ -206,7 +206,7 @@ export default function Submissions() {
   const uniqueStatuses = [...new Set(submissions.map((s) => s.status))];
 
   return (
-    <div className="min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes submissions-fade-in {
@@ -220,7 +220,7 @@ export default function Submissions() {
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
       <div
-        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f56 100%)` }}
       >
         {/* decorative circles */}
@@ -235,8 +235,8 @@ export default function Submissions() {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <FileText className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <FileText className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
               Submissoes
             </h1>
             <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
@@ -247,7 +247,7 @@ export default function Submissions() {
           <Button
             onClick={refreshData}
             disabled={loading || refreshing}
-            className="shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+            className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
           >
             <RefreshCw
               className={`w-4 h-4 mr-1.5 ${(loading || refreshing) ? "animate-spin" : ""}`}
@@ -379,7 +379,7 @@ export default function Submissions() {
           />
         </div>
 
-        <div className="relative shrink-0">
+        <div className="relative w-full sm:w-auto sm:shrink-0">
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4 z-10 pointer-events-none" />
           <select
             value={statusFilter}
@@ -450,7 +450,7 @@ export default function Submissions() {
                     Problema
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold" style={{ color: palette.textPrimary }}>
+                <TableHead className="hidden sm:table-cell font-semibold" style={{ color: palette.textPrimary }}>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Data de Submissao
@@ -484,27 +484,27 @@ export default function Submissions() {
                     className="sub-row cursor-pointer hover:bg-teal-50 transition-colors duration-200 group"
                     style={{ animationDelay: `${i * 40}ms` }}
                   >
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium max-w-0">
                       <div className="flex flex-col">
                         <span
-                          className="group-hover:text-teal-600 transition-colors"
+                          className="group-hover:text-teal-600 transition-colors truncate"
                           style={{ color: palette.textPrimary }}
                         >
                           {problemTitle}
                         </span>
-                        <span className="text-xs mt-1" style={{ color: palette.accent }}>
+                        <span className="text-xs mt-1 truncate" style={{ color: palette.accent }}>
                           Atividade ID: {submission.activityId} - Submissao ID: {submission.id}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="flex flex-col">
                         <span className="font-medium" style={{ color: palette.textPrimary }}>
                           {formattedDateOnly}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <StatusBadge status={submission.status as keyof typeof statusConfig} />
                     </TableCell>
                     <TableCell>

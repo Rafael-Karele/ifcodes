@@ -174,7 +174,7 @@ export default function Classes() {
 
   /* ================================================================ */
   return (
-    <div className="min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes classes-fade-up {
@@ -183,7 +183,7 @@ export default function Classes() {
         }
         @keyframes classes-slide-down {
           from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
-          to   { opacity: 1; max-height: 320px; }
+          to   { opacity: 1; max-height: 480px; }
         }
         .cls-card {
           animation: classes-fade-up .45s cubic-bezier(.22,1,.36,1) both;
@@ -204,7 +204,7 @@ export default function Classes() {
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
       <div
-        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f56 100%)` }}
       >
         {/* decorative circles */}
@@ -219,8 +219,8 @@ export default function Classes() {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <BookOpen className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
               Minhas Turmas
             </h1>
             <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
@@ -233,7 +233,7 @@ export default function Classes() {
           {isProfOrAdmin && (
             <Button
               onClick={() => setShowForm(!showForm)}
-              className="shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+              className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
             >
               {showForm ? (
                 <>
@@ -360,7 +360,7 @@ export default function Classes() {
                   </h3>
 
                   {isProfOrAdmin && (
-                    <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => handleEdit(cls)}
                         className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
@@ -425,6 +425,7 @@ export default function Classes() {
 
                   {isProfOrAdmin && (
                     <button
+                      aria-label="Gerenciar alunos"
                       onClick={() => navigate(`/classes/${cls.id}?tab=students`)}
                       className="flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-sm font-semibold border transition-colors"
                       style={{
@@ -443,7 +444,7 @@ export default function Classes() {
                       }}
                     >
                       <UserPlus className="w-4 h-4" />
-                      <span className="hidden lg:inline">Alunos</span>
+                      <span className="hidden sm:inline">Alunos</span>
                     </button>
                   )}
                 </div>

@@ -42,7 +42,7 @@ export function SubmissionFeed({ submissions }: SubmissionFeedProps) {
               <p className="text-sm font-medium text-stone-700 truncate">
                 {sub.problemTitle ?? `Submissão #${sub.id}`}
               </p>
-              <p className="text-[11px] text-stone-400">
+              <p className="text-xs text-stone-400">
                 {formatDistanceToNow(new Date(sub.dateSubmitted), { addSuffix: true, locale: ptBR })}
               </p>
             </div>

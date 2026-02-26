@@ -83,7 +83,7 @@ export function WeeklyHeatmap({ cells, streak }: WeeklyHeatmapProps) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-1.5 mt-2.5 text-[9px] text-stone-400">
+      <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-stone-400">
         <span>Menos</span>
         <div className="w-2.5 h-2.5 rounded-sm bg-stone-100" />
         <div className="w-2.5 h-2.5 rounded-sm bg-teal-200" />
