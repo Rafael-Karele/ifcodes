@@ -13,11 +13,9 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         const token = localStorage.getItem("auth_token");
         if (token) {
-            // Fetch user data and roles
             Promise.all([
                 axios.get(`${import.meta.env.VITE_API_URL}/api/user`, {
                     headers: {
@@ -33,9 +31,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                 })
             ])
             .then(([userRes, rolesRes]) => {
-                // Extrair roles da resposta correta
                 const roles = rolesRes.data.roles || rolesRes.data || [];
-                
+
                 const userData = {
                     ...userRes.data,
                     roles: roles

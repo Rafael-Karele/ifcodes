@@ -8,6 +8,7 @@ import { getAllProblems } from "@/services/ProblemsServices";
 import { JamSessionService } from "@/services/JamSessionService";
 import type { JamSession } from "@/types/jam";
 import type { ActivityFormData } from "./types";
+import { useUser } from "@/context/UserContext";
 
 export function useClassDetails(id: string | undefined) {
   const [classData, setClassData] = useState<Class | null>(null);
@@ -33,25 +34,24 @@ export function useClassDetails(id: string | undefined) {
   const [jamSessions, setJamSessions] = useState<JamSession[]>([]);
   const [activeJam, setActiveJam] = useState<JamSession | null>(null);
 
+  const { user } = useUser();
+  const isProfessorOrAdmin = user?.roles?.includes("professor") || user?.roles?.includes("admin");
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (id) {
-      // Prevent Strict Mode double-fire
-      if (initializedRef.current) return;
-      initializedRef.current = true;
+    if (!id) return;
 
-      loadClassData();
-      loadClassStudents();
+    // Prevent Strict Mode double-fire
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    loadClassDataAndStudents();
+    if (isProfessorOrAdmin) {
       loadAllStudents();
-      loadClassActivities();
-      loadProblems();
-      loadJamSessions();
     }
-
-    return () => {
-      initializedRef.current = false;
-    };
+    loadClassActivities();
+    loadProblems();
+    loadJamSessions();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -79,23 +79,25 @@ export function useClassDetails(id: string | undefined) {
     };
   }, [openMenuId]);
 
-  const loadClassData = async () => {
+  const loadClassDataAndStudents = async () => {
     try {
       const data = await ClassesService.getClassById(Number(id));
       setClassData(data);
+
+      // Extract students from the same response to avoid a duplicate request
+      const alunos = data.alunos || [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setStudents(alunos.map((aluno: any) => ({
+        id: aluno.id,
+        classId: data.id,
+        studentId: aluno.id,
+        studentName: aluno.name,
+        studentEmail: aluno.email,
+        enrolledAt: aluno.created_at || new Date().toISOString(),
+      })));
     } catch (error) {
       console.error("Erro ao carregar turma:", error);
       showNotification("Erro ao carregar turma", "error");
-    }
-  };
-
-  const loadClassStudents = async () => {
-    try {
-      const data = await ClassesService.getClassStudents(Number(id));
-      setStudents(data);
-    } catch (error) {
-      console.error("Erro ao carregar alunos:", error);
-      showNotification("Erro ao carregar alunos", "error");
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import AppRouter from "./routes/AppRouter.tsx";
@@ -13,12 +12,10 @@ axios.defaults.baseURL = API_URL;
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <UserProvider>
-      <DataProvider>
-        <AppRouter />
-        <RealtimeNotifications />
-      </DataProvider>
-    </UserProvider>
-  </StrictMode>
+  <UserProvider>
+    <DataProvider>
+      <AppRouter />
+      <RealtimeNotifications />
+    </DataProvider>
+  </UserProvider>
 );
