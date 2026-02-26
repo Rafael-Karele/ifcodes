@@ -14,6 +14,7 @@
 - **CD (Continuous Deployment):** Apos merge na `main`, o deploy e feito automaticamente no VPS via SSH + Docker Compose.
 
 Para mais detalhes sobre o pipeline de deploy, configuracao de secrets e evolucao futura, veja a [documentacao de CD](docs/CD.md).
+- **Melhorias futuras:** Sugestoes como migracao para Nginx + PHP-FPM e GHCR estao documentadas em [docs/melhorias-futuras.md](docs/melhorias-futuras.md).
 
 ---
 
