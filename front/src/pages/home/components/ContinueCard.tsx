@@ -51,16 +51,17 @@ export function ContinueCard({ activity, problemTitle }: ContinueCardProps) {
         <ArrowRight className="w-4 h-4 ml-1" />
       </Button>
 
-      <button
+      <Button
+        size="icon"
         onClick={() => navigate(`/activities/${activity.id}`)}
-        className={`sm:hidden p-2 rounded-lg shrink-0 ${
+        className={`sm:hidden h-8 w-8 rounded-lg shrink-0 shadow-none ${
           isOverdue
-            ? "bg-red-600 text-white"
-            : "bg-amber-500 text-white"
+            ? "bg-red-600 text-white hover:bg-red-700"
+            : "bg-amber-500 text-white hover:bg-amber-600"
         }`}
       >
         <ArrowRight className="w-4 h-4" />
-      </button>
+      </Button>
     </div>
   );
 }
