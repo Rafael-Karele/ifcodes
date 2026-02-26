@@ -1,17 +1,25 @@
 interface CircularProgressProps {
   percentage: number;
-  size?: number;
-  strokeWidth?: number;
 }
 
-export function CircularProgress({ percentage, size = 64, strokeWidth = 6 }: CircularProgressProps) {
+export function CircularProgress({ percentage }: CircularProgressProps) {
+  const size = 36;
+  const strokeWidth = 4;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
   const center = size / 2;
 
   return (
-    <div className="flex items-center gap-3 sm:gap-5">
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="text-xl sm:text-3xl font-bold tabular-nums tracking-tight text-stone-900">
+          {Math.round(percentage)}%
+        </div>
+        <p className="text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium text-stone-500">
+          Taxa de Acerto
+        </p>
+      </div>
       <svg
         width={size}
         height={size}
@@ -39,12 +47,6 @@ export function CircularProgress({ percentage, size = 64, strokeWidth = 6 }: Cir
           className="circular-progress-ring"
         />
       </svg>
-      <div>
-        <div className="text-2xl sm:text-3xl font-bold tabular-nums tracking-tight text-stone-900">
-          {Math.round(percentage)}%
-        </div>
-        <p className="text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium text-stone-500">Taxa de Acerto</p>
-      </div>
     </div>
   );
 }
