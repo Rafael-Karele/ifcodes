@@ -4,10 +4,11 @@ import type { Student, Activity, Problem } from "@/types";
 import ClassesService from "@/services/ClassesService";
 import { getAllStudents } from "@/services/StudentsService";
 import { getActivitiesByClass, createActivity, updateActivity, deleteActivity } from "@/services/ActivitiesService";
-import { getAllProblems } from "@/services/ProblemsServices";
 import { JamSessionService } from "@/services/JamSessionService";
 import type { JamSession } from "@/types/jam";
 import type { ActivityFormData } from "./types";
+import { useUser } from "@/context/UserContext";
+import { useData } from "@/context/DataContext";
 
 export function useClassDetails(id: string | undefined) {
   const [classData, setClassData] = useState<Class | null>(null);
@@ -23,7 +24,6 @@ export function useClassDetails(id: string | undefined) {
     type: "success" | "error";
   } | null>(null);
   const [showNewActivity, setShowNewActivity] = useState(false);
-  const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [viewProblem, setViewProblem] = useState<Problem | null>(null);
   const [viewActivity, setViewActivity] = useState<Activity | null>(null);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
@@ -33,27 +33,30 @@ export function useClassDetails(id: string | undefined) {
   const [jamSessions, setJamSessions] = useState<JamSession[]>([]);
   const [activeJam, setActiveJam] = useState<JamSession | null>(null);
 
+  const { user } = useUser();
+  const { problems: allProblems } = useData();
+  const isProfessorOrAdmin = user?.roles?.includes("professor") || user?.roles?.includes("admin");
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (id) {
-      // Prevent Strict Mode double-fire
-      if (initializedRef.current) return;
-      initializedRef.current = true;
+    if (!id) return;
 
-      loadClassData();
-      loadClassStudents();
+    // Prevent Strict Mode double-fire
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    loadClassDataAndStudents();
+    if (isProfessorOrAdmin) {
       loadAllStudents();
-      loadClassActivities();
-      loadProblems();
-      loadJamSessions();
     }
+    loadClassActivities();
+    loadJamSessions();
 
     return () => {
       initializedRef.current = false;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, isProfessorOrAdmin]);
 
   useEffect(() => {
     filterAvailableStudents();
@@ -79,23 +82,24 @@ export function useClassDetails(id: string | undefined) {
     };
   }, [openMenuId]);
 
-  const loadClassData = async () => {
+  const loadClassDataAndStudents = async () => {
     try {
       const data = await ClassesService.getClassById(Number(id));
       setClassData(data);
+
+      // Extract students from the same response to avoid a duplicate request
+      const alunos = data.alunos || [];
+      setStudents(alunos.map((aluno) => ({
+        id: aluno.id,
+        classId: data.id,
+        studentId: aluno.id,
+        studentName: aluno.name,
+        studentEmail: aluno.email,
+        enrolledAt: aluno.created_at || new Date().toISOString(),
+      })));
     } catch (error) {
       console.error("Erro ao carregar turma:", error);
       showNotification("Erro ao carregar turma", "error");
-    }
-  };
-
-  const loadClassStudents = async () => {
-    try {
-      const data = await ClassesService.getClassStudents(Number(id));
-      setStudents(data);
-    } catch (error) {
-      console.error("Erro ao carregar alunos:", error);
-      showNotification("Erro ao carregar alunos", "error");
     } finally {
       setLoading(false);
     }
@@ -117,15 +121,6 @@ export function useClassDetails(id: string | undefined) {
       setActivities(data);
     } catch (error) {
       console.error("Erro ao carregar atividades:", error);
-    }
-  };
-
-  const loadProblems = async () => {
-    try {
-      const data = await getAllProblems();
-      setAllProblems(data);
-    } catch (error) {
-      console.error("Erro ao carregar problemas:", error);
     }
   };
 
@@ -159,7 +154,7 @@ export function useClassDetails(id: string | undefined) {
     try {
       await ClassesService.addStudentToClass(Number(id), { studentId });
       showNotification("Aluno adicionado com sucesso!", "success");
-      loadClassStudents();
+      loadClassDataAndStudents();
       setSearchTerm("");
     } catch (error) {
       console.error("Erro ao adicionar aluno:", error);
@@ -173,7 +168,7 @@ export function useClassDetails(id: string | undefined) {
     try {
       await ClassesService.removeStudentFromClass(Number(id), studentId);
       showNotification("Aluno removido com sucesso!", "success");
-      loadClassStudents();
+      loadClassDataAndStudents();
     } catch (error) {
       console.error("Erro ao remover aluno:", error);
       showNotification("Erro ao remover aluno", "error");

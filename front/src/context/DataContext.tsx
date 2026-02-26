@@ -155,6 +155,12 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ws.onmessage = (event) => {
         try {
           const msg = JSON.parse(event.data);
+          if (msg.type === "ERROR") {
+            // Auth failed — stop reconnecting
+            disposed = true;
+            ws?.close();
+            return;
+          }
           if (msg.type === "NOTIFICATION") {
             switch (msg.event) {
               case "activity.created":

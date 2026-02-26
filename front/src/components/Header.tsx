@@ -30,7 +30,7 @@ export default function Header() {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const isAdmin = user?.roles?.includes("admin") || false;
   const isProfessor = user?.roles?.includes("professor") || false;
@@ -102,6 +102,7 @@ export default function Header() {
         }
       );
       localStorage.removeItem("auth_token");
+      setUser(null);
       navigate("/login");
     } catch {
       setError("Erro ao fazer logout");
