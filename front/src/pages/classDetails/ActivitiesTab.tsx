@@ -53,8 +53,8 @@ function hasAdvancedConfig(a: Activity): boolean {
 }
 
 export default function ActivitiesTab({
-  activities, allProblems, openMenuId,
-  onNewActivity, onViewActivity, onEditActivity, onDeleteActivity, onViewSubmissions, onToggleMenu,
+  activities, allProblems, openMenuId: _openMenuId,
+  onNewActivity, onViewActivity, onEditActivity, onDeleteActivity, onViewSubmissions, onToggleMenu: _onToggleMenu,
 }: ActivitiesTabProps) {
   const { hasAnyRole } = useUserRole();
   const isProfessor = hasAnyRole(["professor", "admin"]);

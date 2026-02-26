@@ -13,7 +13,6 @@ import {
   Trash2,
   Users,
   Search,
-  ArrowRight,
   UserPlus,
   BookOpen,
   X,

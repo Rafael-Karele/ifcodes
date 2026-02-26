@@ -8,8 +8,8 @@ on:
       - '.github/workflows/frontend.yml'
 
 jobs:
-  typecheck:
-    name: Type Check
+  typecheck-and-lint:
+    name: Type Check & Lint
     runs-on: ubuntu-latest
 
     defaults:
@@ -31,3 +31,6 @@ jobs:
 
       - name: Type check
         run: npx tsc -b
+
+      - name: Lint
+        run: npm run lint

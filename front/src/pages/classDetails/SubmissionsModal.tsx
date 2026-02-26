@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Activity, Problem, Submission, SubmissionStatus } from "@/types";
+import type { Activity, Problem, Submission } from "@/types";
 import { getActivitySubmissions } from "@/services/ActivitiesService";
 import { getProblemById } from "@/services/ProblemsServices";
 import { getResultBySubmissionId } from "@/services/SubmissionsService";

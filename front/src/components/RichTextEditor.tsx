@@ -134,7 +134,7 @@ function createEditorStateFromValue(value: string) {
     if (parsed && parsed.blocks && Array.isArray(parsed.blocks) && parsed.entityMap !== undefined) {
       return EditorState.createWithContent(convertFromRaw(parsed));
     }
-  } catch (error) {
+  } catch (_error) {
     const content = ContentState.createFromText(value);
     return EditorState.createWithContent(content);
   }

@@ -13,8 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import Editor from "@monaco-editor/react";
-import { postSubmission } from "@/services/SubmissionsService";
-import type { Activity } from "@/types";
 
 /**
  * Componente de submissão de código com integração ao Monaco Editor.
@@ -34,13 +32,13 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   );
 
   // Estado para arquivo de submissão (suporte a upload futuro)
-  const [submissionCodeFile, setSubmissionCodeFile] = useState<File | null>(null);
+  const [submissionCodeFile, _setSubmissionCodeFile] = useState<File | null>(null);
 
   // Estado para texto extraído do arquivo de submissão (suporte futuro)
-  const [submissionCodeText, setSubmissionCodeText] = useState("");
+  const [submissionCodeText, _setSubmissionCodeText] = useState("");
 
   // Estado de carregamento no envio
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, _setSubmitting] = useState(false);
 
   // Referência para o editor Monaco, possibilitando comandos diretos
   const editorRef = useRef(null);

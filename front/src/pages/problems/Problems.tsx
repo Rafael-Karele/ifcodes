@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, Clock, HardDrive, X, BookOpen, Search, Codesandbox, Sparkles } from "lucide-react";
+import { Plus, Trash2, X, Search, Codesandbox, Sparkles } from "lucide-react";
 import { RichTextEditor } from "@/components/RichTextEditor";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -124,7 +116,7 @@ function ProblemFormModal({ isOpen, onClose, onSave, problem, mode }: ProblemFor
         const parsed = JSON.parse(formData.enunciado);
         plainText = parsed.blocks?.map((b: any) => b.text).join('').trim() || '';
       }
-    } catch (e) {
+    } catch (_e) {
       plainText = formData.enunciado.trim();
     }
 
@@ -495,7 +487,7 @@ export default function Problems() {
       setLoading(true);
       const data = await getAllProblems();
       setProblems(data);
-    } catch (error) {
+    } catch (_error) {
       setNotification({ type: 'error', message: 'Erro ao carregar problemas' });
     } finally {
       setLoading(false);
@@ -524,7 +516,7 @@ export default function Problems() {
 
       setIsFormModalOpen(false);
       setEditingProblem(null);
-    } catch (error) {
+    } catch (_error) {
       setNotification({ type: 'error', message: 'Erro ao salvar problema' });
     }
   };
@@ -536,7 +528,7 @@ export default function Problems() {
         setEditingProblem(fullProblem);
         setIsFormModalOpen(true);
       }
-    } catch (error) {
+    } catch (_error) {
       setNotification({ type: 'error', message: 'Erro ao carregar dados do problema' });
     }
   };
@@ -548,7 +540,7 @@ export default function Problems() {
         setViewingProblem(fullProblem);
         setIsViewModalOpen(true);
       }
-    } catch (error) {
+    } catch (_error) {
       setNotification({ type: 'error', message: 'Erro ao carregar problema' });
     }
   };
@@ -568,7 +560,7 @@ export default function Problems() {
         } else {
           setNotification({ type: 'error', message: 'Erro ao excluir problema' });
         }
-      } catch (error) {
+      } catch (_error) {
         setNotification({ type: 'error', message: 'Erro ao excluir problema' });
       }
     }

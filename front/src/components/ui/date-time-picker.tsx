@@ -3,7 +3,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import { ptBR } from "date-fns/locale/pt-BR";
 import "react-datepicker/dist/react-datepicker.css";
 import { Calendar, Clock, Home } from "lucide-react";
-import { parse, isValid, format } from "date-fns";
+import { parse, isValid } from "date-fns";
 
 registerLocale("pt-BR", ptBR);
 
@@ -48,7 +48,7 @@ const parseInputDate = (value: string | undefined): Date | null => {
 };
 
 const CustomInput = forwardRef<HTMLInputElement, any>(
-  ({ value, onClick, onChange, placeholderText, onChangeRaw, onBlur, onDateChange }, ref) => {
+  ({ value, onClick, placeholderText, onBlur, onDateChange }, ref) => {
     const [inputValue, setInputValue] = useState(value || "");
 
     useEffect(() => {
@@ -109,7 +109,7 @@ export function DateTimePicker({
   required = false,
   className = "",
 }: DateTimePickerProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [, setCurrentMonth] = useState(new Date());
 
   const handleChange = (date: Date | null) => {
     onChange(date);

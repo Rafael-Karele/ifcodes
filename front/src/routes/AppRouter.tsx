@@ -1,4 +1,3 @@
-import App from "@/App";
 import Activities from "@/pages/activities/Activities";
 import ActivitiesDetails from "@/pages/activitiesDetails/ActivitiesDetails";
 import AppLayout from "@/pages/AppLayout";

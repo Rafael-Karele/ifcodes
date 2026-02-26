@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, AlertTriangle, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical } from "lucide-react";
+import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { RichTextViewer } from "@/components/RichTextEditor";

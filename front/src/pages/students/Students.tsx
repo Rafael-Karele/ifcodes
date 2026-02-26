@@ -47,24 +47,6 @@ const palette = {
   dangerBg: "#fef2f2",
 };
 
-// Skeleton de loading exibido enquanto os alunos são carregados
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center space-x-4 p-4 bg-white rounded-lg border border-stone-200"
-        >
-          <div className="h-4 bg-stone-200 rounded w-1/4 animate-pulse"></div>
-          <div className="h-4 bg-stone-200 rounded w-1/5 animate-pulse"></div>
-          <div className="h-4 bg-stone-200 rounded w-1/6 animate-pulse"></div>
-          <div className="h-4 bg-stone-200 rounded w-1/4 animate-pulse"></div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // Interface para props do modal de formulário
 interface StudentFormModalProps {

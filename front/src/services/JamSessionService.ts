@@ -79,7 +79,7 @@ export const JamSessionService = {
     return response.data && response.data.id ? response.data : null;
   },
 
-  connectWebSocket: (jamId: number): WebSocket => {
+  connectWebSocket: (_jamId: number): WebSocket => {
     const ws = new WebSocket(WS_URL);
     return ws;
   },
