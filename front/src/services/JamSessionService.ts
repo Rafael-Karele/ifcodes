@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import type { JamSession, CreateJamSessionDTO, JamParticipant } from "@/types/jam";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-const WS_URL = import.meta.env.VITE_JAM_WS_URL || "ws://localhost:3001";
+const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:3002";
 
 const api = axios.create({
   baseURL: API_URL,

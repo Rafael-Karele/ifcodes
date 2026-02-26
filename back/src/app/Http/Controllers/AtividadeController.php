@@ -6,6 +6,7 @@ use App\Services\ProblemaService;
 use App\Models\Atividade;
 use App\Models\Submissao;
 use App\Lib\Dicionarios\Status;
+use App\Support\RealtimeNotifier;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -119,6 +120,8 @@ class AtividadeController extends Controller
 
         $atividade = Atividade::create($validated);
 
+        RealtimeNotifier::toTurma($atividade->turma_id, 'activity.created');
+
         return response()->json($atividade, 201);
     }
 
@@ -195,6 +198,8 @@ class AtividadeController extends Controller
 
         $atividade->update($validated);
 
+        RealtimeNotifier::toTurma($atividade->turma_id, 'activity.updated');
+
         return response()->json($atividade);
     }
 
@@ -215,7 +220,10 @@ class AtividadeController extends Controller
     public function destroy(Atividade $atividade)
     {
         try {
+            $turmaId = $atividade->turma_id;
             $atividade->delete();
+
+            RealtimeNotifier::toTurma($turmaId, 'activity.deleted');
 
             return response()->json([
                 'message' => 'Atividade removida com sucesso.'

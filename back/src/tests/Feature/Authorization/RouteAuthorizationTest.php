@@ -237,11 +237,11 @@ class RouteAuthorizationTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_professor_cannot_list_alunos(): void
+    public function test_professor_can_list_alunos(): void
     {
         $this->actingAs($this->professor)
             ->getJson('/api/alunos')
-            ->assertForbidden();
+            ->assertSuccessful();
     }
 
     public function test_professor_cannot_create_aluno(): void

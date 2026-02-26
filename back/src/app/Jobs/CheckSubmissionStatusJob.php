@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use App\Lib\Dicionarios\Status;
 use App\Models\JamParticipant;
 use App\Services\JamSubmissaoService;
+use App\Support\RealtimeNotifier;
 use Throwable;
 
 class CheckSubmissionStatusJob implements ShouldQueue
@@ -103,6 +104,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
                     'stdout' => $stdout,
                 ];
 
+                RealtimeNotifier::toUser($submissao->user_id, 'submission.updated');
                 $this->notifyJamSidecarIfNeeded($submissao, 'failed', $statusInfo['nome'] ?? 'Erro', $testResults);
                 return;
             }
@@ -126,6 +128,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
 
                 $submissao->status_correcao_id = STATUS::TEMPO_LIMITE_EXCEDIDO;
                 $submissao->save();
+                RealtimeNotifier::toUser($submissao->user_id, 'submission.updated');
                 $this->notifyJamSidecarIfNeeded($submissao, 'error', 'Tempo Limite Excedido', $testResults);
                 return;
             }
@@ -139,6 +142,7 @@ class CheckSubmissionStatusJob implements ShouldQueue
         } else {
             $submissao->status_correcao_id = Status::ACEITA;
             $submissao->save();
+            RealtimeNotifier::toUser($submissao->user_id, 'submission.updated');
             $this->notifyJamSidecarIfNeeded($submissao, 'passed', 'Aceita', $testResults);
             return;
         }

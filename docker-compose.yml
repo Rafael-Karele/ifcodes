@@ -122,18 +122,20 @@ services:
     depends_on:
       - backend_app
 
-  # --- SERVIÇO DO JAM SERVER (WebSocket Sidecar) ---
-  jam_server:
-    build: ./jam-server
-    container_name: jam_server
+  # --- SERVIÇO DO WS SERVER (WebSocket genérico) ---
+  ws_server:
+    build: ./ws-server
+    container_name: ws_server
     restart: unless-stopped
     ports:
       - "3002:3001"
     environment:
       - LARAVEL_API_URL=http://laravel_app:8000
       - PORT=3001
+      - REDIS_HOST=laravel_redis
     depends_on:
       - backend_app
+      - laravel_redis
 
   # --- SERVIÇO DE EMAIL (MAILPIT) ---
   mailpit:
