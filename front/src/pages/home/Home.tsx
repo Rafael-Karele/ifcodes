@@ -1,18 +1,12 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router";
 import {
-  BookOpen,
   CheckCircle2,
   Flame,
-  LayoutDashboard,
   Loader2,
-  Send,
   Terminal,
-  Users,
   Code,
 } from "lucide-react";
 import { startOfDay, subDays, startOfWeek, addDays } from "date-fns";
-import { Button } from "@/components/ui/button";
 import { useData } from "@/context/DataContext";
 import { useUser } from "@/context/UserContext";
 import { StatCard } from "@/components/StatCard";
@@ -22,14 +16,9 @@ import { WeeklyHeatmap, type HeatmapCell } from "./components/WeeklyHeatmap";
 import { LanguageBar, type LanguageStat } from "./components/LanguageBar";
 import { SubmissionFeed } from "./components/SubmissionFeed";
 import { ContinueCard } from "./components/ContinueCard";
+import { HeroHeader } from "./components/HeroHeader";
 import type { Submission } from "@/types";
-
-/* ── palette ──────────────────────────────────────────── */
-
-const palette = {
-  accent: "#0d9488",
-  accentDark: "#065f46",
-};
+import "./Home.css";
 
 /* ── helpers ─────────────────────────────────────────── */
 
@@ -68,7 +57,7 @@ function LoadingDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-16">
       <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
-        <Loader2 className="w-6 h-6 animate-spin" style={{ color: palette.accent }} />
+        <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
         <p className="text-sm text-stone-500 font-medium">Carregando seu painel...</p>
       </div>
     </div>
@@ -93,7 +82,6 @@ function useHomeData() {
     );
     let count = 0;
     let cursor = startOfDay(new Date());
-    // If no submission today, start from yesterday
     if (!days.has(cursor.getTime())) {
       cursor = subDays(cursor, 1);
     }
@@ -106,12 +94,9 @@ function useHomeData() {
 
   const heatmapCells = useMemo((): HeatmapCell[] => {
     const today = startOfDay(new Date());
-    // Find the Monday of the current week
     const thisMonday = startOfWeek(today, { weekStartsOn: 1 });
-    // Start from 3 weeks before this Monday
     const start = subDays(thisMonday, 21);
 
-    // Build count map
     const countMap = new Map<number, number>();
     for (const s of submissions) {
       const d = startOfDay(new Date(s.dateSubmitted)).getTime();
@@ -143,7 +128,6 @@ function useHomeData() {
   }, [submissions]);
 
   const urgentActivity = useMemo(() => {
-    const now = new Date();
     return [...activities]
       .filter((a) => a.status !== "completed")
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
@@ -193,7 +177,6 @@ function useHomeData() {
 /* ── main component ──────────────────────────────────── */
 
 export default function Home() {
-  const navigate = useNavigate();
   const { user } = useUser();
   const { loading } = useData();
   const {
@@ -222,76 +205,20 @@ export default function Home() {
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
-      <style>{`
-        @keyframes home-fade-up {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .home-section {
-          animation: home-fade-up 0.4s ease-out both;
-        }
-        .heatmap-cell {
-          animation: home-fade-up 0.3s ease-out both;
-        }
-        .feed-row {
-          animation: home-fade-up 0.35s ease-out both;
-        }
-        .circular-progress-ring {
-          transition: stroke-dashoffset 0.8s ease-out;
-        }
-      `}</style>
-
       {/* ── 1. Smart Hero Header ── */}
-      <div
-        className="home-section relative rounded-2xl px-8 py-10 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)`, animationDelay: "0ms" }}
-      >
-        <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
-        <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
-
-        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <p className="text-sm text-teal-100 font-medium capitalize">{currentDate}</p>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1 flex items-center gap-3">
-              <LayoutDashboard className="w-8 h-8" />
-              {getGreeting()}, {userName}
-            </h1>
-            <p className="text-teal-100 text-sm mt-2 max-w-lg">
-              {pendingCount > 0 && (
-                <span>
-                  {pendingCount} pendente{pendingCount !== 1 && "s"}
-                  {dueThisWeek > 0 && <>, {dueThisWeek} vence{dueThisWeek !== 1 && "m"} esta semana</>}.
-                  {submissions.length > 0 && <> Taxa de acerto: {Math.round(successRate)}%</>}
-                  {" — "}
-                </span>
-              )}
-              {getMotivation(streak, successRate)}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/activities")}
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
-            >
-              <BookOpen className="w-4 h-4" />
-              Atividades
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => navigate("/submissions")}
-              className="bg-white text-teal-700 hover:bg-white/90 rounded-xl shadow-none font-semibold"
-            >
-              <Send className="w-4 h-4" />
-              Submissões
-            </Button>
-          </div>
-        </div>
-      </div>
+      <HeroHeader
+        userName={userName}
+        currentDate={currentDate}
+        greeting={getGreeting()}
+        motivation={getMotivation(streak, successRate)}
+        pendingCount={pendingCount}
+        dueThisWeek={dueThisWeek}
+        submissionCount={submissions.length}
+        successRate={successRate}
+      />
 
       {/* ── 2. Stats Row ── */}
-      <div className="home-section grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ animationDelay: "80ms" }}>
+      <div className="home-section home-delay-1 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="col-span-2 lg:col-span-1 rounded-xl border border-stone-200 bg-white px-5 py-5">
           <CircularProgress percentage={successRate} />
         </div>
@@ -306,22 +233,9 @@ export default function Home() {
         <StatCard label="Submissões" value={submissions.length} icon={Terminal} />
       </div>
 
-      {/* ── 3. Heatmap + Language Distribution ── */}
-      <div
-        className="home-section grid grid-cols-1 lg:grid-cols-2 gap-4"
-        style={{ animationDelay: "160ms" }}
-      >
-        <WeeklyHeatmap cells={heatmapCells} streak={streak} />
-        <SectionCard title="Linguagens" icon={Terminal}>
-          <div className="px-5 py-5">
-            <LanguageBar stats={languageStats} />
-          </div>
-        </SectionCard>
-      </div>
-
-      {/* ── 4. Continue Where You Left Off ── */}
+      {/* ── 3. Continue Where You Left Off ── */}
       {urgentActivity && (
-        <div className="home-section" style={{ animationDelay: "240ms" }}>
+        <div className="home-section home-delay-2">
           <ContinueCard
             activity={urgentActivity}
             problemTitle={
@@ -331,45 +245,21 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 5. Recent Submissions ── */}
-      <div className="home-section" style={{ animationDelay: "320ms" }}>
-        <SectionCard title="Submissões Recentes" icon={Code}>
-          <SubmissionFeed submissions={recentSubmissions} />
+      {/* ── 4. Heatmap + Language Distribution ── */}
+      <div className="home-section home-delay-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <WeeklyHeatmap cells={heatmapCells} streak={streak} />
+        <SectionCard title="Linguagens" icon={Terminal}>
+          <div className="px-5 py-5">
+            <LanguageBar stats={languageStats} />
+          </div>
         </SectionCard>
       </div>
 
-      {/* ── 6. Quick Actions ── */}
-      <div
-        className="home-section border-t border-stone-200 pt-6 flex flex-wrap gap-3"
-        style={{ animationDelay: "400ms" }}
-      >
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/activities")}
-          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
-        >
-          <BookOpen className="w-4 h-4" />
-          Ver Atividades
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/submissions")}
-          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
-        >
-          <Send className="w-4 h-4" />
-          Ver Submissões
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/classes")}
-          className="rounded-xl text-stone-600 border-stone-300 hover:border-teal-300 hover:text-teal-700"
-        >
-          <Users className="w-4 h-4" />
-          Minhas Turmas
-        </Button>
+      {/* ── 5. Recent Submissions ── */}
+      <div className="home-section home-delay-4">
+        <SectionCard title="Submissões Recentes" icon={Code}>
+          <SubmissionFeed submissions={recentSubmissions} />
+        </SectionCard>
       </div>
     </div>
   );
