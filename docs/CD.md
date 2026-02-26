@@ -6,18 +6,31 @@ O deploy automatico e acionado quando um push e feito na branch `main` (geralmen
 
 ### Fluxo
 
-1. **Testes** — O workflow roda os testes PHPUnit como garantia extra antes do deploy
-2. **Deploy** — Se os testes passarem, conecta no VPS via SSH e executa:
+1. **Detect changes** — Identifica quais diretorios foram alterados (`back/`, `front/`, `jam-server/`)
+2. **Testes** — Roda PHPUnit apenas se houve mudancas no backend (`back/**`)
+3. **Deploy** — Conecta no VPS via SSH e executa:
    - `git pull origin main` — atualiza o codigo
-   - `docker compose up -d --build` — reconstroi e reinicia os containers
-   - `php artisan migrate --force` — roda migrations pendentes
-   - `php artisan config:cache` — limpa e recria o cache de configuracao
+   - `docker compose up -d --build <servicos>` — reconstroi apenas os servicos afetados
+   - `php artisan migrate --force` + `config:cache` — apenas se o backend mudou
+
+### Deploy condicional por servico
+
+O deploy so reconstroi os containers que foram afetados:
+
+| Mudanca em | Servicos rebuilds |
+|---|---|
+| `back/**` | `backend_app`, `queue_worker` + migrations + config:cache |
+| `front/**` | `frontend_app` |
+| `jam-server/**` | `jam_server` |
+
+Se nenhum desses paths mudou (ex: apenas docs ou CI), faz apenas `git pull` sem rebuild.
 
 ### Workflow
 
-O arquivo `.github/workflows/deploy.yml` contem dois jobs:
-- **tests** — mesmos testes do CI (PHPUnit + PostgreSQL)
-- **deploy** — depende de `tests`, usa [appleboy/ssh-action](https://github.com/appleboy/ssh-action) para conectar no VPS
+O arquivo `.github/workflows/deploy.yml` contem tres jobs:
+- **changes** — detecta quais partes do projeto mudaram usando [dorny/paths-filter](https://github.com/dorny/paths-filter)
+- **tests** — roda PHPUnit (via workflow reutilizavel `phpunit.yml`) apenas se o backend mudou
+- **deploy** — depende de `changes` e `tests`, usa [appleboy/ssh-action](https://github.com/appleboy/ssh-action) para conectar no VPS
 
 ---
 
@@ -106,3 +119,9 @@ Considere migrar para GHCR quando:
 - Precisar de rollback rapido e confiavel
 - O time crescer e precisar de mais controle sobre versoes
 - Quiser separar completamente o build do deploy
+
+---
+
+## Veja tambem
+
+- [Melhorias Futuras](./melhorias-futuras.md) — Sugestoes de melhorias como migracao para Nginx + PHP-FPM
