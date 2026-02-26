@@ -34,7 +34,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   );
 
   // Estado para arquivo de submissão (suporte a upload futuro)
-  const [submissionCodeFile, setSubmissionCodeFile] = useState(null);
+  const [submissionCodeFile, setSubmissionCodeFile] = useState<File | null>(null);
 
   // Estado para texto extraído do arquivo de submissão (suporte futuro)
   const [submissionCodeText, setSubmissionCodeText] = useState("");
@@ -56,7 +56,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
    * Função chamada ao montar o editor Monaco.
    * Permite configurar atalhos e opções extras do editor.
    */
-  const handleEditorDidMount = (editor, monaco) => {
+  const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
 
     // Configurações visuais e funcionais do editor
@@ -82,7 +82,7 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   /**
    * Atualiza o estado do código conforme o usuário digita.
    */
-  const handleEditorChange = (value) => {
+  const handleEditorChange = (value: string | undefined) => {
     setCodeValue(value || "");
   };
 
@@ -265,10 +265,9 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
             {submissionCodeText && (
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Prévia do código:</Label>
-                <CodePreview
-                  code={submissionCodeText}
-                  filename={submissionCodeFile.name}
-                />
+                <pre className="bg-gray-50 p-3 rounded-lg text-sm overflow-auto">
+                  {submissionCodeText}
+                </pre>
               </div>
             )}
           </div>

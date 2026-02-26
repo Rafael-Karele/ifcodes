@@ -51,7 +51,7 @@ export default function SubmissionsModal({ isOpen, onClose, activity, classId }:
 
     try {
       const problemData = await getProblemById(String(activity.problemId));
-      setProblem(problemData);
+      setProblem(problemData ?? null);
     } catch (error) {
       console.error("Erro ao carregar problema:", error);
     }

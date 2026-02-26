@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fakeSubmissionReports } from "../mocks";
-import type { SubmissionReport, TestCaseResult, Submission, SubmissionStatus } from "../types";
+import type { SubmissionReport, TestCaseResult, Submission, SubmissionStatus, Language } from "../types";
 
 /**
  * Simula uma chamada de API para buscar o relatório de submissão pelo submissionId.
@@ -33,18 +33,18 @@ const API_URL = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000
 /**
  * Mapeia language_id do Judge0 para slug usado no frontend
  */
-const JUDGE0_LANG_MAP: Record<number, string> = {
+const JUDGE0_LANG_MAP: Record<number, Language> = {
   50: "c",
   54: "cpp",
   62: "java",
   71: "python",
 };
 
-function mapLanguage(linguagem: number | string): string {
+function mapLanguage(linguagem: number | string): Language {
   if (typeof linguagem === "number") {
     return JUDGE0_LANG_MAP[linguagem] ?? "c";
   }
-  return linguagem || "c";
+  return (linguagem as Language) || "c";
 }
 
 /**

@@ -35,6 +35,7 @@ export type Problem = {
   timeLimitMs: number;
   memoryLimitKb: number;
   testCases?: TestCase[];
+  testCasesCount?: number;
   atividades_count?: number;
 };
 
