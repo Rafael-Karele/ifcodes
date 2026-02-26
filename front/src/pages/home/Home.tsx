@@ -55,7 +55,7 @@ const LANG_DISPLAY: Record<string, string> = {
 
 function LoadingDashboard() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
       <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
         <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
         <p className="text-sm text-stone-500 font-medium">Carregando seu painel...</p>
@@ -204,7 +204,7 @@ export default function Home() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-6">
       {/* ── 1. Smart Hero Header ── */}
       <HeroHeader
         userName={userName}

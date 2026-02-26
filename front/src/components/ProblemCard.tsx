@@ -77,7 +77,7 @@ export function ProblemCard({ problem, onDelete, onEdit, onView, index = 0 }: Pr
         </div>
 
         {/* Action buttons (show on hover) */}
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" ref={menuRef}>
+        <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity" ref={menuRef}>
           <button
             onClick={(e) => { e.stopPropagation(); onView(problem); }}
             className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"

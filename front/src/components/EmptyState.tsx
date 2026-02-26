@@ -16,7 +16,7 @@ export function EmptyState({ icon: Icon, title, description, action }: EmptyStat
   const DisplayIcon = Icon || Sparkles;
 
   return (
-    <div className="flex flex-col items-center justify-center py-24">
+    <div className="flex flex-col items-center justify-center py-12 sm:py-24">
       <div className="h-20 w-20 rounded-2xl flex items-center justify-center mb-5" style={{ backgroundColor: "#ccfbf1" }}>
         <DisplayIcon className="w-9 h-9" style={{ color: "#0d9488" }} />
       </div>

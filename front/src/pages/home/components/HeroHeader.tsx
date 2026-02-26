@@ -35,8 +35,8 @@ export function HeroHeader({
           <p className="text-sm text-teal-100 font-medium capitalize">
             {currentDate}
           </p>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white mt-1 flex items-center gap-3">
-            <LayoutDashboard className="w-8 h-8" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1 flex items-center gap-3">
+            <LayoutDashboard className="w-6 h-6 sm:w-8 sm:h-8" />
             {greeting}, {userName}
           </h1>
           <p className="text-teal-100 text-sm mt-2 max-w-lg">
@@ -58,12 +58,12 @@ export function HeroHeader({
             {motivation}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
             size="sm"
             onClick={() => navigate("/activities")}
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
+            className="flex-1 sm:flex-none bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
           >
             <BookOpen className="w-4 h-4" />
             Atividades
@@ -71,7 +71,7 @@ export function HeroHeader({
           <Button
             size="sm"
             onClick={() => navigate("/submissions")}
-            className="bg-white text-teal-700 hover:bg-white/90 rounded-xl shadow-none font-semibold"
+            className="flex-1 sm:flex-none bg-white text-teal-700 hover:bg-white/90 rounded-xl shadow-none font-semibold"
           >
             <Send className="w-4 h-4" />
             Submissões

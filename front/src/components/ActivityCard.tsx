@@ -69,7 +69,7 @@ export function ActivityCard({ activity, problemTitle, problemPreview, onClick, 
           {problemPreview && !isCompleted && (
             <p className="text-xs text-stone-400 truncate mt-0.5">{problemPreview}</p>
           )}
-          <div className="flex items-center gap-3 mt-1.5">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
             <span className="text-xs text-stone-400">{dueDateStr}</span>
             {!isCompleted && (
               <span

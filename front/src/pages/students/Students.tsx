@@ -215,7 +215,7 @@ function StudentFormModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-600 transition-colors"
+            className="p-2 -mr-2 rounded-lg text-stone-400 hover:text-stone-600 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -587,7 +587,7 @@ export default function Students() {
   });
 
   return (
-    <div className="min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes students-fade-up {
@@ -610,7 +610,7 @@ export default function Students() {
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
       <div
-        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
+        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
         style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
       >
         {/* decorative circles */}
@@ -625,8 +625,8 @@ export default function Students() {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <Users className="w-8 h-8 opacity-90" strokeWidth={2.2} />
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
               Gerenciamento de Alunos
             </h1>
             <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
@@ -636,7 +636,7 @@ export default function Students() {
 
           <button
             onClick={handleCreate}
-            className="shrink-0 flex items-center gap-2 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
+            className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
           >
             <Plus className="w-4 h-4" />
             Adicionar Aluno
@@ -668,7 +668,7 @@ export default function Students() {
 
       {/* ═══════ TABELA DE ALUNOS ═══════ */}
       <div
-        className="bg-white rounded-2xl border shadow-sm overflow-hidden"
+        className="bg-white rounded-2xl border shadow-sm overflow-x-auto"
         style={{ borderColor: palette.border }}
       >
         {loading ? (
@@ -705,7 +705,7 @@ export default function Students() {
                     Nome
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-stone-900">
+                <TableHead className="hidden md:table-cell font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <IdCard className="w-4 h-4" />
                     Matrícula
@@ -717,13 +717,13 @@ export default function Students() {
                     Curso
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-stone-900">
+                <TableHead className="hidden md:table-cell font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
                     E-mail
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold text-stone-900 text-center">
+                <TableHead className="font-semibold text-stone-900 text-center whitespace-nowrap">
                   Ações
                 </TableHead>
               </TableRow>
@@ -735,30 +735,30 @@ export default function Students() {
                   className="stu-row hover:bg-stone-50 transition-colors duration-200"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <TableCell className="font-medium text-stone-900">
+                  <TableCell className="font-medium text-stone-900 max-w-[160px] sm:max-w-none truncate">
                     {student.name}
                   </TableCell>
-                  <TableCell className="text-stone-600">
+                  <TableCell className="hidden md:table-cell text-stone-600">
                     {student.matricula}
                   </TableCell>
-                  <TableCell className="text-stone-600">
+                  <TableCell className="text-stone-600 max-w-[120px] sm:max-w-none truncate">
                     {student.curso?.nome || (student.curso_id ? `Curso ${student.curso_id}` : "N/A")}
                   </TableCell>
-                  <TableCell className="text-stone-600">
+                  <TableCell className="hidden md:table-cell text-stone-600">
                     {student.email}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => handleEdit(student)}
-                        className="p-2 text-stone-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
+                        className="p-2.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                         title="Editar aluno"
                       >
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteClick(student)}
-                        className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Remover aluno"
                       >
                         <Trash2 className="w-4 h-4" />
