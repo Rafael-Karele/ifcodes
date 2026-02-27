@@ -9,8 +9,17 @@ let broadcastTimer: NodeJS.Timeout | null = null;
 
 // Ping/pong latency tracking
 const latencyMap = new Map<WebSocket, number>();
+const latencies: number[] = [];
 
 setInterval(() => {
+  // Calculate average from previous cycle's pongs
+  if (latencies.length > 0) {
+    const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length;
+    setLatencyMs(Math.round(avg));
+    latencies.length = 0;
+  }
+
+  // Send new pings
   for (const ws of adminClients) {
     if (ws.readyState === WebSocket.OPEN) {
       latencyMap.set(ws, Date.now());
@@ -75,7 +84,7 @@ export async function handleMetricsConnection(ws: WebSocket): Promise<void> {
       ws.on('pong', () => {
         const sent = latencyMap.get(ws);
         if (sent) {
-          setLatencyMs(Date.now() - sent);
+          latencies.push(Date.now() - sent);
           latencyMap.delete(ws);
         }
       });
