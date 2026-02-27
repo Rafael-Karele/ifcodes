@@ -43,6 +43,11 @@ import {
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
+
+  if (!dateString || isNaN(date.getTime())) {
+    return { formatted: "Data indisponível", relative: "", isOverdue: false };
+  }
+
   const now = new Date();
   const diffTime = date.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
