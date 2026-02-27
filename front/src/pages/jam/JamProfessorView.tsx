@@ -12,16 +12,22 @@ const DEFAULT_CARD_W = 280;
 const DEFAULT_CARD_H = 220;
 const GAP = 16;
 
+function getCardDimensions(containerWidth: number) {
+  if (containerWidth < 480) return { w: Math.max(220, containerWidth - GAP * 2), h: 180 };
+  return { w: DEFAULT_CARD_W, h: DEFAULT_CARD_H };
+}
+
 function autoLayout(
   count: number,
   containerWidth: number,
 ): CardLayout[] {
-  const cols = Math.max(1, Math.floor((containerWidth + GAP) / (DEFAULT_CARD_W + GAP)));
+  const { w, h } = getCardDimensions(containerWidth);
+  const cols = Math.max(1, Math.floor((containerWidth + GAP) / (w + GAP)));
   return Array.from({ length: count }, (_, i) => ({
-    x: (i % cols) * (DEFAULT_CARD_W + GAP),
-    y: Math.floor(i / cols) * (DEFAULT_CARD_H + GAP),
-    w: DEFAULT_CARD_W,
-    h: DEFAULT_CARD_H,
+    x: (i % cols) * (w + GAP),
+    y: Math.floor(i / cols) * (h + GAP),
+    w,
+    h,
   }));
 }
 
@@ -150,37 +156,37 @@ export default function JamProfessorView({
   return (
     <div className="flex h-full flex-col p-3">
       {/* Header */}
-      <div className="mb-2 flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-stone-800">{session.titulo}</h2>
-          <p className="text-sm text-stone-500">
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-lg sm:text-xl font-bold text-stone-800 truncate">{session.titulo}</h2>
+          <p className="text-xs sm:text-sm text-stone-500 truncate">
             Problema: {session.problema?.titulo}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
           {isFinished && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-stone-100 px-3 py-1 text-sm font-medium text-stone-600">
               Sessão Encerrada
             </span>
           )}
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-3 py-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white px-2 sm:px-3 py-1 text-xs sm:text-sm">
             <Users className="h-3.5 w-3.5 text-stone-500" />
             <span className="font-semibold text-stone-800">{stats.total}</span>
-            <span className="text-stone-400">participantes</span>
+            <span className="hidden sm:inline text-stone-400">participantes</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-3 py-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-100 bg-yellow-50 px-2 sm:px-3 py-1 text-xs sm:text-sm">
             <Square className="h-3.5 w-3.5 text-yellow-500" />
             <span className="font-semibold text-yellow-700">{stats.submitted}</span>
-            <span className="text-yellow-400">submetidos</span>
+            <span className="hidden sm:inline text-yellow-400">submetidos</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-green-100 bg-green-50 px-3 py-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-green-100 bg-green-50 px-2 sm:px-3 py-1 text-xs sm:text-sm">
             <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
             <span className="font-semibold text-green-700">{stats.passed}</span>
-            <span className="text-green-400">aprovados</span>
+            <span className="hidden sm:inline text-green-400">aprovados</span>
           </span>
           {!isFinished && (
             <>
-              <div className="mx-1 h-6 w-px bg-stone-200" />
+              <div className="hidden sm:block mx-1 h-6 w-px bg-stone-200" />
               <JamTimer
                 startedAt={session.started_at}
                 timeLimitMinutes={session.tempo_limite}
@@ -192,7 +198,7 @@ export default function JamProfessorView({
                 title="Reorganizar cards"
               >
                 <RotateCcw className="h-4 w-4" />
-                Reorganizar
+                <span className="hidden sm:inline">Reorganizar</span>
               </Button>
               <Button
                 onClick={() => setShowSettings(true)}
@@ -200,7 +206,7 @@ export default function JamProfessorView({
                 className="flex items-center gap-2 border-stone-300"
               >
                 <Settings className="h-4 w-4" />
-                Configurações
+                <span className="hidden sm:inline">Configurações</span>
               </Button>
               <Button
                 onClick={onEndSession}
@@ -208,7 +214,7 @@ export default function JamProfessorView({
                 className="flex items-center gap-2 border-red-200 text-red-600 hover:bg-red-50"
               >
                 <Square className="h-4 w-4" />
-                Encerrar
+                <span className="hidden sm:inline">Encerrar</span>
               </Button>
             </>
           )}

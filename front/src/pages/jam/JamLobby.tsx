@@ -11,7 +11,7 @@ interface JamLobbyProps {
 
 export default function JamLobby({ session, participants, isProfessor, onStart }: JamLobbyProps) {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center p-8">
+    <div className="flex min-h-[60vh] flex-col items-center justify-center p-4 sm:p-8">
       <div className="w-full max-w-lg rounded-xl border border-stone-200 bg-white p-8 text-center shadow-lg">
         <div className="mb-4 flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100">
@@ -19,7 +19,7 @@ export default function JamLobby({ session, participants, isProfessor, onStart }
           </div>
         </div>
 
-        <h2 className="mb-2 text-2xl font-bold text-stone-800">{session.titulo}</h2>
+        <h2 className="mb-2 text-xl sm:text-2xl font-bold text-stone-800">{session.titulo}</h2>
         <p className="mb-1 text-stone-500">
           Problema: {session.problema?.titulo || "Carregando..."}
         </p>

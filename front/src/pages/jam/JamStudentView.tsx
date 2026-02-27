@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical } from "lucide-react";
+import { Send, CheckCircle2, XCircle, Loader2, MessageSquare, FileText, X, BookOpen, GraduationCap, Terminal, FlaskConical, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Editor, { type OnMount } from "@monaco-editor/react";
 import { RichTextViewer } from "@/components/RichTextEditor";
@@ -19,6 +19,171 @@ interface JamStudentViewProps {
 
 const DEFAULT_CODE = "#include <stdio.h>\n\nint main() {\n    \n    return 0;\n}";
 
+interface ResultsPanelProps {
+  myStatus: string;
+  myResult: JamSubmissionResult | null;
+  compileError: string | null;
+  myFeedback: { message: string; created_at: string }[];
+  onClose?: () => void;
+  showClose?: boolean;
+}
+
+function ResultsPanel({ myStatus, myResult, compileError, myFeedback, onClose, showClose }: ResultsPanelProps) {
+  return (
+    <div className="overflow-hidden">
+      <div className="px-3 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FlaskConical className="h-4 w-4 shrink-0 text-stone-400" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-stone-500" style={{ fontSize: "0.7rem", letterSpacing: "0.08em" }}>
+            Resultados
+          </span>
+        </div>
+        {showClose && onClose && (
+          <button
+            onClick={onClose}
+            className="rounded-md p-1 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+      <div className="mx-3 h-px bg-stone-200" />
+
+      <div className="p-3 space-y-3">
+        {myStatus === "passed" && (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-2.5">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+                <span className="text-xs font-semibold break-words">Todos os testes passaram!</span>
+              </div>
+            </div>
+            {myResult?.testResults && (
+              <div className="space-y-1.5">
+                {myResult.testResults.map((t, i) => (
+                  <div
+                    key={i}
+                    className="rounded-md border border-green-200 bg-green-50 p-2 text-xs font-medium text-green-700 overflow-hidden"
+                  >
+                    <div>Teste {i + 1}: {t.status}</div>
+                    {t.stdout && (
+                      <pre className="mt-1 whitespace-pre-wrap break-all font-mono text-green-600 leading-relaxed text-[11px]">
+                        {t.stdout}
+                      </pre>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {myStatus === "failed" && (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-2.5">
+              <div className="flex items-center gap-2 text-red-700">
+                <XCircle className="h-4 w-4 shrink-0" />
+                <span className="text-xs font-semibold break-words">
+                  {myResult?.statusMessage || "Alguns testes falharam"}
+                </span>
+              </div>
+            </div>
+            {compileError && (
+              <div className="rounded-lg border border-stone-200 bg-stone-50 p-2.5 overflow-hidden">
+                <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-stone-500">
+                  <Terminal className="h-3 w-3 shrink-0" />
+                  Saída do compilador
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-[11px] text-red-600 font-mono leading-relaxed">
+                  {compileError}
+                </pre>
+              </div>
+            )}
+            {myResult?.testResults && !compileError && (
+              <div className="space-y-1.5">
+                {myResult.testResults.map((t, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-md border p-2 text-xs font-medium ${
+                      t.status === "Aceita"
+                        ? "border-green-200 bg-green-50 text-green-700"
+                        : "border-red-200 bg-red-50 text-red-700"
+                    }`}
+                  >
+                    Teste {i + 1}: {t.status}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {myStatus === "error" && (
+          <div className="space-y-2">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-2.5">
+              <div className="flex items-center gap-2 text-red-700">
+                <XCircle className="h-4 w-4 shrink-0" />
+                <span className="text-xs font-semibold break-words">
+                  {myResult?.statusMessage || "Erro na execução"}
+                </span>
+              </div>
+            </div>
+            {compileError && (
+              <div className="rounded-lg border border-stone-200 bg-stone-50 p-2.5 overflow-hidden">
+                <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-stone-500">
+                  <Terminal className="h-3 w-3 shrink-0" />
+                  Detalhes do erro
+                </div>
+                <pre className="whitespace-pre-wrap break-all text-[11px] text-red-600 font-mono leading-relaxed">
+                  {compileError}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
+
+        {myStatus === "submitted" && (
+          <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-2.5">
+            <div className="flex items-center gap-2 text-yellow-700">
+              <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+              <span className="text-xs font-semibold">Avaliando...</span>
+            </div>
+          </div>
+        )}
+
+        {(myStatus === "joined" || myStatus === "coding") && (
+          <div className="rounded-lg border border-stone-200 bg-stone-50 p-2.5 text-xs text-stone-500">
+            Submeta seu código para ver os resultados.
+          </div>
+        )}
+
+        {/* Feedback Section */}
+        {myFeedback.length > 0 && (
+          <div>
+            <div className="mb-2 mt-1 h-px bg-stone-200" />
+            <div className="mb-2 flex items-center gap-2">
+              <MessageSquare className="h-3.5 w-3.5 shrink-0 text-stone-400" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-stone-500" style={{ fontSize: "0.7rem", letterSpacing: "0.08em" }}>
+                Feedback ({myFeedback.length})
+              </span>
+            </div>
+            <div className="space-y-2">
+              {myFeedback.map((entry, i) => (
+                <div key={i} className="rounded-lg border border-stone-200 bg-stone-50 p-2.5">
+                  <p className="text-xs leading-relaxed text-stone-600 break-words">{entry.message}</p>
+                  <p className="mt-1 text-[10px] text-stone-400">
+                    {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function JamStudentView({
   session,
   myParticipant,
@@ -31,10 +196,12 @@ export default function JamStudentView({
   const [code, setCode] = useState(myParticipant?.codigo || DEFAULT_CODE);
   const [submitting, setSubmitting] = useState(false);
   const [showProblem, setShowProblem] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const onUpdateCursorRef = useRef(onUpdateCursor);
   onUpdateCursorRef.current = onUpdateCursor;
 
   const toggleProblem = useCallback(() => setShowProblem((v) => !v), []);
+  const toggleResults = useCallback(() => setShowResults((v) => !v), []);
 
   // Ctrl+E to toggle problem panel
   useEffect(() => {
@@ -109,17 +276,17 @@ export default function JamStudentView({
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-stone-200 bg-white px-6 py-3">
-        <div>
-          <h2 className="text-lg font-bold text-stone-800">{session.titulo}</h2>
-          <p className="text-sm text-stone-500">
+      <div className="flex items-center justify-between gap-2 border-b border-stone-200 bg-white px-3 sm:px-6 py-2 sm:py-3">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base sm:text-lg font-bold text-stone-800 truncate">{session.titulo}</h2>
+          <p className="text-xs sm:text-sm text-stone-500 truncate">
             Problema: {session.problema?.titulo}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
           <div className="flex items-center gap-2">
             {statusIcon()}
-            <span className="text-sm font-medium text-stone-600">
+            <span className="text-xs sm:text-sm font-medium text-stone-600">
               {statusLabel[myStatus] || myStatus}
             </span>
           </div>
@@ -134,12 +301,11 @@ export default function JamStudentView({
       <div className="relative flex flex-1 min-h-0 overflow-hidden">
         {/* Problem Panel - Slide-over */}
         <div
-          className={`absolute inset-y-0 left-0 z-20 flex transition-transform duration-300 ease-out ${
+          className={`absolute inset-y-0 left-0 z-20 flex w-full max-w-xs sm:max-w-sm md:max-w-[520px] transition-transform duration-300 ease-out ${
             showProblem ? "translate-x-0" : "-translate-x-full"
           }`}
-          style={{ width: "min(42%, 520px)" }}
         >
-          <div className="flex h-full w-full flex-col bg-white shadow-2xl">
+          <div className="flex h-full w-full flex-col bg-white/95 backdrop-blur-sm shadow-2xl">
             {/* Panel header */}
             <div className="flex items-center justify-between px-5 py-3 shrink-0">
               <div className="flex items-center gap-2.5">
@@ -206,37 +372,48 @@ export default function JamStudentView({
         )}
 
         {/* Code Editor */}
-        <div className="flex flex-1 min-h-0 flex-col">
-          <div className="flex items-center justify-between border-b border-stone-200 bg-stone-50 px-4 py-2 shrink-0">
-            <div className="flex items-center gap-2">
+        <div className="flex flex-1 min-h-0 min-w-0 flex-col">
+          <div className="flex items-center gap-1 sm:gap-2 border-b border-stone-200 bg-stone-50 px-2 sm:px-4 py-2 shrink-0 min-w-0">
               <button
                 onClick={toggleProblem}
-                className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+                className={`flex items-center gap-1.5 rounded-md px-1.5 sm:px-2 py-1 text-xs font-medium transition-colors shrink-0 ${
                   showProblem
                     ? "bg-teal-100 text-teal-700"
                     : "text-stone-500 hover:bg-stone-100 hover:text-stone-700"
                 }`}
                 title="Enunciado (Ctrl+E)"
               >
-                <FileText className="h-3.5 w-3.5" />
-                Enunciado
+                <FileText className="h-3.5 w-3.5 shrink-0" />
+                <span className="hidden sm:inline">Enunciado</span>
               </button>
-              <span className="text-sm font-medium text-stone-600">Editor de Código</span>
-            </div>
-            <Button
-              onClick={handleSubmit}
-              disabled={submitting || myStatus === "submitted"}
-              size="sm"
-              className="flex items-center gap-2 hover:opacity-90"
-              style={{ backgroundColor: "#0d9488" }}
-            >
-              {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-              Submeter
-            </Button>
+              <button
+                onClick={toggleResults}
+                className={`flex items-center gap-1.5 rounded-md px-1.5 sm:px-2 py-1 text-xs font-medium transition-colors shrink-0 ${
+                  showResults
+                    ? "bg-teal-100 text-teal-700"
+                    : "text-stone-500 hover:bg-stone-100 hover:text-stone-700"
+                }`}
+                title="Resultados"
+              >
+                <BarChart3 className="h-3.5 w-3.5 shrink-0" />
+                <span className="hidden sm:inline">Resultados</span>
+              </button>
+              <span className="hidden md:inline text-sm font-medium text-stone-600 truncate">Editor de Código</span>
+              <div className="flex-1" />
+              <Button
+                onClick={handleSubmit}
+                disabled={submitting || myStatus === "submitted"}
+                size="sm"
+                className="flex items-center gap-1.5 sm:gap-2 hover:opacity-90 shrink-0"
+                style={{ backgroundColor: "#0d9488" }}
+              >
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">Submeter</span>
+              </Button>
           </div>
           <div className="flex-1 min-h-0">
             <Editor
@@ -256,150 +433,18 @@ export default function JamStudentView({
           </div>
         </div>
 
-        {/* Right Panel - Results & Feedback */}
-        <div className="w-1/4 overflow-y-auto border-l border-stone-200 bg-white">
-          {/* Panel header */}
-          <div className="px-5 py-3">
-            <div className="flex items-center gap-2.5">
-              <FlaskConical className="h-4 w-4 text-stone-400" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-stone-500" style={{ fontSize: "0.7rem", letterSpacing: "0.08em" }}>
-                Resultados
-              </span>
-            </div>
-          </div>
-          <div className="mx-5 h-px bg-stone-200" />
-
-          <div className="p-5 space-y-4">
-            {myStatus === "passed" && (
-              <div className="space-y-3">
-                <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                  <div className="flex items-center gap-2 text-green-700">
-                    <CheckCircle2 className="h-4 w-4 shrink-0" />
-                    <span className="text-sm font-semibold">Todos os testes passaram!</span>
-                  </div>
-                </div>
-                {myResult?.testResults && (
-                  <div className="space-y-1.5">
-                    {myResult.testResults.map((t, i) => (
-                      <div
-                        key={i}
-                        className="rounded-md border border-green-200 bg-green-50 p-2 text-xs font-medium text-green-700"
-                      >
-                        <div>Teste {i + 1}: {t.status}</div>
-                        {t.stdout && (
-                          <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-green-600 leading-relaxed">
-                            {t.stdout}
-                          </pre>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {myStatus === "failed" && (
-              <div className="space-y-3">
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                  <div className="flex items-center gap-2 text-red-700">
-                    <XCircle className="h-4 w-4 shrink-0" />
-                    <span className="text-sm font-semibold">
-                      {myResult?.statusMessage || "Alguns testes falharam"}
-                    </span>
-                  </div>
-                </div>
-                {compileError && (
-                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-                    <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-stone-500">
-                      <Terminal className="h-3 w-3" />
-                      Saída do compilador
-                    </div>
-                    <pre className="whitespace-pre-wrap break-words text-xs text-red-600 font-mono leading-relaxed">
-                      {compileError}
-                    </pre>
-                  </div>
-                )}
-                {myResult?.testResults && !compileError && (
-                  <div className="space-y-1.5">
-                    {myResult.testResults.map((t, i) => (
-                      <div
-                        key={i}
-                        className={`rounded-md border p-2 text-xs font-medium ${
-                          t.status === "Aceita"
-                            ? "border-green-200 bg-green-50 text-green-700"
-                            : "border-red-200 bg-red-50 text-red-700"
-                        }`}
-                      >
-                        Teste {i + 1}: {t.status}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {myStatus === "error" && (
-              <div className="space-y-3">
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                  <div className="flex items-center gap-2 text-red-700">
-                    <XCircle className="h-4 w-4 shrink-0" />
-                    <span className="text-sm font-semibold">
-                      {myResult?.statusMessage || "Erro na execução"}
-                    </span>
-                  </div>
-                </div>
-                {compileError && (
-                  <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-                    <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-stone-500">
-                      <Terminal className="h-3 w-3" />
-                      Detalhes do erro
-                    </div>
-                    <pre className="whitespace-pre-wrap break-words text-xs text-red-600 font-mono leading-relaxed">
-                      {compileError}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {myStatus === "submitted" && (
-              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-                <div className="flex items-center gap-2 text-yellow-700">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm font-semibold">Avaliando...</span>
-                </div>
-              </div>
-            )}
-
-            {(myStatus === "joined" || myStatus === "coding") && (
-              <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 text-sm text-stone-500">
-                Submeta seu código para ver os resultados.
-              </div>
-            )}
-
-            {/* Feedback Section */}
-            {myFeedback.length > 0 && (
-              <div>
-                <div className="mb-3 mt-2 h-px bg-stone-200" />
-                <div className="mb-3 flex items-center gap-2">
-                  <MessageSquare className="h-3.5 w-3.5 text-stone-400" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-stone-500" style={{ fontSize: "0.7rem", letterSpacing: "0.08em" }}>
-                    Feedback ({myFeedback.length})
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {myFeedback.map((entry, i) => (
-                    <div key={i} className="rounded-lg border border-stone-200 bg-stone-50 p-3">
-                      <p className="text-sm leading-relaxed text-stone-600">{entry.message}</p>
-                      <p className="mt-1.5 text-xs text-stone-400">
-                        {new Date(entry.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Results Panel - Slide-over on top of editor */}
+        <div className={`absolute inset-y-0 right-0 z-20 w-full max-w-xs sm:max-w-sm overflow-y-auto border-l border-stone-200 bg-white/95 backdrop-blur-sm shadow-2xl transition-transform duration-300 ease-out ${
+          showResults ? "translate-x-0" : "translate-x-full"
+        }`}>
+          <ResultsPanel
+            myStatus={myStatus}
+            myResult={myResult}
+            compileError={compileError}
+            myFeedback={myFeedback}
+            onClose={toggleResults}
+            showClose
+          />
         </div>
       </div>
     </div>

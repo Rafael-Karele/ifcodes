@@ -122,7 +122,7 @@ export default function JamView() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-56px-2.5rem)] flex-col -mx-[7.5rem] -mt-10">
+    <div className="fixed inset-0 top-[56px] z-10 flex flex-col overflow-hidden bg-white">
       {/* Top bar */}
       <div className="flex items-center justify-between border-b border-stone-200 bg-white px-4 py-2">
         <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export default function JamView() {
       )}
 
       {/* Main content based on session status and role */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {session.status === "waiting" ? (
           <JamLobby
             session={session}
