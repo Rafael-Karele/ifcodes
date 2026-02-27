@@ -3,54 +3,20 @@ import { useNavigate } from "react-router";
 import type { Class, CreateClassDTO } from "@/types/classes";
 import ClassesService from "@/services/ClassesService";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Loading from "@/components/Loading";
 import Notification from "@/components/Notification";
 import {
   Plus,
-  Edit,
-  Trash2,
-  Users,
-  UserPlus,
   BookOpen,
   X,
-  ChevronRight,
   Sparkles,
 } from "lucide-react";
 import { SearchFilter } from "@/components/SearchFilter";
 import { HeroHeader } from "@/components/HeroHeader";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUser } from "@/context/UserContext";
-
-/* ── palette tokens (inline, no global leak) ────────────────── */
-const palette = {
-  accent: "#0d9488",        // teal-600
-  accentLight: "#ccfbf1",   // teal-100
-  accentSoft: "#f0fdfa",    // teal-50
-  warm: "#f59e0b",          // amber-500
-  warmLight: "#fef3c7",     // amber-100
-  surface: "#fafaf9",       // stone-50
-  cardBg: "#ffffff",
-  textPrimary: "#1c1917",   // stone-900
-  textSecondary: "#78716c", // stone-500
-  border: "#e7e5e4",        // stone-300
-  dangerText: "#dc2626",
-  dangerBg: "#fef2f2",
-};
-
-/* ── colour helpers for card accent strips ───────────────── */
-const stripColours = [
-  "from-teal-500 to-emerald-400",
-  "from-amber-400 to-orange-400",
-  "from-sky-400 to-cyan-400",
-  "from-rose-400 to-pink-400",
-  "from-violet-400 to-purple-400",
-  "from-lime-400 to-green-400",
-];
-function stripFor(index: number) {
-  return stripColours[index % stripColours.length];
-}
+import { ClassCard } from "./ClassCard";
+import { ClassFormInline } from "./ClassFormInline";
 
 /* ================================================================== */
 export default function Classes() {
@@ -204,7 +170,7 @@ export default function Classes() {
         />
       )}
 
-      {/* ═══════ HERO / HEADER AREA ═══════ */}
+      {/* ======= HERO / HEADER AREA ======= */}
       <HeroHeader
         icon={BookOpen}
         title="Minhas Turmas"
@@ -213,7 +179,7 @@ export default function Classes() {
           : "Veja as turmas em que você está matriculado e acesse as atividades."}
       />
 
-      {/* ═══════ SEARCH BAR + NEW CLASS BUTTON ═══════ */}
+      {/* ======= SEARCH BAR + NEW CLASS BUTTON ======= */}
       <div className="flex items-center gap-3 mb-6">
         <div className="flex-1">
           <SearchFilter
@@ -242,60 +208,27 @@ export default function Classes() {
 
       {/* ── inline form ── */}
       {showForm && (
-        <div className="cls-form-enter rounded-xl border border-stone-200 bg-white p-6 shadow-sm mb-6">
-          <h2 className="text-lg font-bold text-stone-800 mb-4">
-            {editingClass ? "Editar Turma" : "Criar Nova Turma"}
-          </h2>
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-end gap-4">
-            <div className="flex-1 w-full">
-              <Label htmlFor="nome" className="mb-1.5 block text-sm font-medium text-stone-600">
-                Nome da turma
-              </Label>
-              <Input
-                id="nome"
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                required
-                placeholder="Ex: Programação I — 2025/1"
-                className="h-11 rounded-lg"
-              />
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <Button
-                type="submit"
-                className="h-11 rounded-xl px-6 font-semibold"
-                style={{ background: palette.accent }}
-              >
-                {editingClass ? "Atualizar" : "Salvar"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={resetForm}
-                className="h-11 rounded-xl text-stone-500 hover:text-red-600 hover:bg-red-50"
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </div>
+        <ClassFormInline
+          formData={formData}
+          editingClass={editingClass}
+          onFormDataChange={setFormData}
+          onSubmit={handleSubmit}
+          onCancel={resetForm}
+        />
       )}
 
-      {/* ═══════ CARDS GRID ═══════ */}
+      {/* ======= CARDS GRID ======= */}
       <div
         ref={gridRef}
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4"
       >
         {filteredClasses.length === 0 ? (
           /* ── empty state ── */
           <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
-            <div
-              className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
-              style={{ background: palette.accentLight }}
-            >
-              <Sparkles className="w-9 h-9" style={{ color: palette.accent }} />
+            <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-teal-100">
+              <Sparkles className="w-9 h-9 text-teal-600" />
             </div>
-            <p className="text-lg font-semibold text-stone-700">
+            <p className="text-base sm:text-lg font-semibold text-stone-700">
               {searchTerm ? "Nenhuma turma encontrada" : "Nenhuma turma por aqui"}
             </p>
             <p className="mt-1 text-sm text-stone-400 max-w-xs">
@@ -308,117 +241,14 @@ export default function Classes() {
           </div>
         ) : (
           filteredClasses.map((cls, i) => (
-            <div
+            <ClassCard
               key={cls.id}
-              className="cls-card group relative flex flex-col rounded-2xl border bg-white shadow-sm hover:shadow-md transition-shadow duration-300"
-              style={{
-                animationDelay: `${i * 60}ms`,
-                borderColor: palette.border,
-              }}
-            >
-              {/* colour accent strip */}
-              <div
-                className={`h-1.5 rounded-t-2xl bg-gradient-to-r ${stripFor(i)}`}
-              />
-
-              <div className="flex flex-col flex-1 p-5 pt-4">
-                {/* header row */}
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="text-[1.05rem] font-bold leading-snug text-stone-800 line-clamp-2">
-                    {cls.nome}
-                  </h3>
-
-                  {isProfOrAdmin && (
-                    <div className="flex gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleEdit(cls)}
-                        className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
-                        title="Editar"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(cls.id)}
-                        className="rounded-lg p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        title="Excluir"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* meta */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-stone-500 mb-5">
-                  {cls.teacherName && (
-                    <span className="flex items-center gap-1.5">
-                      <span
-                        className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                        style={{ background: palette.accent }}
-                      >
-                        {cls.teacherName.charAt(0).toUpperCase()}
-                      </span>
-                      {cls.teacherName}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5" />
-                    {cls.studentsCount || 0} aluno{(cls.studentsCount ?? 0) !== 1 && "s"}
-                  </span>
-                </div>
-
-                {/* spacer */}
-                <div className="flex-1" />
-
-                {/* actions */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => navigate(`/classes/${cls.id}`)}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl h-10 text-sm font-semibold transition-colors"
-                    style={{
-                      color: palette.accent,
-                      background: palette.accentSoft,
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = palette.accent;
-                      e.currentTarget.style.color = "#fff";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = palette.accentSoft;
-                      e.currentTarget.style.color = palette.accent;
-                    }}
-                  >
-                    Ver Detalhes
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-
-                  {isProfOrAdmin && (
-                    <button
-                      aria-label="Gerenciar alunos"
-                      onClick={() => navigate(`/classes/${cls.id}?tab=students`)}
-                      className="flex items-center justify-center gap-2 rounded-xl h-10 px-4 text-sm font-semibold border transition-colors"
-                      style={{
-                        borderColor: palette.border,
-                        color: palette.textSecondary,
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = palette.accent;
-                        e.currentTarget.style.color = palette.accent;
-                        e.currentTarget.style.background = palette.accentSoft;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = palette.border;
-                        e.currentTarget.style.color = palette.textSecondary;
-                        e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      <span className="hidden sm:inline">Alunos</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+              cls={cls}
+              index={i}
+              isProfOrAdmin={isProfOrAdmin}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))
         )}
       </div>
