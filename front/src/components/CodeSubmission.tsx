@@ -19,10 +19,11 @@ import Editor from "@monaco-editor/react";
  * Permite edição de código C, visualização em tela cheia e submissão.
  */
 interface CodeSubmissionProps {
-  onSubmit: (code: string) => void;
+  onSubmit: (code: string) => void | Promise<void>;
+  disabled?: boolean;
 }
 
-export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
+export function CodeSubmissionComponent({ onSubmit, disabled = false }: CodeSubmissionProps) {
   // Estado para alternar entre modo normal e tela cheia
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -38,7 +39,8 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
   const [submissionCodeText, _setSubmissionCodeText] = useState("");
 
   // Estado de carregamento no envio
-  const [submitting, _setSubmitting] = useState(false);
+  const [internalSubmitting, setInternalSubmitting] = useState(false);
+  const isDisabled = disabled || internalSubmitting;
 
   // Referência para o editor Monaco, possibilitando comandos diretos
   const editorRef = useRef(null);
@@ -90,7 +92,13 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
    * Adicione aqui a lógica real de envio para o backend.
    */
   const handleSubmit = async () => {
-    onSubmit(codeValue);
+    if (isDisabled) return;
+    setInternalSubmitting(true);
+    try {
+      await onSubmit(codeValue);
+    } finally {
+      setInternalSubmitting(false);
+    }
   };
 
   // ----- Renderização do modo tela cheia (fullscreen) -----
@@ -175,10 +183,10 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
                 {/* Botão de submissão */}
                 <Button
                   onClick={handleSubmit}
-                  // disabled={submitting || !codeValue.trim()}
+                  disabled={isDisabled}
                   className="flex items-center gap-2"
                 >
-                  {submitting ? (
+                  {isDisabled ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       Enviando...
@@ -280,10 +288,10 @@ export function CodeSubmissionComponent({ onSubmit }: CodeSubmissionProps) {
 
           <Button
             onClick={handleSubmit}
-            // disabled={submitting || !codeValue.trim()}
+            disabled={disabled}
             className="flex items-center gap-2"
           >
-            {submitting ? (
+            {disabled ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Enviando...

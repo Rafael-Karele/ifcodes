@@ -13,7 +13,7 @@ import {
   postSubmission,
 } from "@/services/SubmissionsService";
 import type { Activity, Problem, Submission } from "@/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   Calendar,
@@ -83,10 +83,14 @@ export default function ActivitiesDetails() {
     loading,
     updateSubmissions,
     submissions,
+    pushNotification,
   } = useData();
 
   const [activitySubmissions, setActivitySubmissions] = useState<Submission[]>([]);
   const [fetchedProblem, setFetchedProblem] = useState<Problem | undefined>(undefined);
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const historyRef = useRef<HTMLDivElement>(null);
 
   const activityId = params.id;
   const [localLoading, setLocalLoading] = useState(false);
@@ -145,6 +149,8 @@ export default function ActivitiesDetails() {
   }
 
   async function handleSubmit(code: string, activityId: number) {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const response = await postSubmission({
         code: code,
@@ -163,9 +169,18 @@ export default function ActivitiesDetails() {
 
       setActivitySubmissions((prev) => [newSubmission, ...prev]);
       updateSubmissions();
+
+      pushNotification("Submissão enviada! Aguarde a avaliação.", "success");
+      setHighlightedId(newSubmission.id);
+      setTimeout(() => setHighlightedId(null), 3000);
+      setTimeout(() => historyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+
+      // Cooldown de 5s antes de permitir nova submissão
+      setTimeout(() => setSubmitting(false), 5000);
     } catch (error) {
-      alert("Erro ao submeter o código. Tente novamente.");
+      pushNotification("Erro ao submeter o código. Tente novamente.", "error");
       console.error("Error submitting code:", error);
+      setSubmitting(false);
     }
   }
 
@@ -267,10 +282,12 @@ export default function ActivitiesDetails() {
       <SectionCard title="Nova Submissão" icon={Upload}>
         <CodeSubmissionComponent
           onSubmit={(code) => handleSubmit(code, selectedActivity.id)}
+          disabled={submitting}
         />
       </SectionCard>
 
       {/* ── histórico de submissões ── */}
+      <div ref={historyRef} />
       <SectionCard
         title="Histórico de Submissões"
         icon={FileText}
@@ -321,7 +338,9 @@ export default function ActivitiesDetails() {
                       <TableRow
                         key={submission.id}
                         onClick={() => redirectToSubmission(submission)}
-                        className="cursor-pointer hover:bg-stone-50 transition-colors duration-150 group"
+                        className={`cursor-pointer hover:bg-stone-50 transition-all duration-500 group ${
+                          highlightedId === submission.id ? "bg-teal-50 ring-1 ring-teal-200" : ""
+                        }`}
                       >
                         <TableCell>
                           <div className="flex flex-col">
