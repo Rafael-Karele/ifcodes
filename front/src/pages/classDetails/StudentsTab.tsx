@@ -29,8 +29,8 @@ export default function StudentsTab({
   const { hasAnyRole } = useUserRole();
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
         <h2 className="text-lg font-semibold text-stone-800">Alunos Matriculados</h2>
         {hasAnyRole(["professor", "admin"]) && (
           <Button onClick={onToggleAddStudent}>
@@ -90,8 +90,8 @@ export default function StudentsTab({
       <div className="space-y-2">
         {students.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: "#ccfbf1" }}>
-              <Users className="w-7 h-7" style={{ color: "#0d9488" }} />
+            <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4 bg-teal-100">
+              <Users className="w-7 h-7 text-teal-600" />
             </div>
             <p className="text-sm font-medium text-stone-600">Nenhum aluno matriculado</p>
             <p className="text-xs text-stone-400 mt-1">Adicione alunos a esta turma</p>

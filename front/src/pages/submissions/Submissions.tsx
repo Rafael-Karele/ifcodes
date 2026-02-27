@@ -22,19 +22,9 @@ import { StatusBadge, submissionStatusConfig, type SubmissionStatusKey } from "@
 import { StatCard } from "@/components/StatCard";
 import { SearchFilter } from "@/components/SearchFilter";
 import { HeroHeader } from "@/components/HeroHeader";
+import { EmptyState } from "@/components/EmptyState";
 import { useData } from "@/context/DataContext";
 import Loading from "@/components/Loading";
-
-/* ── palette tokens (inline, no global leak) ────────────────── */
-const palette = {
-  accent: "#0d9488",        // teal-600
-  accentLight: "#ccfbf1",   // teal-100
-  surface: "#fafaf9",       // stone-50
-  cardBg: "#ffffff",
-  textPrimary: "#1c1917",   // stone-900
-  textSecondary: "#78716c", // stone-500
-  border: "#e7e5e4",        // stone-300
-};
 
 
 export default function Submissions() {
@@ -88,6 +78,8 @@ export default function Submissions() {
   // Obtem os status unicos presentes para montar o filtro do select
   const uniqueStatuses = [...new Set(submissions.map((s) => s.status))];
 
+  const isFiltered = searchTerm || statusFilter !== "all";
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
@@ -134,61 +126,46 @@ export default function Submissions() {
       </div>
 
       {/* ═══════ TABLE ═══════ */}
-      <div
-        className="rounded-2xl border shadow-sm overflow-hidden"
-        style={{ background: palette.cardBg, borderColor: palette.border }}
-      >
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-6">
             <Loading />
           </div>
         ) : sortedSubmissions.length === 0 ? (
           /* ── empty state ── */
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div
-              className="mb-5 flex h-20 w-20 items-center justify-center rounded-2xl"
-              style={{ background: palette.accentLight }}
-            >
-              <FileText className="w-9 h-9" style={{ color: palette.accent }} />
-            </div>
-            <p className="text-lg font-semibold text-stone-700">
-              {searchTerm || statusFilter !== "all"
-                ? "Nenhuma submissao encontrada"
-                : "Nenhuma submissao ainda"}
-            </p>
-            <p className="mt-1 text-sm text-stone-400 max-w-xs">
-              {searchTerm || statusFilter !== "all"
+          <EmptyState
+            icon={FileText}
+            title={isFiltered ? "Nenhuma submissao encontrada" : "Nenhuma submissao ainda"}
+            description={
+              isFiltered
                 ? "Tente ajustar os filtros de busca."
-                : "Suas submissoes aparecerao aqui quando voce enviar solucoes."}
-            </p>
-          </div>
+                : "Suas submissoes aparecerao aqui quando voce enviar solucoes."
+            }
+          />
         ) : (
           <Table>
             <TableHeader>
-              <TableRow
-                className="hover:bg-stone-50"
-                style={{ background: palette.surface }}
-              >
-                <TableHead className="font-semibold" style={{ color: palette.textPrimary }}>
+              <TableRow className="bg-stone-50 hover:bg-stone-50">
+                <TableHead className="font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4" />
                     Problema
                   </div>
                 </TableHead>
-                <TableHead className="hidden sm:table-cell font-semibold" style={{ color: palette.textPrimary }}>
+                <TableHead className="hidden sm:table-cell font-semibold text-stone-900">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Data de Submissao
                   </div>
                 </TableHead>
-                <TableHead className="font-semibold" style={{ color: palette.textPrimary }}>
+                <TableHead className="font-semibold text-stone-900">
                   Status
                 </TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedSubmissions.map((submission, i) => {
+              {sortedSubmissions.map((submission) => {
                 const formattedDateOnly = new Date(
                   submission.dateSubmitted
                 ).toLocaleDateString("pt-BR", {
@@ -207,29 +184,25 @@ export default function Submissions() {
                     key={submission.id}
                     onClick={() => redirectToSubmission(submission)}
                     className="sub-row cursor-pointer hover:bg-teal-50 transition-colors duration-200 group"
-                    style={{ animationDelay: `${i * 40}ms` }}
                   >
-                    <TableCell className="font-medium max-w-0">
+                    <TableCell className="font-medium text-sm max-w-0">
                       <div className="flex flex-col">
-                        <span
-                          className="group-hover:text-teal-600 transition-colors truncate"
-                          style={{ color: palette.textPrimary }}
-                        >
+                        <span className="text-stone-900 group-hover:text-teal-600 transition-colors truncate">
                           {problemTitle}
                         </span>
-                        <span className="text-xs mt-1 truncate" style={{ color: palette.accent }}>
+                        <span className="text-xs mt-1 text-teal-600 truncate">
                           Atividade ID: {submission.activityId} - Submissao ID: {submission.id}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="hidden sm:table-cell">
+                    <TableCell className="hidden sm:table-cell text-sm">
                       <div className="flex flex-col">
-                        <span className="font-medium" style={{ color: palette.textPrimary }}>
+                        <span className="font-medium text-stone-900">
                           {formattedDateOnly}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">
+                    <TableCell className="whitespace-nowrap text-sm">
                       {(() => {
                         const cfg = submissionStatusConfig[submission.status as SubmissionStatusKey] ?? submissionStatusConfig.unknown;
                         return <StatusBadge label={cfg.label} className={cfg.className} />;
@@ -248,10 +221,10 @@ export default function Submissions() {
 
       {/* Rodape com info sobre os filtros aplicados */}
       {!loading && sortedSubmissions.length > 0 && (
-        <div className="text-center text-sm mt-6" style={{ color: palette.textSecondary }}>
+        <div className="text-center text-sm mt-6 text-stone-500">
           Mostrando {sortedSubmissions.length} de {submissions.length}{" "}
           submissoes
-          {(searchTerm || statusFilter !== "all") && " (filtradas)"}
+          {isFiltered && " (filtradas)"}
         </div>
       )}
     </div>

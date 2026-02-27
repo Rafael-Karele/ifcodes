@@ -1,12 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/table";
 import { getProblemById } from "@/services/ProblemsServices";
 import {
   getSubmissionsByActivityId,
@@ -17,14 +8,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   Calendar,
-  FileText,
   Upload,
   XCircle,
   ArrowLeft,
-  RefreshCw,
   User,
   Target,
-  ArrowRight,
   Loader2,
 } from "lucide-react";
 import { CodeSubmissionComponent } from "../../components/CodeSubmission";
@@ -33,49 +21,8 @@ import { RichTextViewer } from "@/components/RichTextEditor";
 import { StatCard } from "@/components/StatCard";
 import { SectionCard } from "@/components/SectionCard";
 import { EmptyState } from "@/components/EmptyState";
-import {
-  StatusBadge,
-  submissionStatusConfig,
-  type SubmissionStatusKey,
-} from "@/components/StatusBadge";
-
-/* ── helpers ────────────────────────────────────────── */
-
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-
-  if (!dateString || isNaN(date.getTime())) {
-    return { formatted: "Data indisponível", relative: "", isOverdue: false };
-  }
-
-  const now = new Date();
-  const diffTime = date.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  const formatted = date.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  let relative = "";
-  let isOverdue = false;
-
-  if (diffDays < 0) {
-    relative = `${Math.abs(diffDays)} dias atrás`;
-    isOverdue = true;
-  } else if (diffDays === 0) {
-    relative = "Hoje";
-  } else if (diffDays === 1) {
-    relative = "Amanhã";
-  } else {
-    relative = `Em ${diffDays} dias`;
-  }
-
-  return { formatted, relative, isOverdue };
-}
+import { SubmissionsHistory } from "./SubmissionsHistory";
+import { formatDate } from "./utils";
 
 /* ── main component ─────────────────────────────────── */
 
@@ -128,7 +75,7 @@ export default function ActivitiesDetails() {
 
       setActivitySubmissions(data);
     } catch (error) {
-      console.error("Erro ao buscar submissões da atividade:", error);
+      console.error("Erro ao buscar submiss\u00f5es da atividade:", error);
       setActivitySubmissions([]);
     } finally {
       setLocalLoading(false);
@@ -180,7 +127,7 @@ export default function ActivitiesDetails() {
       setActivitySubmissions((prev) => [newSubmission, ...prev]);
       updateSubmissions();
 
-      pushNotification("Submissão enviada! Aguarde a avaliação.", "success");
+      pushNotification("Submiss\u00e3o enviada! Aguarde a avalia\u00e7\u00e3o.", "success");
       setHighlightedId(newSubmission.id);
       setTimeout(() => setHighlightedId(null), 3000);
       setTimeout(() => historyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
@@ -188,7 +135,7 @@ export default function ActivitiesDetails() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const axiosError = error as any;
       const backendMsg = axiosError?.response?.data?.message;
-      pushNotification(backendMsg || "Erro ao submeter o código. Tente novamente.", "error");
+      pushNotification(backendMsg || "Erro ao submeter o c\u00f3digo. Tente novamente.", "error");
       console.error("Error submitting code:", error);
     } finally {
       setSubmitting(false);
@@ -198,7 +145,7 @@ export default function ActivitiesDetails() {
   /* ── loading state ── */
   if (loading || (selectedActivity && !selectedProblem && localLoading)) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <div className="bg-stone-50 border border-stone-200 rounded-xl p-12 flex flex-col items-center gap-4">
           <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
           <p className="text-sm text-stone-500 font-medium">Carregando detalhes da atividade...</p>
@@ -210,11 +157,11 @@ export default function ActivitiesDetails() {
   /* ── activity not found ── */
   if (selectedActivity === undefined) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <EmptyState
           icon={XCircle}
-          title="Atividade não encontrada"
-          description="A atividade que você está procurando não existe ou foi removida."
+          title="Atividade n\u00e3o encontrada"
+          description="A atividade que voc\u00ea est\u00e1 procurando n\u00e3o existe ou foi removida."
           action={{
             label: "Voltar para Atividades",
             onClick: () => navigate("/activities"),
@@ -228,11 +175,11 @@ export default function ActivitiesDetails() {
   /* ── problem not found ── */
   if (selectedProblem === undefined) {
     return (
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <EmptyState
           icon={XCircle}
-          title="Problema não encontrado"
-          description="O problema associado a esta atividade não foi encontrado."
+          title="Problema n\u00e3o encontrado"
+          description="O problema associado a esta atividade n\u00e3o foi encontrado."
           action={{
             label: "Voltar para Atividades",
             onClick: () => navigate("/activities"),
@@ -246,7 +193,7 @@ export default function ActivitiesDetails() {
   const dueDate = formatDate(selectedActivity.dueDate);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
 
       {/* ── back link + header ── */}
       <div>
@@ -259,12 +206,12 @@ export default function ActivitiesDetails() {
         </button>
 
         <p className="text-sm text-stone-400 font-medium">Atividade #{selectedActivity.id}</p>
-        <h1 className="text-2xl font-bold text-stone-900 tracking-tight mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-stone-900 tracking-tight mt-1">
           {selectedProblem.title}
         </h1>
       </div>
 
-      {/* ── stat cards (prazo + submissões) ── */}
+      {/* ── stat cards (prazo + submiss\u00f5es) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <StatCard
           label={dueDate.relative}
@@ -273,7 +220,7 @@ export default function ActivitiesDetails() {
           accent={dueDate.isOverdue}
         />
         <StatCard
-          label="Submissões"
+          label="Submiss\u00f5es"
           value={localLoading ? <Loader2 className="w-6 h-6 animate-spin text-teal-600" /> : activitySubmissions.length}
           icon={User}
         />
@@ -281,106 +228,31 @@ export default function ActivitiesDetails() {
 
       {/* ── enunciado ── */}
       <SectionCard title="Enunciado" icon={Target}>
-        <div className="p-6">
+        <div className="px-3 py-4 sm:px-6 sm:py-6">
           <RichTextViewer
             value={selectedProblem.statement}
-            className="text-stone-700 leading-relaxed"
+            className="text-sm sm:text-base text-stone-700 leading-relaxed"
           />
         </div>
       </SectionCard>
 
-      {/* ── nova submissão ── */}
-      <SectionCard title="Nova Submissão" icon={Upload}>
+      {/* ── nova submiss\u00e3o ── */}
+      <SectionCard title="Nova Submiss\u00e3o" icon={Upload}>
         <CodeSubmissionComponent
           onSubmit={(code) => handleSubmit(code, selectedActivity.id)}
           disabled={submitDisabled}
         />
       </SectionCard>
 
-      {/* ── histórico de submissões ── */}
+      {/* ── hist\u00f3rico de submiss\u00f5es ── */}
       <div ref={historyRef} />
-      <SectionCard
-        title="Histórico de Submissões"
-        icon={FileText}
-        action={
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => selectedActivity && fetchSubmissions(selectedActivity)}
-            disabled={localLoading}
-          >
-            <RefreshCw className={`w-4 h-4 ${localLoading ? 'animate-spin' : ''}`} />
-            {localLoading ? 'Atualizando...' : 'Atualizar'}
-          </Button>
-        }
-      >
-        <div className="p-6">
-          {localLoading ? (
-            <div className="flex flex-col items-center gap-4 py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-teal-600" />
-              <p className="text-sm text-stone-500 font-medium">Carregando submissões...</p>
-            </div>
-          ) : activitySubmissions.length === 0 ? (
-            <EmptyState
-              icon={FileText}
-              title="Nenhuma submissão para esta atividade"
-              description="Use o editor acima para enviar seu código."
-            />
-          ) : (
-            <div className="overflow-hidden rounded-lg border border-stone-200">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-stone-50 hover:bg-stone-50">
-                    <TableHead className="font-semibold text-stone-700 text-xs">
-                      Data de Submissão
-                    </TableHead>
-                    <TableHead className="font-semibold text-stone-700 text-xs">
-                      Status
-                    </TableHead>
-                    <TableHead className="w-12"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {activitySubmissions.map((submission: Submission) => {
-                    const submissionDate = formatDate(submission.dateSubmitted);
-                    const statusKey = submission.status as SubmissionStatusKey;
-                    const statusCfg = submissionStatusConfig[statusKey] || submissionStatusConfig.pending;
-                    return (
-                      <TableRow
-                        key={submission.id}
-                        onClick={() => redirectToSubmission(submission)}
-                        className={`cursor-pointer hover:bg-stone-50 transition-all duration-500 group ${
-                          highlightedId === submission.id ? "bg-teal-50 ring-1 ring-teal-200" : ""
-                        }`}
-                      >
-                        <TableCell>
-                          <div className="flex flex-col">
-                            <span className="text-stone-800 text-sm font-medium">
-                              {submissionDate.formatted}
-                            </span>
-                            <span className="text-xs text-stone-400">
-                              {submissionDate.relative}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge
-                            label={statusCfg.label}
-                            className={statusCfg.className}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <ArrowRight className="w-4 h-4 text-stone-300 group-hover:text-teal-600 transition-colors" />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-      </SectionCard>
+      <SubmissionsHistory
+        submissions={activitySubmissions}
+        highlightedId={highlightedId}
+        loading={localLoading}
+        onRefresh={() => selectedActivity && fetchSubmissions(selectedActivity)}
+        onSubmissionClick={redirectToSubmission}
+      />
     </div>
   );
 }

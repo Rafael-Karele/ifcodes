@@ -58,8 +58,7 @@ export default function JamLobby({ session, participants, isProfessor, onStart }
           <Button
             onClick={onStart}
             size="lg"
-            className="flex items-center gap-2 hover:opacity-90"
-            style={{ backgroundColor: "#0d9488" }}
+            className="flex items-center gap-2 bg-teal-600 text-white hover:bg-teal-700"
           >
             <Play className="h-5 w-5" />
             Iniciar Sessão

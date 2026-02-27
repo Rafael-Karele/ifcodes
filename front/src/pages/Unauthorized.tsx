@@ -9,11 +9,11 @@ export default function Unauthorized() {
     const navigate = useNavigate();
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
-            <div className="text-center">
+        <div className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
+            <div className="text-center max-w-md w-full">
                 <div className="mb-8">
                     <svg
-                        className="mx-auto h-24 w-24 text-red-500"
+                        className="mx-auto h-20 w-20 sm:h-24 sm:w-24 text-red-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -27,16 +27,16 @@ export default function Unauthorized() {
                         />
                     </svg>
                 </div>
-                <h1 className="mb-4 text-4xl font-bold text-gray-900">
+                <h1 className="mb-4 text-3xl sm:text-4xl font-bold text-stone-900">
                     Acesso Negado
                 </h1>
-                <p className="mb-8 text-lg text-gray-600">
+                <p className="mb-6 sm:mb-8 text-base sm:text-lg text-stone-600">
                     Você não tem permissão para acessar este recurso.
                 </p>
-                <p className="mb-8 text-sm text-gray-500">
+                <p className="mb-6 sm:mb-8 text-sm text-stone-500">
                     Entre em contato com o administrador se você acredita que deveria ter acesso.
                 </p>
-                <div className="flex gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                     <Button
                         onClick={() => navigate(-1)}
                         variant="outline"

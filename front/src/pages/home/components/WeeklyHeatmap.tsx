@@ -41,7 +41,7 @@ export function WeeklyHeatmap({ cells, streak }: WeeklyHeatmapProps) {
   ];
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white px-5 py-4">
+    <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 sm:px-5 sm:py-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-stone-500 uppercase tracking-wide">Atividade Semanal</h3>
         {streak > 0 && (

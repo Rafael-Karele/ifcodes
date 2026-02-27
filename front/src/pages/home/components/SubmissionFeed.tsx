@@ -30,7 +30,7 @@ export function SubmissionFeed({ submissions }: SubmissionFeedProps) {
         return (
           <div
             key={sub.id}
-            className="flex items-center gap-3 px-5 py-3 feed-row"
+            className="flex items-center gap-3 px-3 py-2.5 sm:px-5 sm:py-3 feed-row"
             style={{ animationDelay: `${i * 40}ms` }}
           >
             <span

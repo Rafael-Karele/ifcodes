@@ -101,7 +101,7 @@ export default function Monitoring() {
       <ContainerGrid containers={metrics.containers} />
 
       {/* Bottom grid: Network + Queue + WebSocket */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <NetworkStats
           rxBytes={metrics.system.net_rx_bytes}
           txBytes={metrics.system.net_tx_bytes}

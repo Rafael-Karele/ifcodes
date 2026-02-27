@@ -1,313 +1,26 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/table";
 import { getProblemById } from "@/services/ProblemsServices";
-import {
-  getResultBySubmissionId,
-} from "@/services/SubmissionsService";
-import type {
-  TestCase,
-  TestCaseResult,
-  Problem,
-} from "@/types";
+import { getResultBySubmissionId } from "@/services/SubmissionsService";
+import type { TestCaseResult, Problem } from "@/types";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
   ArrowLeft,
   Calendar,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  AlertCircle,
   FileText,
   User,
-  Target,
-  Activity as ActivityIcon,
-  TestTube,
-  Eye,
-  EyeOff,
-  Copy,
-  Loader2,
-  TrendingUp,
   Hash,
-  Terminal,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { HeroHeader } from "@/components/HeroHeader";
 import { useData } from "@/context/DataContext";
 import Loading from "@/components/Loading";
 
-// Configurações de status de testes e submissões
-const statusConfig = {
-  passed: {
-    label: "Aceito",
-    icon: CheckCircle2,
-    className: "bg-green-100 text-green-800 border-green-200",
-    dotColor: "bg-green-500",
-    bgColor: "bg-green-50",
-    borderColor: "border-green-200",
-  },
-  pending: {
-    label: "Pendente",
-    icon: Clock,
-    className: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    dotColor: "bg-yellow-500",
-    bgColor: "bg-yellow-50",
-    borderColor: "border-yellow-200",
-  },
-  processing: {
-    label: "Processando",
-    icon: Loader2,
-    className: "bg-blue-100 text-blue-800 border-blue-200",
-    dotColor: "bg-blue-500",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
-  },
-  failed: {
-    label: "Resposta Errada",
-    icon: XCircle,
-    className: "bg-red-100 text-red-800 border-red-200",
-    dotColor: "bg-red-500",
-    bgColor: "bg-red-50",
-    borderColor: "border-red-200",
-  },
-  "compile-error": {
-    label: "Erro de Compilação",
-    icon: AlertCircle,
-    className: "bg-orange-100 text-orange-800 border-orange-200",
-    dotColor: "bg-orange-500",
-    bgColor: "bg-orange-50",
-    borderColor: "border-orange-200",
-  },
-  timeout: {
-    label: "Tempo Limite",
-    icon: Clock,
-    className: "bg-purple-100 text-purple-800 border-purple-200",
-    dotColor: "bg-purple-500",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
-  },
-  "runtime-error": {
-    label: "Erro de Execução",
-    icon: AlertCircle,
-    className: "bg-red-100 text-red-800 border-red-200",
-    dotColor: "bg-red-500",
-    bgColor: "bg-red-50",
-    borderColor: "border-red-200",
-  },
-  "internal-error": {
-    label: "Erro Interno",
-    icon: AlertCircle,
-    className: "bg-stone-100 text-stone-800 border-stone-200",
-    dotColor: "bg-stone-500",
-    bgColor: "bg-stone-50",
-    borderColor: "border-stone-200",
-  },
-  unknown: {
-    label: "Desconhecido",
-    icon: AlertCircle,
-    className: "bg-stone-100 text-stone-800 border-stone-200",
-    dotColor: "bg-stone-500",
-    bgColor: "bg-stone-50",
-    borderColor: "border-stone-200",
-  },
-} as const;
-
-interface StatusBadgeProps {
-  status: keyof typeof statusConfig;
-  size?: "sm" | "md" | "lg";
-}
-
-// Badge de status do teste/submissão
-function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
-  const config = statusConfig[status] || statusConfig.pending;
-  const Icon = config.icon;
-
-  const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs",
-    md: "px-2.5 py-1 text-xs",
-    lg: "px-3 py-1.5 text-sm",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium border ${config.className} ${sizeClasses[size]}`}
-    >
-      <div className={`w-1.5 h-1.5 rounded-full ${config.dotColor}`} />
-      <Icon className="w-3 h-3" />
-      {config.label}
-    </span>
-  );
-}
-
-// Formata a data e retorna também string relativa (ex: "2h atrás")
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
-  const diffMinutes = Math.floor(diffTime / (1000 * 60));
-
-  const formatted = date.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  let relative = "";
-
-  if (diffMinutes < 1) {
-    relative = "Agora mesmo";
-  } else if (diffMinutes < 60) {
-    relative = `${diffMinutes}min atrás`;
-  } else if (diffHours < 24) {
-    relative = `${diffHours}h atrás`;
-  } else if (diffDays === 1) {
-    relative = "Ontem";
-  } else if (diffDays < 7) {
-    relative = `${diffDays} dias atrás`;
-  } else {
-    relative = `${Math.floor(diffDays / 7)} semanas atrás`;
-  }
-
-  return { formatted, relative };
-}
-
-interface TestCaseRowProps {
-  testCase: TestCase;
-  result: TestCaseResult | undefined;
-  index: number;
-}
-
-// Linha da tabela de casos de teste, com exibição/ocultação de saída e copiar para clipboard
-function TestCaseRow({ testCase, index, result }: TestCaseRowProps) {
-  const [showOutput, setShowOutput] = useState(false);
-
-  // Determina a saída real: stdout se passou, stderr se falhou
-  const actualOutput = result?.stdout || result?.stderr || "Sem saída";
-  const expectedOutput = testCase.expectedOutput || "Sem saída esperada";
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
-
-  return (
-    <TableRow className="hover:bg-stone-50 transition-colors duration-200">
-      <TableCell className="font-medium">
-        <div className="flex items-center gap-2">
-          <Hash className="w-4 h-4 text-stone-400" />
-          <span>Teste {index + 1}</span>
-        </div>
-      </TableCell>
-      <TableCell>
-        <StatusBadge
-          status={result?.status as keyof typeof statusConfig || 'pending'}
-          size="sm"
-        />
-      </TableCell>
-      <TableCell>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowOutput(!showOutput)}
-              className="h-6 px-2 text-xs"
-            >
-              {showOutput ? (
-                <EyeOff className="w-3 h-3" />
-              ) : (
-                <Eye className="w-3 h-3" />
-              )}
-              {showOutput ? "Ocultar" : "Mostrar"}
-            </Button>
-            {actualOutput && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(actualOutput)}
-                className="h-6 px-2 text-xs"
-              >
-                <Copy className="w-3 h-3" />
-              </Button>
-            )}
-          </div>
-          {showOutput && (
-            <div className="bg-gray-900 rounded p-2 max-w-xs">
-              <pre className="text-xs text-gray-300 whitespace-pre-wrap overflow-auto max-h-20">
-                {actualOutput}
-              </pre>
-            </div>
-          )}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => copyToClipboard(expectedOutput)}
-              className="h-6 px-2 text-xs"
-            >
-              <Copy className="w-3 h-3" />
-              Copiar
-            </Button>
-          </div>
-          <div className="bg-gray-900 rounded p-2 max-w-xs">
-            <pre className="text-xs text-gray-300 whitespace-pre-wrap overflow-auto max-h-20">
-              {expectedOutput}
-            </pre>
-          </div>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-interface StatsCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
-  gradient: string;
-  description?: string;
-}
-
-// Card de estatística para métricas rápidas da submissão
-function StatsCard({
-  title,
-  value,
-  icon: Icon,
-  gradient,
-  description,
-}: StatsCardProps) {
-  return (
-    <div className="bg-white p-4 rounded-lg border border-stone-200 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-stone-600">{title}</p>
-          <p className="text-xl font-bold text-stone-900 mt-1">{value}</p>
-          {description && (
-            <p className="text-xs text-stone-500 mt-1">{description}</p>
-          )}
-        </div>
-        <div
-          className="p-2 rounded-lg"
-          style={{ background: gradient }}
-        >
-          <Icon className="w-5 h-5 text-white" />
-        </div>
-      </div>
-    </div>
-  );
-}
+import { StatsCards } from "./StatsCards";
+import { SubmissionInfoSection } from "./SubmissionInfoSection";
+import { ErrorSections } from "./ErrorSections";
+import { TestResultsSection } from "./TestResultsSection";
+import { formatDate } from "./utils";
 
 export default function SubmissionsDetails() {
   const params = useParams();
@@ -337,28 +50,23 @@ export default function SubmissionsDetails() {
     return mapSubmissions.get(Number(submissionId));
   }, [submissionId, mapSubmissions]);
 
-  // Tenta pegar do cache primeiro, senão usa o fetchedProblem
+  // Tenta pegar do cache primeiro, senao usa o fetchedProblem
   const selectedProblem = useMemo(() => {
     const fromCache = mapProblems.get(Number(selectedActivity?.problemId));
     return fromCache || fetchedProblem;
   }, [selectedActivity, mapProblems, fetchedProblem]);
 
-  // Cálculo de estatísticas dos casos de teste baseado nos resultados reais
+  // Calculo de estatisticas dos casos de teste baseado nos resultados reais
   // IMPORTANTE: Este useMemo deve estar ANTES de qualquer return condicional (regras dos Hooks)
   const testStats = useMemo(() => {
     if (!selectedProblem?.testCases || selectedProblem.testCases.length === 0) {
-      return {
-        total: 0,
-        passed: 0,
-        failed: 0,
-        successRate: 0,
-      };
+      return { total: 0, passed: 0, failed: 0, successRate: 0 };
     }
 
     const total = selectedProblem.testCases.length;
     const passed = selectedProblem.testCases.filter((tc) => {
       const result = mapResultByTestId.get(tc.id);
-      return result?.status === 'passed';
+      return result?.status === "passed";
     }).length;
     const failed = total - passed;
     const successRate = total > 0 ? Math.round((passed / total) * 100) : 0;
@@ -367,7 +75,6 @@ export default function SubmissionsDetails() {
   }, [selectedProblem, mapResultByTestId]);
 
   useEffect(() => {
-    // Busca detalhes da submissão, relatório e atividade relacionada
     const fetchData = async () => {
       if (!submissionId) return;
 
@@ -376,7 +83,6 @@ export default function SubmissionsDetails() {
         const submissionResult = await getResultBySubmissionId(
           Number(submissionId)
         );
-
         setResults(submissionResult);
       } catch (error) {
         console.error("Failed to fetch submission details:", error);
@@ -387,7 +93,7 @@ export default function SubmissionsDetails() {
     fetchData();
   }, [submissionId]);
 
-  // Busca o problema separadamente quando a atividade estiver disponível
+  // Busca o problema separadamente quando a atividade estiver disponivel
   useEffect(() => {
     if (selectedActivity && !mapProblems.get(selectedActivity.problemId)) {
       getProblemById(String(selectedActivity.problemId)).then((problem) => {
@@ -396,32 +102,31 @@ export default function SubmissionsDetails() {
         }
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedActivity?.problemId]);
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
         <Loading />
       </div>
     );
   }
 
-  // Exibe mensagem caso algum dado essencial não seja encontrado
   if (!selectedActivity || !submission) {
     return (
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
         <div className="text-center py-12">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-stone-900 mb-2">
-            Submissão não encontrada
+            Submissao nao encontrada
           </h2>
-          <p className="text-stone-600 mb-4">
-            A submissão solicitada não existe ou não pôde ser carregada.
+          <p className="text-sm text-stone-600 mb-4">
+            A submissao solicitada nao existe ou nao pode ser carregada.
           </p>
           <Button onClick={() => navigate("/submissions")} variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar às submissões
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar as submissoes
           </Button>
         </div>
       </div>
@@ -440,260 +145,62 @@ export default function SubmissionsDetails() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Header de navegação */}
-      <div className="flex items-center gap-4 mb-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6 pb-10">
+      {/* Back button */}
+      <div className="flex items-center gap-4 pt-4 sm:pt-6">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => navigate("/submissions")}
           className="flex items-center gap-2"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           Voltar
         </Button>
       </div>
 
-      {/* Hero header da submissão */}
-      <div
-        className="relative rounded-2xl px-8 py-10 text-white overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #0d9488 0%, #065f46 100%)" }}
-      >
-        {/* Decorative circles */}
-        <div
-          className="absolute -top-10 -right-10 w-48 h-48 rounded-full"
-          style={{ background: "rgba(255,255,255,0.1)" }}
-        />
-        <div
-          className="absolute -bottom-8 -left-8 w-36 h-36 rounded-full"
-          style={{ background: "rgba(255,255,255,0.07)" }}
-        />
-
-        <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="w-6 h-6" />
-              <span className="text-teal-100 text-sm font-medium">
-                Detalhes da Submissão
+      {/* Hero header */}
+      <HeroHeader
+        icon={FileText}
+        title={selectedProblem?.title || "Problema nao encontrado"}
+        description={
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
+            <div className="flex items-center gap-4 text-teal-100">
+              <span className="inline-flex items-center gap-1">
+                <User className="h-4 w-4" />
+                <span className="text-sm">Usuario</span>
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <Hash className="h-4 w-4" />
+                <span className="text-sm">ID: {submission.id}</span>
               </span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-              {selectedProblem?.title || "Problema não encontrado"}
-            </h1>
-            <div className="flex items-center gap-4 text-teal-100">
-              <div className="flex items-center gap-1">
-                <User className="w-4 h-4" />
-                <span>Usuário</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Hash className="w-4 h-4" />
-                <span>ID: {submission.id}</span>
-              </div>
+            <div className="inline-flex items-center gap-1 text-teal-100">
+              <Calendar className="h-4 w-4" />
+              <span className="text-sm">Enviado em: {formattedSubmissionDateOnly}</span>
             </div>
           </div>
+        }
+      />
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
-              <Calendar className="w-5 h-5 mx-auto mb-1" />
-              <div className="text-sm font-medium">Enviado em</div>
-              <div className="text-lg font-bold">
-                {formattedSubmissionDateOnly}
-              </div>
-              {/* relativa removida - não exibir 'Agora mesmo' nem '7h atrás' */}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Stats */}
+      <StatsCards testStats={testStats} />
 
-      {/* Cards de estatísticas rápidas (casos de teste) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard
-          title="Casos de Teste"
-          value={testStats.total}
-          icon={TestTube}
-          gradient="linear-gradient(135deg, #0d9488 0%, #0f766e 100%)"
-          description="Total de testes"
-        />
-        <StatsCard
-          title="Testes Aprovados"
-          value={testStats.passed}
-          icon={CheckCircle2}
-          gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
-          description={`${testStats.passed}/${testStats.total} passaram`}
-        />
-        <StatsCard
-          title="Taxa de Sucesso"
-          value={`${testStats.successRate}%`}
-          icon={TrendingUp}
-          gradient="linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
-          description="Aprovação dos testes"
-        />
-        <StatsCard
-          title="Testes Falharam"
-          value={testStats.failed}
-          icon={XCircle}
-          gradient="linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
-          description={`${testStats.failed} falharam`}
-        />
-      </div>
+      {/* Activity info */}
+      <SubmissionInfoSection
+        selectedActivity={selectedActivity}
+        selectedProblem={selectedProblem}
+        formattedDueDate={dueDate.formatted}
+      />
 
-      {/* Informações da atividade */}
-      <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
-        <div className="border-b border-stone-200 p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-teal-50 rounded-lg">
-              <Target className="w-5 h-5 text-teal-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-stone-800">
-              Informações da Atividade
-            </h2>
-          </div>
-        </div>
+      {/* Compile / runtime errors */}
+      <ErrorSections results={results} />
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="text-sm font-medium text-stone-600">Titulo</label>
-            <div className="mt-1">
-              <div className="text-lg font-semibold text-stone-900">
-                {selectedProblem?.title || "Título não encontrado"}
-              </div>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-stone-600">
-              Prazo de Entrega
-            </label>
-            <div className="mt-1">
-                <div className="text-lg font-semibold text-stone-900">
-                  {dueDate.formatted}
-                </div>
-              </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-stone-600">
-              ID da Atividade
-            </label>
-            <div className="mt-1 text-lg font-semibold text-stone-900">
-              {selectedActivity.id}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Erro de compilação */}
-      {results.some((r) => r.compileOutput) && (
-        <div className="bg-white rounded-lg border border-orange-200 shadow-sm">
-          <div className="border-b border-orange-200 p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-50 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-orange-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-stone-800">
-                Saída do Compilador
-              </h2>
-            </div>
-          </div>
-          <div className="p-6">
-            <pre className="bg-gray-900 text-gray-300 rounded-lg p-4 text-sm font-mono whitespace-pre-wrap overflow-auto max-h-80">
-              {results.find((r) => r.compileOutput)?.compileOutput}
-            </pre>
-          </div>
-        </div>
-      )}
-
-      {/* Erro de execução (runtime error, timeout, etc.) */}
-      {!results.some((r) => r.compileOutput) && results.some((r) => r.message || r.stderr) && (
-        <div className="bg-white rounded-lg border border-red-200 shadow-sm">
-          <div className="border-b border-red-200 p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-stone-800">
-                Erro de Execução
-              </h2>
-            </div>
-          </div>
-          <div className="p-6">
-            <pre className="bg-gray-900 text-gray-300 rounded-lg p-4 text-sm font-mono whitespace-pre-wrap overflow-auto max-h-80">
-              {results.find((r) => r.message)?.message || results.find((r) => r.stderr)?.stderr}
-            </pre>
-          </div>
-        </div>
-      )}
-
-      {/* Casos de teste da submissão */}
-      <div className="bg-white rounded-lg border border-stone-200 shadow-sm">
-        <div className="border-b border-stone-200 p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 rounded-lg">
-                <TestTube className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-stone-800">
-                Casos de Teste
-              </h2>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6">
-          {selectedProblem?.testCases?.length === 0 ? (
-            <div className="text-center py-8">
-              <TestTube className="w-12 h-12 text-stone-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-stone-900 mb-2">
-                Nenhum caso de teste
-              </h3>
-              <p className="text-stone-500">
-                Esta submissão não possui casos de teste para exibir
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-stone-50 hover:bg-stone-50">
-                    <TableHead className="font-semibold text-stone-800">
-                      <div className="flex items-center gap-2">
-                        <Hash className="w-4 h-4" />
-                        Teste
-                      </div>
-                    </TableHead>
-                    <TableHead className="font-semibold text-stone-800">
-                      <div className="flex items-center gap-2">
-                        <ActivityIcon className="w-4 h-4" />
-                        Status
-                      </div>
-                    </TableHead>
-                    <TableHead className="font-semibold text-stone-800">
-                      <div className="flex items-center gap-2">
-                        <Terminal className="w-4 h-4" />
-                        Saída Atual
-                      </div>
-                    </TableHead>
-                    <TableHead className="font-semibold text-stone-800">
-                      <div className="flex items-center gap-2">
-                        <Target className="w-4 h-4" />
-                        Saída Esperada
-                      </div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {selectedProblem?.testCases?.map((testCase, index) => (
-                    <TestCaseRow
-                      key={testCase.id}
-                      testCase={testCase}
-                      result={mapResultByTestId.get(testCase.id)}
-                      index={index}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Test cases table */}
+      <TestResultsSection
+        testCases={selectedProblem?.testCases}
+        mapResultByTestId={mapResultByTestId}
+      />
     </div>
   );
 }

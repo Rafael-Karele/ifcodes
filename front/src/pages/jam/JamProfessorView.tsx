@@ -257,8 +257,8 @@ export default function JamProfessorView({
 
       {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white px-3 py-3 sm:px-5 sm:py-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-stone-800">Configurações da Sessão</h3>
               <button onClick={() => setShowSettings(false)} className="rounded p-1 hover:bg-stone-100">
@@ -306,8 +306,7 @@ export default function JamProfessorView({
               </Button>
               <Button
                 onClick={handleSaveSettings}
-                style={{ backgroundColor: "#0d9488" }}
-                className="hover:opacity-90"
+                className="bg-teal-600 text-white hover:bg-teal-700"
               >
                 Salvar
               </Button>

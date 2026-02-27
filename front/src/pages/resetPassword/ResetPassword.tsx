@@ -5,6 +5,9 @@ import { resetPassword } from "@/services/ForgotPasswordService";
 import Notification from "@/components/Notification";
 import axios from "axios";
 import { ArrowLeft, Terminal, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function ResetPassword() {
   const params = useParams();
@@ -115,17 +118,10 @@ export default function ResetPassword() {
         />
       )}
 
-      <div className="w-full min-h-screen flex">
+      <div className="min-h-screen flex">
         {/* Left panel */}
-        <div className="hidden lg:flex lg:w-[45%] bg-zinc-900 relative overflow-hidden flex-col justify-between p-12">
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+        <div className="hidden lg:flex lg:w-[45%] bg-stone-900 relative overflow-hidden flex-col justify-between p-12">
+          <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-8">
@@ -144,7 +140,7 @@ export default function ResetPassword() {
               <br />
               nova senha.
             </h2>
-            <p className="text-zinc-400 text-sm mt-4 max-w-xs leading-relaxed">
+            <p className="text-stone-400 text-sm mt-4 max-w-xs leading-relaxed">
               Escolha uma senha segura com pelo menos 8 caracteres para
               proteger sua conta.
             </p>
@@ -156,10 +152,10 @@ export default function ResetPassword() {
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-              <div className="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md bg-stone-900 flex items-center justify-center">
                 <Terminal className="w-4 h-4 text-white" />
               </div>
-              <span className="text-zinc-900 text-lg font-bold tracking-tight">
+              <span className="text-stone-900 text-lg font-bold tracking-tight">
                 IFCodes
               </span>
             </div>
@@ -168,7 +164,7 @@ export default function ResetPassword() {
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-8"
+              className="flex items-center gap-1.5 text-sm text-stone-400 hover:text-stone-700 transition-colors mb-8"
             >
               <ArrowLeft className="w-4 h-4" />
               Voltar para Login
@@ -180,10 +176,10 @@ export default function ResetPassword() {
                 <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center mx-auto mb-5">
                   <CheckCircle2 className="w-6 h-6 text-teal-600" />
                 </div>
-                <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+                <h1 className="text-xl font-bold text-stone-900 tracking-tight">
                   Senha redefinida
                 </h1>
-                <p className="text-sm text-zinc-400 mt-2 leading-relaxed max-w-xs mx-auto">
+                <p className="text-sm text-stone-400 mt-2 leading-relaxed max-w-xs mx-auto">
                   Sua senha foi alterada com sucesso. Você será redirecionado
                   para o login em instantes.
                 </p>
@@ -192,28 +188,25 @@ export default function ResetPassword() {
               /* Form state */
               <>
                 <div className="mb-8">
-                  <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+                  <h1 className="text-xl font-bold text-stone-900 tracking-tight">
                     Redefinir senha
                   </h1>
-                  <p className="text-sm text-zinc-400 mt-1.5">
+                  <p className="text-sm text-stone-400 mt-1.5">
                     Digite sua nova senha abaixo.
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-medium text-zinc-700 mb-1.5"
-                    >
+                    <Label htmlFor="password" className="mb-1.5 text-stone-700">
                       Nova senha
-                    </label>
+                    </Label>
                     <div className="relative">
-                      <input
+                      <Input
                         type={showPassword ? "text" : "password"}
                         id="password"
                         placeholder="Mínimo 8 caracteres"
-                        className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg outline-none transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-100 pr-10"
+                        className="pr-10"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -221,9 +214,10 @@ export default function ResetPassword() {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                         aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                        tabIndex={-1}
                       >
                         {showPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -235,18 +229,15 @@ export default function ResetPassword() {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="password_confirmation"
-                      className="block text-sm font-medium text-zinc-700 mb-1.5"
-                    >
+                    <Label htmlFor="password_confirmation" className="mb-1.5 text-stone-700">
                       Confirmar nova senha
-                    </label>
+                    </Label>
                     <div className="relative">
-                      <input
+                      <Input
                         type={showConfirmPassword ? "text" : "password"}
                         id="password_confirmation"
                         placeholder="Repita a senha"
-                        className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg outline-none transition-all focus:border-teal-500 focus:ring-2 focus:ring-teal-100 pr-10"
+                        className="pr-10"
                         value={passwordConfirmation}
                         onChange={(e) =>
                           setPasswordConfirmation(e.target.value)
@@ -256,11 +247,12 @@ export default function ResetPassword() {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 transition-colors"
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
                         aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                        tabIndex={-1}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -271,10 +263,11 @@ export default function ResetPassword() {
                     </div>
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full"
+                    size="lg"
                   >
                     {loading ? (
                       <>
@@ -284,7 +277,7 @@ export default function ResetPassword() {
                     ) : (
                       "Redefinir senha"
                     )}
-                  </button>
+                  </Button>
                 </form>
               </>
             )}

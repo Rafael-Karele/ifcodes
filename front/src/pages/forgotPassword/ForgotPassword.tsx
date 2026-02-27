@@ -4,6 +4,9 @@ import axios from "axios";
 import Notification from "@/components/Notification";
 import { sendForgotPasswordEmail } from "@/services/ForgotPasswordService";
 import { ArrowLeft, Terminal, Loader2, Mail } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function ForgotPassword() {
   const [error, setError] = useState<string | null>(null);
@@ -70,17 +73,10 @@ export default function ForgotPassword() {
         />
       )}
 
-      <div className="w-full min-h-screen flex">
+      <div className="min-h-screen flex">
         {/* Left panel */}
-        <div className="hidden lg:flex lg:w-[45%] bg-zinc-900 relative overflow-hidden flex-col justify-between p-12">
-          <div
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
+        <div className="hidden lg:flex lg:w-[45%] bg-stone-900 relative overflow-hidden flex-col justify-between p-12">
+          <div className="absolute inset-0 opacity-[0.04] bg-[linear-gradient(rgba(255,255,255,.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-8">
@@ -99,7 +95,7 @@ export default function ForgotPassword() {
               <br />
               acesso.
             </h2>
-            <p className="text-zinc-400 text-sm mt-4 max-w-xs leading-relaxed">
+            <p className="text-stone-400 text-sm mt-4 max-w-xs leading-relaxed">
               Enviaremos um link para o seu e-mail com instruções para redefinir
               sua senha.
             </p>
@@ -111,10 +107,10 @@ export default function ForgotPassword() {
           <div className="w-full max-w-sm">
             {/* Mobile logo */}
             <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-              <div className="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-md bg-stone-900 flex items-center justify-center">
                 <Terminal className="w-4 h-4 text-white" />
               </div>
-              <span className="text-zinc-900 text-lg font-bold tracking-tight">
+              <span className="text-stone-900 text-lg font-bold tracking-tight">
                 IFCodes
               </span>
             </div>
@@ -123,7 +119,7 @@ export default function ForgotPassword() {
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-8"
+              className="flex items-center gap-1.5 text-sm text-stone-400 hover:text-stone-700 transition-colors mb-8"
             >
               <ArrowLeft className="w-4 h-4" />
               Voltar para Login
@@ -135,10 +131,10 @@ export default function ForgotPassword() {
                 <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center mx-auto mb-5">
                   <Mail className="w-6 h-6 text-teal-600" />
                 </div>
-                <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+                <h1 className="text-xl font-bold text-stone-900 tracking-tight">
                   E-mail enviado
                 </h1>
-                <p className="text-sm text-zinc-400 mt-2 leading-relaxed max-w-xs mx-auto">
+                <p className="text-sm text-stone-400 mt-2 leading-relaxed max-w-xs mx-auto">
                   Se o e-mail estiver cadastrado, você receberá um link para
                   redefinir sua senha. Verifique também a caixa de spam.
                 </p>
@@ -157,10 +153,10 @@ export default function ForgotPassword() {
               /* Form state */
               <>
                 <div className="mb-8">
-                  <h1 className="text-xl font-bold text-zinc-900 tracking-tight">
+                  <h1 className="text-xl font-bold text-stone-900 tracking-tight">
                     Recuperar senha
                   </h1>
-                  <p className="text-sm text-zinc-400 mt-1.5">
+                  <p className="text-sm text-stone-400 mt-1.5">
                     Digite seu e-mail e enviaremos um link para redefinir sua
                     senha.
                   </p>
@@ -168,21 +164,19 @@ export default function ForgotPassword() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-zinc-700 mb-1.5"
-                    >
+                    <Label htmlFor="email" className="mb-1.5 text-stone-700">
                       Email
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="email"
                       id="email"
                       placeholder="seu@email.com"
-                      className={`w-full px-3 py-2.5 text-sm bg-white border rounded-lg outline-none transition-all ${
+                      className={
                         emailError
                           ? "border-red-400 ring-2 ring-red-100"
-                          : "border-zinc-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
-                      }`}
+                          : ""
+                      }
+                      aria-invalid={emailError ? true : undefined}
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -191,16 +185,17 @@ export default function ForgotPassword() {
                       }
                     />
                     {emailError && (
-                      <p className="text-red-600 text-xs mt-1.5">
+                      <p className="text-sm text-red-600 mt-1.5">
                         {emailError}
                       </p>
                     )}
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full"
+                    size="lg"
                   >
                     {loading ? (
                       <>
@@ -210,7 +205,7 @@ export default function ForgotPassword() {
                     ) : (
                       "Enviar link de recuperação"
                     )}
-                  </button>
+                  </Button>
                 </form>
               </>
             )}

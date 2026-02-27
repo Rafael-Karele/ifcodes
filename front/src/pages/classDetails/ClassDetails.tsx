@@ -74,7 +74,7 @@ export default function ClassDetails() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       {notification && (
         <Notification
           message={notification.message}
@@ -85,8 +85,7 @@ export default function ClassDetails() {
 
       <button
         onClick={() => navigate("/classes")}
-        className="inline-flex items-center gap-1 text-sm font-medium transition-colors"
-        style={{ color: "#0d9488" }}
+        className="inline-flex items-center gap-1 text-sm font-medium text-teal-600 hover:text-teal-700 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Voltar para Turmas
@@ -101,7 +100,7 @@ export default function ClassDetails() {
       {activeJam && <JamSessionBanner session={activeJam} />}
 
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 mb-6">
           <TabsTrigger value="activities" className="flex items-center gap-2">
             <BookOpen className="w-4 h-4" />
             Atividades ({activities.length})

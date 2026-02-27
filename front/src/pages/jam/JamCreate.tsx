@@ -70,10 +70,9 @@ export default function JamCreate() {
 
       {/* Hero Header */}
       <div
-        className="relative overflow-hidden px-4 sm:px-6 py-8 sm:py-12"
-        style={{ background: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)" }}
+        className="relative overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 px-4 sm:px-6 py-8 sm:py-12"
       >
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-5xl">
           <button
             onClick={() => navigate(`/classes/${turmaId}`)}
             className="mb-6 flex items-center gap-2 text-sm font-medium text-white/80 transition-colors hover:text-white"
@@ -91,8 +90,8 @@ export default function JamCreate() {
       </div>
 
       {/* Form */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10 space-y-8">
-        <div className="rounded-2xl border border-stone-200 bg-white shadow-sm p-6">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-8">
+        <div className="rounded-xl border border-stone-200 bg-white px-3 py-3 sm:px-5 sm:py-5 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="titulo">Título da Sessão</Label>
@@ -159,8 +158,7 @@ export default function JamCreate() {
               <Button
                 type="submit"
                 disabled={loading || !titulo || !problemaId}
-                style={{ backgroundColor: "#0d9488" }}
-                className="hover:opacity-90"
+                className="bg-teal-600 text-white hover:bg-teal-700"
               >
                 {loading ? "Criando..." : "Criar Sessão"}
               </Button>
