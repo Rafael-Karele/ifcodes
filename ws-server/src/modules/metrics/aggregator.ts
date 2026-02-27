@@ -35,6 +35,10 @@ export interface MetricsSnapshot {
     jam_disconnects: number;
     notif_disconnects: number;
     avg_latency_ms: number;
+    jam_bytes_in: number;
+    jam_bytes_out: number;
+    notif_bytes_in: number;
+    notif_bytes_out: number;
   };
   queue: {
     pending: number;

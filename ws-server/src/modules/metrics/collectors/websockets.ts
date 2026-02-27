@@ -39,5 +39,9 @@ export function collectWebSocketStats() {
     jam_disconnects: jam.disconnectCount,
     notif_disconnects: notifications.disconnectCount,
     avg_latency_ms: currentLatencyMs,
+    jam_bytes_in: jam.bytesIn,
+    jam_bytes_out: jam.bytesOut,
+    notif_bytes_in: notifications.bytesIn,
+    notif_bytes_out: notifications.bytesOut,
   };
 }

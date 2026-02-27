@@ -40,6 +40,8 @@ let msgCount = 0;
 let errorCount = 0;
 let disconnectCount = 0;
 let totalConnectionsEver = 0;
+let bytesIn = 0;
+let bytesOut = 0;
 
 // Auto-end timers: when all professors disconnect, schedule session end after 30 min
 const PROFESSOR_DISCONNECT_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
@@ -109,7 +111,9 @@ function startProfessorDisconnectTimer(jamId: number): void {
 
 function send(ws: WebSocket, type: string, payload: any) {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type, ...payload }));
+    const data = JSON.stringify({ type, ...payload });
+    bytesOut += data.length;
+    ws.send(data);
   }
 }
 
@@ -119,6 +123,7 @@ function broadcastToJam(jamId: number, type: string, payload: any) {
   const message = JSON.stringify({ type, ...payload });
   for (const ws of sockets) {
     if (ws.readyState === WebSocket.OPEN) {
+      bytesOut += message.length;
       ws.send(message);
     }
   }
@@ -145,6 +150,8 @@ export function getJamStats() {
     errorCount,
     disconnectCount,
     totalConnectionsEver,
+    bytesIn,
+    bytesOut,
   };
 }
 
@@ -154,6 +161,7 @@ export async function handleConnection(ws: WebSocket) {
 
   ws.on('message', async (raw: Buffer) => {
     msgCount++;
+    bytesIn += raw.length;
     let msg: any;
     try {
       msg = JSON.parse(raw.toString());

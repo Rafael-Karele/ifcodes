@@ -6,6 +6,12 @@ interface WebSocketStatsProps {
   websockets: WebSocketMetrics;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function Stat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="flex items-center justify-between py-2.5 px-1">
@@ -79,6 +85,14 @@ export function WebSocketStats({ websockets }: WebSocketStatsProps) {
         <Stat
           label="Desconexoes Notificacoes"
           value={websockets.notif_disconnects}
+        />
+        <Stat
+          label="Payload Jam"
+          value={`${formatBytes(websockets.jam_bytes_in)} / ${formatBytes(websockets.jam_bytes_out)}`}
+        />
+        <Stat
+          label="Payload Notificacoes"
+          value={`${formatBytes(websockets.notif_bytes_in)} / ${formatBytes(websockets.notif_bytes_out)}`}
         />
       </div>
     </SectionCard>

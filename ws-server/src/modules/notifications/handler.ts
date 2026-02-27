@@ -20,6 +20,8 @@ let msgCount = 0;
 let errorCount = 0;
 let disconnectCount = 0;
 let totalConnectionsEver = 0;
+let bytesIn = 0;
+let bytesOut = 0;
 
 const REDIS_HOST = process.env.REDIS_HOST || 'laravel_redis';
 const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
@@ -72,6 +74,7 @@ function handleRedisMessage(channel: string, raw: string): void {
     if (clients) {
       for (const client of clients) {
         if (client.ws.readyState === WebSocket.OPEN) {
+          bytesOut += msg.length;
           client.ws.send(msg);
         }
       }
@@ -87,6 +90,7 @@ function handleRedisMessage(channel: string, raw: string): void {
     if (clients) {
       for (const client of clients) {
         if (client.ws.readyState === WebSocket.OPEN) {
+          bytesOut += msg.length;
           client.ws.send(msg);
         }
       }
@@ -139,6 +143,8 @@ export function getNotificationStats() {
     errorCount,
     disconnectCount,
     totalConnectionsEver,
+    bytesIn,
+    bytesOut,
   };
 }
 
@@ -150,6 +156,7 @@ export async function handleNotificationConnection(ws: WebSocket): Promise<void>
 
   ws.on('message', async (raw: Buffer) => {
     msgCount++;
+    bytesIn += raw.length;
     let msg: any;
     try {
       msg = JSON.parse(raw.toString());

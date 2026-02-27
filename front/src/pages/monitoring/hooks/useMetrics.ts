@@ -33,6 +33,10 @@ export interface WebSocketMetrics {
   jam_disconnects: number;
   notif_disconnects: number;
   avg_latency_ms: number;
+  jam_bytes_in: number;
+  jam_bytes_out: number;
+  notif_bytes_in: number;
+  notif_bytes_out: number;
 }
 
 export interface QueueMetrics {
