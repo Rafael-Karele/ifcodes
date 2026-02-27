@@ -196,7 +196,7 @@ REDIS_PORT=6379
 
 # Specify Redis password. Cannot be blank.
 # Default: NO DEFAULT! MUST BE SET!
-REDIS_PASSWORD=changeme-please-set-a-strong-password
+REDIS_PASSWORD=CHANGE_ME_REDIS_PASSWORD
 
 
 ################################################################################
@@ -220,8 +220,7 @@ POSTGRES_USER=integrador
 
 # Password of the user. Cannot be blank. Used only in production.
 # Default: NO DEFAULT, YOU MUST SET YOUR PASSWORD
-POSTGRES_PASSWORD=changeme-please-set-strong-password
-# !!! WARNING: Change the above password to a strong, unique value before deploying to production !!!
+POSTGRES_PASSWORD=CHANGE_ME_POSTGRES_PASSWORD
 ################################################################################
 # Submission Configuration
 ################################################################################

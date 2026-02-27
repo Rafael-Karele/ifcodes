@@ -31,6 +31,13 @@ jobs:
 
             git stash --include-untracked || true
             git pull origin main
+            git stash pop || true
+
+            # Ensure judge0.conf exists (it is gitignored, only judge0.conf.example is tracked)
+            if [ ! -f judge0.conf ]; then
+              echo "WARNING: judge0.conf not found, copying from example. Update passwords before use!"
+              cp judge0.conf.example judge0.conf
+            fi
 
             AFTER=$(git rev-parse HEAD)
 
