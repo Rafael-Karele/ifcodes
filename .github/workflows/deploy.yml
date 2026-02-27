@@ -58,13 +58,13 @@ jobs:
               SERVICES="$SERVICES ws_server"
             fi
 
-            if echo "$CHANGED" | grep -q '^docker-compose.yml'; then
+            if echo "$CHANGED" | grep -q '^docker-compose.prod.yml'; then
               SERVICES="backend_app queue_worker frontend_app ws_server"
             fi
 
             if [ -n "$SERVICES" ]; then
               echo "Rebuilding: $SERVICES"
-              docker compose up -d --build $SERVICES
+              docker compose -f docker-compose.prod.yml up -d --build $SERVICES
             else
               echo "No service changes detected"
             fi
