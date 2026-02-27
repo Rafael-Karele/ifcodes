@@ -12,13 +12,14 @@ import {
   Edit,
   Trash2,
   Users,
-  Search,
   UserPlus,
   BookOpen,
   X,
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import { SearchFilter } from "@/components/SearchFilter";
+import { HeroHeader } from "@/components/HeroHeader";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useUser } from "@/context/UserContext";
 
@@ -175,7 +176,7 @@ export default function Classes() {
 
   /* ================================================================ */
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes classes-fade-up {
@@ -204,114 +205,81 @@ export default function Classes() {
       )}
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
-      <div
-        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f56 100%)` }}
-      >
-        {/* decorative circles */}
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
-          style={{ background: "white" }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
-          style={{ background: "white" }}
-        />
+      <HeroHeader
+        icon={BookOpen}
+        title="Minhas Turmas"
+        description={isProfOrAdmin
+          ? "Gerencie suas turmas, adicione alunos e acompanhe o progresso de cada grupo."
+          : "Veja as turmas em que você está matriculado e acesse as atividades."}
+      />
 
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
-              Minhas Turmas
-            </h1>
-            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
-              {isProfOrAdmin
-                ? "Gerencie suas turmas, adicione alunos e acompanhe o progresso de cada grupo."
-                : "Veja as turmas em que você está matriculado e acesse as atividades."}
-            </p>
-          </div>
-
-          {isProfOrAdmin && (
-            <Button
-              onClick={() => setShowForm(!showForm)}
-              className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
-            >
-              {showForm ? (
-                <>
-                  <X className="w-4 h-4 mr-1.5" /> Fechar
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4 mr-1.5" /> Nova Turma
-                </>
-              )}
-            </Button>
-          )}
+      {/* ═══════ SEARCH BAR + NEW CLASS BUTTON ═══════ */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Buscar turma por nome…"
+          />
         </div>
-
-        {/* ── inline form ── */}
-        {showForm && (
-          <div className="cls-form-enter relative z-10 mt-8 rounded-xl bg-white/95 backdrop-blur p-6 shadow-xl">
-            <h2 className="text-lg font-bold text-stone-800 mb-4">
-              {editingClass ? "Editar Turma" : "Criar Nova Turma"}
-            </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-end gap-4">
-              <div className="flex-1 w-full">
-                <Label htmlFor="nome" className="mb-1.5 block text-sm font-medium text-stone-600">
-                  Nome da turma
-                </Label>
-                <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  required
-                  placeholder="Ex: Programação I — 2025/1"
-                  className="h-11 rounded-lg"
-                />
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <Button
-                  type="submit"
-                  className="h-11 rounded-xl px-6 font-semibold"
-                  style={{ background: palette.accent }}
-                >
-                  {editingClass ? "Atualizar" : "Salvar"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={resetForm}
-                  className="h-11 rounded-xl text-stone-500 hover:text-red-600 hover:bg-red-50"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </div>
+        {isProfOrAdmin && (
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            className="shrink-0 bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors rounded-xl px-5 h-10"
+          >
+            {showForm ? (
+              <>
+                <X className="w-4 h-4 mr-1.5" /> Fechar
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-1.5" /> Nova Turma
+              </>
+            )}
+          </Button>
         )}
       </div>
 
-      {/* ═══════ SEARCH + STATS BAR ═══════ */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-          <Input
-            type="text"
-            placeholder="Buscar turma por nome…"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 rounded-xl border-stone-200 bg-white shadow-sm focus-visible:ring-teal-500/30 focus-visible:border-teal-400"
-          />
+      {/* ── inline form ── */}
+      {showForm && (
+        <div className="cls-form-enter rounded-xl border border-stone-200 bg-white p-6 shadow-sm mb-6">
+          <h2 className="text-lg font-bold text-stone-800 mb-4">
+            {editingClass ? "Editar Turma" : "Criar Nova Turma"}
+          </h2>
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-end gap-4">
+            <div className="flex-1 w-full">
+              <Label htmlFor="nome" className="mb-1.5 block text-sm font-medium text-stone-600">
+                Nome da turma
+              </Label>
+              <Input
+                id="nome"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                required
+                placeholder="Ex: Programação I — 2025/1"
+                className="h-11 rounded-lg"
+              />
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button
+                type="submit"
+                className="h-11 rounded-xl px-6 font-semibold"
+                style={{ background: palette.accent }}
+              >
+                {editingClass ? "Atualizar" : "Salvar"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={resetForm}
+                className="h-11 rounded-xl text-stone-500 hover:text-red-600 hover:bg-red-50"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
         </div>
-        <div
-          className="shrink-0 flex items-center gap-2 rounded-xl px-4 h-11 text-sm font-medium"
-          style={{ background: palette.accentSoft, color: palette.accent }}
-        >
-          <BookOpen className="w-4 h-4" />
-          {filteredClasses.length}{" "}
-          {filteredClasses.length === 1 ? "turma" : "turmas"}
-        </div>
-      </div>
+      )}
 
       {/* ═══════ CARDS GRID ═══════ */}
       <div

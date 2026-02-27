@@ -17,12 +17,11 @@ import {
   TrendingUp,
   Target,
   ArrowRight,
-  RefreshCw,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { StatusBadge, submissionStatusConfig, type SubmissionStatusKey } from "@/components/StatusBadge";
 import { StatCard } from "@/components/StatCard";
 import { SearchFilter } from "@/components/SearchFilter";
+import { HeroHeader } from "@/components/HeroHeader";
 import { useData } from "@/context/DataContext";
 import Loading from "@/components/Loading";
 
@@ -41,11 +40,10 @@ const palette = {
 export default function Submissions() {
   const navigate = useNavigate();
 
-  const { loading, submissions, updateSubmissions } = useData();
+  const { loading, submissions } = useData();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [refreshing, setRefreshing] = useState(false);
 
   // Calcula estatisticas rapidas sobre as submissoes
   const stats = useMemo(() => {
@@ -70,16 +68,6 @@ export default function Submissions() {
     navigate(`/submissions/${submission.activityId}/${submission.id}`);
   }
 
-  // Atualiza os dados ao clicar em "Atualizar"
-  async function refreshData() {
-    setRefreshing(true);
-    try {
-      await updateSubmissions();
-    } finally {
-      setRefreshing(false);
-    }
-  }
-
   // Filtra submissoes pelo termo de busca e filtro de status
   const filteredSubmissions = submissions.filter((submission) => {
     const problemTitle = submission.problemTitle || "";
@@ -101,7 +89,7 @@ export default function Submissions() {
   const uniqueStatuses = [...new Set(submissions.map((s) => s.status))];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes submissions-fade-in {
@@ -114,43 +102,11 @@ export default function Submissions() {
       `}</style>
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
-      <div
-        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f56 100%)` }}
-      >
-        {/* decorative circles */}
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
-          style={{ background: "white" }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
-          style={{ background: "white" }}
-        />
-
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <FileText className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
-              Submissoes
-            </h1>
-            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
-              Acompanhe o historico de todas as suas submissoes e monitore seu progresso.
-            </p>
-          </div>
-
-          <Button
-            onClick={refreshData}
-            disabled={loading || refreshing}
-            className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
-          >
-            <RefreshCw
-              className={`w-4 h-4 mr-1.5 ${(loading || refreshing) ? "animate-spin" : ""}`}
-            />
-            Atualizar
-          </Button>
-        </div>
-      </div>
+      <HeroHeader
+        icon={FileText}
+        title="Submissões"
+        description="Acompanhe o histórico de todas as suas submissões e monitore seu progresso."
+      />
 
       {/* ═══════ STAT CARDS ═══════ */}
       {!loading && (

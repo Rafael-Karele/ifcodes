@@ -11,15 +11,9 @@ import { useData } from "@/context/DataContext";
 import { StatCard } from "@/components/StatCard";
 import { ActivityCard } from "@/components/ActivityCard";
 import { EmptyState } from "@/components/EmptyState";
+import { HeroHeader } from "@/components/HeroHeader";
 import { SearchFilter } from "@/components/SearchFilter";
 import { activityStatusConfig, type ActivityStatusKey } from "@/components/StatusBadge";
-
-/* ── palette ──────────────────────────────────────────── */
-
-const palette = {
-  accent: "#0d9488",
-  accentDark: "#065f46",
-};
 
 /* ── helpers ────────────────────────────────────────── */
 
@@ -91,43 +85,13 @@ export default function Activities() {
   ).length;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 space-y-8">
 
       {/* ── hero header ── */}
-      <div
-        className="relative rounded-2xl px-5 py-8 sm:px-8 sm:py-10 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, ${palette.accentDark} 100%)` }}
-      >
-        {/* decorative circles */}
-        <div className="absolute -top-6 -right-6 h-32 w-32 rounded-full bg-white opacity-10" />
-        <div className="absolute bottom-4 left-1/3 h-20 w-20 rounded-full bg-white opacity-[0.07]" />
-
-        <div className="relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
-              Atividades
-            </h1>
-            <p className="text-teal-100 text-sm mt-2">
-              Gerencie e acompanhe suas atividades acadêmicas
-            </p>
-          </div>
-          <span className="text-sm text-teal-100">
-            {activities.length} atividade{activities.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-      </div>
-
-      {/* ── search / filter ── */}
-      <SearchFilter
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        statusOptions={uniqueStatuses.map((status) => ({
-          value: status,
-          label: activityStatusConfig[status as ActivityStatusKey]?.label || status,
-        }))}
+      <HeroHeader
+        icon={BookOpen}
+        title="Atividades"
+        description="Gerencie e acompanhe suas atividades acadêmicas"
       />
 
       {/* ── stats ── */}
@@ -143,6 +107,18 @@ export default function Activities() {
           <StatCard label="Concluídas" value={completedCount} icon={CheckCircle2} />
         </div>
       )}
+
+      {/* ── search / filter ── */}
+      <SearchFilter
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        statusOptions={uniqueStatuses.map((status) => ({
+          value: status,
+          label: activityStatusConfig[status as ActivityStatusKey]?.label || status,
+        }))}
+      />
 
       {/* ── activity cards ── */}
       {loading ? (

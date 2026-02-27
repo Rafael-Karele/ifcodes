@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Trash2, X, Search, Codesandbox, Sparkles } from "lucide-react";
+import { Plus, Trash2, X, Codesandbox, Sparkles } from "lucide-react";
+import { HeroHeader } from "@/components/HeroHeader";
+import { SearchFilter } from "@/components/SearchFilter";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -586,7 +588,7 @@ export default function Problems() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 min-h-[80vh]">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 min-h-[80vh]">
       {/* ---- scoped keyframes ---- */}
       <style>{`
         @keyframes problems-fade-up {
@@ -604,64 +606,31 @@ export default function Problems() {
       )}
 
       {/* ═══════ HERO / HEADER AREA ═══════ */}
-      <div
-        className="relative rounded-2xl px-5 sm:px-8 py-8 sm:py-10 mb-8 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
-      >
-        {/* decorative circles */}
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
-          style={{ background: "white" }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
-          style={{ background: "white" }}
-        />
+      <HeroHeader
+        icon={Codesandbox}
+        title="Gerenciamento de Problemas"
+        description="Crie e gerencie problemas de programação, defina casos de teste e acompanhe as atividades."
+      />
 
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <Codesandbox className="w-6 h-6 sm:w-8 sm:h-8 opacity-90" strokeWidth={2.2} />
-              Gerenciamento de Problemas
-            </h1>
-            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
-              Crie e gerencie problemas de programacao, defina casos de teste e acompanhe as atividades.
-            </p>
-          </div>
-
-          <Button
-            onClick={() => {
-              setEditingProblem(null);
-              setIsFormModalOpen(true);
-            }}
-            className="w-full sm:w-auto shrink-0 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
-          >
-            <Plus className="w-4 h-4 mr-1.5" />
-            Adicionar Problema
-          </Button>
-        </div>
-      </div>
-
-      {/* ═══════ SEARCH + STATS BAR ═══════ */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-          <Input
-            type="text"
-            placeholder="Buscar por titulo do problema..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-11 rounded-xl border-stone-200 bg-white shadow-sm focus-visible:ring-teal-500/30 focus-visible:border-teal-400"
+      {/* ═══════ SEARCH BAR + ADD BUTTON ═══════ */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            placeholder="Buscar por título do problema..."
           />
         </div>
-        <div
-          className="shrink-0 flex items-center gap-2 rounded-xl px-4 h-11 text-sm font-medium"
-          style={{ background: palette.accentSoft, color: palette.accent }}
+        <Button
+          onClick={() => {
+            setEditingProblem(null);
+            setIsFormModalOpen(true);
+          }}
+          className="shrink-0 bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors rounded-xl px-5 h-10"
         >
-          <Codesandbox className="w-4 h-4" />
-          {filteredProblems.length}{" "}
-          {filteredProblems.length === 1 ? "problema" : "problemas"}
-        </div>
+          <Plus className="w-4 h-4 mr-1.5" />
+          Adicionar Problema
+        </Button>
       </div>
 
       {/* ═══════ CARDS GRID ═══════ */}

@@ -16,7 +16,6 @@ import type { Professor } from "@/types";
 import { useEffect, useState } from "react";
 import {
   GraduationCap,
-  Search,
   Plus,
   Pencil,
   Trash2,
@@ -28,6 +27,8 @@ import {
 } from "lucide-react";
 import Notification from "@/components/Notification";
 import Loading from "@/components/Loading";
+import { HeroHeader } from "@/components/HeroHeader";
+import { SearchFilter } from "@/components/SearchFilter";
 
 /* ── palette tokens (inline, no global leak) ────────────────── */
 const palette = {
@@ -539,61 +540,28 @@ export default function Teachers() {
       )}
 
       {/* ══════ HERO HEADER ══════ */}
-      <div
-        className="relative rounded-2xl px-8 py-10 mb-8 overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${palette.accent} 0%, #065f46 100%)` }}
-      >
-        {/* decorative circles */}
-        <div
-          className="pointer-events-none absolute -top-12 -right-12 h-56 w-56 rounded-full opacity-10"
-          style={{ background: "white" }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-1/3 h-32 w-32 rounded-full opacity-[0.07]"
-          style={{ background: "white" }}
-        />
+      <HeroHeader
+        icon={GraduationCap}
+        title="Gerenciamento de Professores"
+        description="Cadastre, edite e gerencie os professores da plataforma."
+      />
 
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
-              <GraduationCap className="w-8 h-8 opacity-90" strokeWidth={2.2} />
-              Gerenciamento de Professores
-            </h1>
-            <p className="mt-2 text-teal-100 text-sm max-w-md leading-relaxed">
-              Cadastre, edite e gerencie os professores da plataforma.
-            </p>
-          </div>
-
-          <button
-            onClick={handleCreate}
-            className="shrink-0 flex items-center gap-2 bg-white text-teal-700 font-semibold shadow-lg hover:bg-teal-50 transition-colors rounded-xl px-5 h-11"
-          >
-            <Plus className="w-4 h-4" />
-            Adicionar Professor
-          </button>
-        </div>
-      </div>
-
-      {/* ══════ SEARCH + STATS BAR ══════ */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-          <input
-            type="text"
+      {/* ══════ SEARCH BAR + ADD BUTTON ══════ */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1">
+          <SearchFilter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
             placeholder="Buscar por nome, área de atuação ou e-mail..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 h-11 rounded-xl border border-stone-200 bg-white shadow-sm focus:ring-2 focus:ring-teal-500/30 focus:border-teal-400 focus:outline-none transition-colors"
           />
         </div>
-        <div
-          className="shrink-0 flex items-center gap-2 rounded-xl px-4 h-11 text-sm font-medium"
-          style={{ background: palette.accentSoft, color: palette.accent }}
+        <button
+          onClick={handleCreate}
+          className="shrink-0 flex items-center gap-2 bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors rounded-xl px-5 h-10"
         >
-          <GraduationCap className="w-4 h-4" />
-          {filteredProfessors.length}{" "}
-          {filteredProfessors.length === 1 ? "professor" : "professores"}
-        </div>
+          <Plus className="w-4 h-4" />
+          Adicionar Professor
+        </button>
       </div>
 
       {/* ══════ TABLE ══════ */}
