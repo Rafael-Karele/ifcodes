@@ -12,8 +12,10 @@ services:
     platform: linux/amd64
     container_name: judge0_server
     depends_on:
-      - postgres
-      - judge0_redis
+      postgres:
+        condition: service_healthy
+      judge0_redis:
+        condition: service_healthy
     volumes:
       - ./judge0.conf:/judge0.conf:ro
     privileged: true
@@ -26,8 +28,10 @@ services:
     command: ["./scripts/workers"]
     container_name: judge0_workers
     depends_on:
-      - postgres
-      - judge0_redis
+      postgres:
+        condition: service_healthy
+      judge0_redis:
+        condition: service_healthy
     volumes:
       - ./judge0.conf:/judge0.conf:ro
     privileged: true
@@ -42,6 +46,11 @@ services:
       "docker-entrypoint.sh --appendonly no --requirepass \"$$REDIS_PASSWORD\""
     ]
     env_file: judge0.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     <<: *default-logging
     restart: always
 
@@ -49,6 +58,11 @@ services:
     image: redis:7.2.4
     container_name: laravel_redis
     command: ["redis-server", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     <<: *default-logging
     restart: always
 
@@ -61,6 +75,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - ./init-backend-db.sh:/docker-entrypoint-initdb.d/init-backend-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     <<: *default-logging
     restart: always
 
@@ -75,9 +95,18 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:
-      - postgres
-      - judge0_server
-      - laravel_redis
+      postgres:
+        condition: service_healthy
+      judge0_server:
+        condition: service_started
+      laravel_redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
 
   queue_worker:
     build:
@@ -88,8 +117,10 @@ services:
     command: php artisan queue:work redis --queue=default --sleep=3 --tries=3
     env_file: ./back/src/.env
     depends_on:
-      - backend_app
-      - laravel_redis
+      backend_app:
+        condition: service_healthy
+      laravel_redis:
+        condition: service_healthy
     restart: unless-stopped
 
   frontend_app:
@@ -101,7 +132,13 @@ services:
     ports:
       - "127.0.0.1:3000:80"
     depends_on:
-      - backend_app
+      backend_app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
 
   ws_server:
     build: ./ws-server
@@ -118,8 +155,15 @@ services:
       - REDIS_HOST=laravel_redis
       - JUDGE0_API_URL=http://judge0_server:2358
     depends_on:
-      - backend_app
-      - laravel_redis
+      backend_app:
+        condition: service_healthy
+      laravel_redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
 
 networks:
   default:

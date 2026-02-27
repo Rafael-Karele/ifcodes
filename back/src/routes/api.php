@@ -90,3 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Rota pública para recuperação de senha (fora do middleware auth:sanctum)
 Route::post('/forgot-password-temp', [ForgotPasswordTempController::class, 'sendTempPassword']);
+
+// Health check (sem auth) para Docker healthcheck
+Route::get('/health', fn () => response()->json(['status' => 'ok']));
