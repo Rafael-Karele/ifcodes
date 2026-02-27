@@ -16,7 +16,9 @@ import { useUser } from "./UserContext";
 export type RealtimeNotification = {
   id: number;
   message: string;
-  type: "success" | "warning";
+  type: "success" | "warning" | "error";
+  createdAt: number;
+  duration: number;
 };
 
 interface DataContextType {
@@ -30,6 +32,7 @@ interface DataContextType {
   updateSubmissions: () => Promise<void>;
   updateActivities: () => Promise<void>;
   notifications: RealtimeNotification[];
+  pushNotification: (message: string, type?: "success" | "warning" | "error") => void;
   dismissNotification: (id: number) => void;
 }
 
@@ -44,6 +47,7 @@ const DataContext = createContext<DataContextType>({
   updateSubmissions: async () => {},
   updateActivities: async () => {},
   notifications: [],
+  pushNotification: () => {},
   dismissNotification: () => {},
 });
 
@@ -57,9 +61,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
 
-  const pushNotification = useCallback((message: string, type: "success" | "warning" = "success") => {
-    const id = Date.now();
-    setNotifications((prev) => [...prev, { id, message, type }]);
+  const pushNotification = useCallback((message: string, type: "success" | "warning" | "error" = "success", duration = 5000) => {
+    const id = Date.now() + Math.random();
+    const createdAt = Date.now();
+    setNotifications((prev) => [...prev, { id, message, type, createdAt, duration }]);
   }, []);
 
   const dismissNotification = useCallback((id: number) => {
@@ -219,6 +224,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         updateSubmissions,
         updateActivities,
         notifications,
+        pushNotification,
         dismissNotification,
       }}
     >

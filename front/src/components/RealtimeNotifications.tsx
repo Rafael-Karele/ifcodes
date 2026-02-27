@@ -6,16 +6,19 @@ export default function RealtimeNotifications() {
 
   if (notifications.length === 0) return null;
 
-  // Show only the most recent notification
-  const latest = notifications[notifications.length - 1];
-
   return (
-    <Notification
-      key={latest.id}
-      message={latest.message}
-      type={latest.type}
-      onClose={() => dismissNotification(latest.id)}
-      duration={5000}
-    />
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex flex-col-reverse gap-3 max-w-sm w-[calc(100vw-2rem)]">
+      {notifications.map((n) => (
+        <Notification
+          key={n.id}
+          message={n.message}
+          type={n.type}
+          createdAt={n.createdAt}
+          duration={n.duration}
+          onClose={() => dismissNotification(n.id)}
+          inline
+        />
+      ))}
+    </div>
   );
 }

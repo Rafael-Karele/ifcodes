@@ -8,6 +8,8 @@ use App\Models\Turma;
 use App\Services\JamSubmissaoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Lib\Dicionarios\Status;
+use App\Models\Submissao;
 
 class JamSessionController extends Controller
 {
@@ -213,6 +215,21 @@ class JamSessionController extends Controller
 
         if (!$participant->codigo) {
             return response()->json(['message' => 'Nenhum código para submeter.'], 422);
+        }
+
+        // Bloqueia se o participante já tem submissão pendente/processando
+        $atividadeId = $session->problema->atividades()->first()?->id;
+        if ($atividadeId) {
+            $hasPending = Submissao::where('user_id', Auth::id())
+                ->where('atividade_id', $atividadeId)
+                ->whereIn('status_correcao_id', [Status::NA_FILA, Status::EM_PROCESSAMENTO])
+                ->exists();
+
+            if ($hasPending) {
+                return response()->json([
+                    'message' => 'Você já possui uma submissão sendo avaliada. Aguarde o resultado.'
+                ], 429);
+            }
         }
 
         $service = new JamSubmissaoService();
