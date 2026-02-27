@@ -15,6 +15,7 @@ import ClassDetails from "@/pages/classDetails/ClassDetails";
 import SubmissionsDetails from "@/pages/submissionsDetails/SubmissionsDetails";
 import Problems from "@/pages/problems/Problems";
 import RequireAuth from "@/pages/RequireAuth";
+import RedirectIfAuth from "@/pages/RedirectIfAuth";
 import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
 import JamCreate from "@/pages/jam/JamCreate";
@@ -41,9 +42,11 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/password-reset/:token" element={<ResetPassword />} />
+        <Route element={<RedirectIfAuth />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/password-reset/:token" element={<ResetPassword />} />
+        </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route element={<RequireAuth />}>
           <Route path="/" element={<AppLayout />}>
