@@ -32,6 +32,9 @@ RUN composer dump-autoload --optimize
 # Garante que www-data (PHP-FPM) pode escrever em storage e bootstrap/cache.
 RUN chown -R www-data:www-data storage bootstrap/cache
 
+# Permite que PHP-FPM herde variáveis de ambiente do container (env_file).
+COPY src/docker/php/php-fpm-env.conf /usr/local/etc/php-fpm.d/zzz-env.conf
+
 # Copia configs do Nginx e Supervisord.
 COPY src/docker/php/nginx.conf /etc/nginx/sites-available/default
 COPY src/docker/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
