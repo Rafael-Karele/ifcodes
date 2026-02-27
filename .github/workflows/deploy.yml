@@ -46,6 +46,7 @@ jobs:
           script: |
             set -e
             cd "${{ secrets.VPS_PROJECT_PATH }}"
+            git stash --include-untracked || true
             git pull origin main
 
             SERVICES=""
