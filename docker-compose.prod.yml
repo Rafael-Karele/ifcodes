@@ -109,10 +109,14 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3002:3001"
+    volumes:
+      - /proc:/host/proc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - LARAVEL_API_URL=http://laravel_app:8000
       - PORT=3001
       - REDIS_HOST=laravel_redis
+      - JUDGE0_API_URL=http://judge0_server:2358
     depends_on:
       - backend_app
       - laravel_redis
