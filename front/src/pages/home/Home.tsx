@@ -16,7 +16,8 @@ import { WeeklyHeatmap, type HeatmapCell } from "./components/WeeklyHeatmap";
 import { LanguageBar, type LanguageStat } from "./components/LanguageBar";
 import { SubmissionFeed } from "./components/SubmissionFeed";
 import { ContinueCard } from "./components/ContinueCard";
-import { HeroHeader } from "./components/HeroHeader";
+import { HeroHeader } from "@/components/HeroHeader";
+import { LayoutDashboard } from "lucide-react";
 import type { Submission } from "@/types";
 import "./Home.css";
 
@@ -204,17 +205,31 @@ export default function Home() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-6">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-5 space-y-6">
       {/* ── 1. Smart Hero Header ── */}
       <HeroHeader
-        userName={userName}
-        currentDate={currentDate}
-        greeting={getGreeting()}
-        motivation={getMotivation(streak, successRate)}
-        pendingCount={pendingCount}
-        dueThisWeek={dueThisWeek}
-        submissionCount={submissions.length}
-        successRate={successRate}
+        icon={LayoutDashboard}
+        title={<>{getGreeting()}, {userName}</>}
+        description={
+          <>
+            <span className="text-xs sm:text-sm text-teal-100 font-medium capitalize block mb-1">{currentDate}</span>
+            {pendingCount > 0 && (
+              <span>
+                {pendingCount} pendente{pendingCount !== 1 && "s"}
+                {dueThisWeek > 0 && (
+                  <>, {dueThisWeek} vence{dueThisWeek !== 1 && "m"} esta semana</>
+                )}
+                .
+                {submissions.length > 0 && (
+                  <> Taxa de acerto: {Math.round(successRate)}%</>
+                )}
+                {" — "}
+              </span>
+            )}
+            {getMotivation(streak, successRate)}
+          </>
+        }
+        className="home-section home-delay-0"
       />
 
       {/* ── 2. Stats Row ── */}
