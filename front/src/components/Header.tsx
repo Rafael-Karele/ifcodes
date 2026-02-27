@@ -47,6 +47,7 @@ export default function Header() {
             submenu: [
               { to: "/students", label: "Alunos" },
               { to: "/teachers", label: "Professores" },
+              { to: "/monitoring", label: "Monitoramento" },
             ],
           },
         ]

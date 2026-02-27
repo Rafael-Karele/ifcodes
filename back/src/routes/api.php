@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\ForgotPasswordTempController;
 use App\Http\Controllers\AlunoController;
 use App\Http\Controllers\TurmaController;
 use App\Http\Controllers\JamSessionController;
+use App\Http\Controllers\MetricsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -83,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('alunos', AlunoController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('professores', ProfessorController::class)
             ->parameters(['professores' => 'professor']);
+        Route::get('/admin/failed-jobs', [MetricsController::class, 'failedJobs']);
     });
 });
 

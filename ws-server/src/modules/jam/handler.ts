@@ -131,6 +131,13 @@ export function broadcastResult(jamId: number, userId: number, status: string, t
   }
 }
 
+export function getJamStats() {
+  return {
+    connections: clients.size,
+    activeSessions: jamClients.size,
+  };
+}
+
 export async function handleConnection(ws: WebSocket) {
   let authenticated = false;
 

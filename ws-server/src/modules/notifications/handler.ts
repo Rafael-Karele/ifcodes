@@ -122,6 +122,14 @@ function removeClient(client: NotificationClient): void {
   }
 }
 
+export function getNotificationStats() {
+  let totalConnections = 0;
+  for (const clients of userClients.values()) {
+    totalConnections += clients.size;
+  }
+  return { connections: totalConnections };
+}
+
 export async function handleNotificationConnection(ws: WebSocket): Promise<void> {
   ensureRedisSubscriber();
 

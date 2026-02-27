@@ -19,6 +19,7 @@ import RequireRole from "@/pages/RequireRole";
 import ProfileView from "@/pages/perfil/ProfileView";
 import JamCreate from "@/pages/jam/JamCreate";
 import JamView from "@/pages/jam/JamView";
+import Monitoring from "@/pages/monitoring/Monitoring";
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router";
 
 function NotFound() {
@@ -66,6 +67,7 @@ export default function AppRouter() {
             <Route element={<RequireRole allowedRoles={["admin"]} />}>
               <Route path="students" element={<Students />} />
               <Route path="teachers" element={<Teachers />} />
+              <Route path="monitoring" element={<Monitoring />} />
             </Route>
             <Route element={<RequireRole allowedRoles={["admin", "professor"]} />}>
               <Route path="problems" element={<Problems />} />

@@ -117,8 +117,6 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
-    environment:
-      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend_app
 
@@ -129,6 +127,9 @@ services:
     restart: unless-stopped
     ports:
       - "3002:3001"
+    volumes:
+      - /proc:/host/proc:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - LARAVEL_API_URL=http://laravel_app:8000
       - PORT=3001
