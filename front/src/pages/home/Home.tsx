@@ -264,7 +264,7 @@ export default function Home() {
       <div className="home-section home-delay-3 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <WeeklyHeatmap cells={heatmapCells} streak={streak} />
         <SectionCard title="Linguagens" icon={Terminal}>
-          <div className="px-5 py-5">
+          <div className="px-3 py-3 sm:px-5 sm:py-5">
             <LanguageBar stats={languageStats} />
           </div>
         </SectionCard>

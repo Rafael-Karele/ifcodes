@@ -41,7 +41,7 @@ export function ContinueCard({ activity, problemTitle }: ContinueCardProps) {
       <Button
         size="sm"
         onClick={() => navigate(`/activities/${activity.id}`)}
-        className={`hidden sm:flex min-h-[44px] rounded-xl shadow-none font-semibold shrink-0 ${
+        className={`hidden sm:flex min-h-11 rounded-xl shadow-none font-semibold shrink-0 ${
           isOverdue
             ? "bg-red-600 hover:bg-red-700 text-white"
             : "bg-amber-500 hover:bg-amber-600 text-white"

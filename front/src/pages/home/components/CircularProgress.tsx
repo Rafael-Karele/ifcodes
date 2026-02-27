@@ -32,7 +32,7 @@ export function CircularProgress({ percentage, label }: CircularProgressProps) {
           cy={center}
           r={radius}
           fill="none"
-          stroke="#e7e5e4"
+          className="stroke-stone-200"
           strokeWidth={strokeWidth}
         />
         <circle
@@ -40,12 +40,10 @@ export function CircularProgress({ percentage, label }: CircularProgressProps) {
           cy={center}
           r={radius}
           fill="none"
-          stroke="#0d9488"
-          strokeWidth={strokeWidth}
+          className="stroke-teal-600 circular-progress-ring"
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="circular-progress-ring"
         />
       </svg>
     </div>
