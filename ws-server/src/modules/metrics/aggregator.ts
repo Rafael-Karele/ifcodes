@@ -141,6 +141,7 @@ export function adminConnected(token: string): void {
 export function adminDisconnected(): void {
   adminCount = Math.max(0, adminCount - 1);
   if (adminCount === 0) {
+    adminToken = null;
     stopLoop();
   }
 }
