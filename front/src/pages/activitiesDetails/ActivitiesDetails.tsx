@@ -92,6 +92,11 @@ export default function ActivitiesDetails() {
   const [submitting, setSubmitting] = useState(false);
   const historyRef = useRef<HTMLDivElement>(null);
 
+  const hasPendingSubmission = activitySubmissions.some(
+    (s) => s.status === "pending" || s.status === "processing"
+  );
+  const submitDisabled = submitting || hasPendingSubmission;
+
   const activityId = params.id;
   const [localLoading, setLocalLoading] = useState(false);
 
@@ -174,12 +179,13 @@ export default function ActivitiesDetails() {
       setHighlightedId(newSubmission.id);
       setTimeout(() => setHighlightedId(null), 3000);
       setTimeout(() => historyRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-
-      // Cooldown de 5s antes de permitir nova submissão
-      setTimeout(() => setSubmitting(false), 5000);
     } catch (error) {
-      pushNotification("Erro ao submeter o código. Tente novamente.", "error");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const axiosError = error as any;
+      const backendMsg = axiosError?.response?.data?.message;
+      pushNotification(backendMsg || "Erro ao submeter o código. Tente novamente.", "error");
       console.error("Error submitting code:", error);
+    } finally {
       setSubmitting(false);
     }
   }
@@ -282,7 +288,7 @@ export default function ActivitiesDetails() {
       <SectionCard title="Nova Submissão" icon={Upload}>
         <CodeSubmissionComponent
           onSubmit={(code) => handleSubmit(code, selectedActivity.id)}
-          disabled={submitting}
+          disabled={submitDisabled}
         />
       </SectionCard>
 

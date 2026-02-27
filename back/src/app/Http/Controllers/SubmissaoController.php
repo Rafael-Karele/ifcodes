@@ -106,7 +106,22 @@ class SubmissaoController extends Controller
      */
     public function store(SubmissaoRequest $request)
     {
-        $recentCount = Submissao::where('user_id', auth()->id())
+        $userId = auth()->id();
+
+        // Bloqueia se o usuário já tem submissão pendente/processando nesta atividade
+        $hasPending = Submissao::where('user_id', $userId)
+            ->where('atividade_id', $request->atividade_id)
+            ->whereIn('status_correcao_id', [Status::NA_FILA, Status::EM_PROCESSAMENTO])
+            ->exists();
+
+        if ($hasPending) {
+            return response()->json([
+                'message' => 'Você já possui uma submissão sendo avaliada nesta atividade. Aguarde o resultado antes de enviar outra.'
+            ], 429);
+        }
+
+        // Rate limit geral: máximo 5 submissões por minuto
+        $recentCount = Submissao::where('user_id', $userId)
             ->where('created_at', '>=', now()->subMinute())
             ->count();
 
