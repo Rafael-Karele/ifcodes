@@ -28,12 +28,12 @@ interface ActivitiesTabProps {
 }
 
 const stripColours = [
-  "linear-gradient(90deg, #14b8a6, #34d399)",
-  "linear-gradient(90deg, #f59e0b, #fb923c)",
-  "linear-gradient(90deg, #38bdf8, #22d3ee)",
-  "linear-gradient(90deg, #fb7185, #f472b6)",
-  "linear-gradient(90deg, #a78bfa, #c084fc)",
-  "linear-gradient(90deg, #a3e635, #4ade80)",
+  "bg-gradient-to-r from-teal-500 to-emerald-400",
+  "bg-gradient-to-r from-amber-500 to-orange-400",
+  "bg-gradient-to-r from-sky-400 to-cyan-400",
+  "bg-gradient-to-r from-rose-400 to-pink-400",
+  "bg-gradient-to-r from-violet-400 to-purple-400",
+  "bg-gradient-to-r from-lime-400 to-emerald-400",
 ];
 
 const statusConfig = {
@@ -60,7 +60,7 @@ export default function ActivitiesTab({
   const isProfessor = hasAnyRole(["professor", "admin"]);
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
+    <div className="bg-white p-4 sm:p-6 rounded-2xl border border-stone-200 shadow-sm">
       <style>{`
         @keyframes activities-fade-up {
           from { opacity: 0; transform: translateY(18px); }
@@ -68,12 +68,11 @@ export default function ActivitiesTab({
         }
       `}</style>
 
-      <div className="flex justify-between items-center mb-5">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-5">
         <h2 className="text-lg font-semibold text-stone-800">Atividades da Turma</h2>
         {isProfessor && (
           <Button onClick={onNewActivity}
-            className="text-white rounded-xl hover:opacity-90 font-semibold transition-opacity h-11 px-6"
-            style={{ backgroundColor: "#0d9488" }}>
+            className="text-white rounded-xl hover:opacity-90 font-semibold transition-opacity h-11 px-6 bg-teal-600 hover:bg-teal-700">
             <Plus className="w-4 h-4 mr-2" />
             Nova Atividade
           </Button>
@@ -83,8 +82,8 @@ export default function ActivitiesTab({
       <div className="space-y-3">
         {activities.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4" style={{ backgroundColor: "#ccfbf1" }}>
-              <BookOpen className="w-7 h-7" style={{ color: "#0d9488" }} />
+            <div className="h-16 w-16 rounded-2xl flex items-center justify-center mb-4 bg-teal-100">
+              <BookOpen className="w-7 h-7 text-teal-600" />
             </div>
             <p className="text-sm font-medium text-stone-600">Nenhuma atividade cadastrada</p>
             <p className="text-xs text-stone-400 mt-1">Crie a primeira atividade para esta turma</p>
@@ -100,12 +99,12 @@ export default function ActivitiesTab({
             return (
               <div
                 key={activity.id}
-                className="group bg-white rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
-                style={{ animation: "activities-fade-up 0.5s cubic-bezier(.22,1,.36,1) both", animationDelay: `${index * 60}ms` }}
+                className="group bg-white rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden animate-[activities-fade-up_0.5s_cubic-bezier(.22,1,.36,1)_both]"
+                style={{ animationDelay: `${index * 60}ms` }}
               >
-                <div className="h-1.5" style={{ background: stripColours[index % stripColours.length] }} />
+                <div className={`h-1.5 ${stripColours[index % stripColours.length]}`} />
 
-                <div className="px-5 py-3.5 flex items-center gap-4">
+                <div className="px-4 py-3 sm:px-5 sm:py-3.5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                   {/* Left: info */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2.5">
@@ -148,7 +147,7 @@ export default function ActivitiesTab({
                   </div>
 
                   {/* Right: actions */}
-                  <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button onClick={(e) => { e.stopPropagation(); onViewActivity(activity); }}
                       className="rounded-lg p-1.5 text-stone-400 hover:text-teal-600 hover:bg-teal-50 transition-colors" title="Ver Problema">
                       <Eye className="w-4 h-4" />
