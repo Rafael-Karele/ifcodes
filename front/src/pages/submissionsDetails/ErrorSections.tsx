@@ -1,4 +1,3 @@
-import { SectionCard } from "@/components/SectionCard";
 import { AlertCircle } from "lucide-react";
 import type { TestCaseResult } from "@/types";
 

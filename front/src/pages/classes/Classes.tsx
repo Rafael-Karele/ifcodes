@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router";
 import type { Class, CreateClassDTO } from "@/types/classes";
 import ClassesService from "@/services/ClassesService";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,6 @@ import { ClassFormInline } from "./ClassFormInline";
 
 /* ================================================================== */
 export default function Classes() {
-  const navigate = useNavigate();
   const { hasAnyRole } = useUserRole();
   const { user } = useUser();
 

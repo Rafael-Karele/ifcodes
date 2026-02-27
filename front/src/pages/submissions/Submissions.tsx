@@ -165,7 +165,7 @@ export default function Submissions() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedSubmissions.map((submission, i) => {
+              {sortedSubmissions.map((submission) => {
                 const formattedDateOnly = new Date(
                   submission.dateSubmitted
                 ).toLocaleDateString("pt-BR", {
