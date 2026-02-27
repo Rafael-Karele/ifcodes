@@ -26,6 +26,13 @@ export interface WebSocketMetrics {
   jam_connections: number;
   notification_connections: number;
   active_jam_sessions: number;
+  jam_msgs_per_sec: number;
+  notif_msgs_per_sec: number;
+  jam_errors: number;
+  notif_errors: number;
+  jam_disconnects: number;
+  notif_disconnects: number;
+  avg_latency_ms: number;
 }
 
 export interface QueueMetrics {

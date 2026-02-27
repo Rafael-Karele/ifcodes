@@ -15,6 +15,12 @@ const userClients = new Map<number, Set<NotificationClient>>();
 // Map turmaId -> Set of notification clients
 const turmaClients = new Map<number, Set<NotificationClient>>();
 
+// Advanced metrics counters
+let msgCount = 0;
+let errorCount = 0;
+let disconnectCount = 0;
+let totalConnectionsEver = 0;
+
 const REDIS_HOST = process.env.REDIS_HOST || 'laravel_redis';
 const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
 
@@ -127,15 +133,23 @@ export function getNotificationStats() {
   for (const clients of userClients.values()) {
     totalConnections += clients.size;
   }
-  return { connections: totalConnections };
+  return {
+    connections: totalConnections,
+    msgCount,
+    errorCount,
+    disconnectCount,
+    totalConnectionsEver,
+  };
 }
 
 export async function handleNotificationConnection(ws: WebSocket): Promise<void> {
   ensureRedisSubscriber();
+  totalConnectionsEver++;
 
   let client: NotificationClient | null = null;
 
   ws.on('message', async (raw: Buffer) => {
+    msgCount++;
     let msg: any;
     try {
       msg = JSON.parse(raw.toString());
@@ -169,7 +183,12 @@ export async function handleNotificationConnection(ws: WebSocket): Promise<void>
     }
   });
 
+  ws.on('error', () => {
+    errorCount++;
+  });
+
   ws.on('close', () => {
+    disconnectCount++;
     if (client) {
       console.log(`[notifications] User ${client.user.id} disconnected`);
       removeClient(client);

@@ -2,9 +2,22 @@ import WebSocket from 'ws';
 import { Request, Response } from 'express';
 import { validateToken } from '../../shared/auth';
 import { adminConnected, adminDisconnected, getLatestSnapshot } from './aggregator';
+import { setLatencyMs } from './collectors/websockets';
 
 const adminClients = new Set<WebSocket>();
 let broadcastTimer: NodeJS.Timeout | null = null;
+
+// Ping/pong latency tracking
+const latencyMap = new Map<WebSocket, number>();
+
+setInterval(() => {
+  for (const ws of adminClients) {
+    if (ws.readyState === WebSocket.OPEN) {
+      latencyMap.set(ws, Date.now());
+      ws.ping();
+    }
+  }
+}, 5000);
 
 function startBroadcast(): void {
   if (broadcastTimer) return;
@@ -58,6 +71,15 @@ export async function handleMetricsConnection(ws: WebSocket): Promise<void> {
       adminConnected(token);
       startBroadcast();
 
+      // Track pong responses for latency measurement
+      ws.on('pong', () => {
+        const sent = latencyMap.get(ws);
+        if (sent) {
+          setLatencyMs(Date.now() - sent);
+          latencyMap.delete(ws);
+        }
+      });
+
       ws.send(JSON.stringify({ type: 'AUTH_OK' }));
       console.log(`[metrics] Admin ${user.id} (${user.name}) connected`);
 
@@ -71,6 +93,7 @@ export async function handleMetricsConnection(ws: WebSocket): Promise<void> {
 
   ws.on('close', () => {
     if (adminClients.has(ws)) {
+      latencyMap.delete(ws);
       adminClients.delete(ws);
       adminDisconnected();
       stopBroadcast();
