@@ -44,6 +44,10 @@ export async function collectJudge0Workers(): Promise<{
 }> {
   try {
     const res = await fetch(`${JUDGE0_API_URL}/workers`);
+    if (!res.ok) {
+      console.error(`[metrics] Judge0 workers request failed: ${res.status} ${res.statusText}`);
+      return { queue_size: 0, workers_available: 0, workers_idle: 0, workers_working: 0, workers_paused: 0, workers_failed: 0 };
+    }
     const data = await res.json();
     const q = data?.[0] ?? {};
     return {
