@@ -120,9 +120,9 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="flex h-[90vh] w-[90vw] flex-col rounded-xl bg-white shadow-2xl">
+      <div className="flex h-[95vh] w-[95vw] sm:h-[90vh] sm:w-[90vw] flex-col rounded-xl bg-white shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
+        <div className="flex items-center justify-between border-b px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-bold text-stone-800">{participant.userName}</h2>
             <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-medium text-teal-700">
@@ -135,9 +135,9 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
           {/* Code Editor - Read Only */}
-          <div className="flex-1 border-r">
+          <div className="flex-1 min-h-0 border-b md:border-b-0 md:border-r">
             <div className="border-b bg-stone-50 px-4 py-2 text-sm font-medium text-stone-600">
               Código do Aluno
             </div>
@@ -160,7 +160,7 @@ export default function JamFocusView({ participant, submissionResult, onClose, o
           </div>
 
           {/* Results & Feedback Panel */}
-          <div className="flex w-80 flex-col overflow-y-auto">
+          <div className="flex w-full md:w-80 flex-col overflow-y-auto max-h-[40vh] md:max-h-none">
             {/* Submission Results */}
             {(participant.status === "passed" || participant.status === "failed" || participant.status === "error") && (
               <div className="border-b">

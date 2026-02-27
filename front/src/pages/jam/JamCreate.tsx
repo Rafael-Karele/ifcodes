@@ -70,7 +70,7 @@ export default function JamCreate() {
 
       {/* Hero Header */}
       <div
-        className="relative overflow-hidden px-6 py-12"
+        className="relative overflow-hidden px-4 sm:px-6 py-8 sm:py-12"
         style={{ background: "linear-gradient(135deg, #0d9488 0%, #0f766e 100%)" }}
       >
         <div className="mx-auto max-w-7xl">
@@ -85,13 +85,13 @@ export default function JamCreate() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
               <Zap className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white">Nova Jam Session</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Nova Jam Session</h1>
           </div>
         </div>
       </div>
 
       {/* Form */}
-      <div className="mx-auto max-w-7xl px-6 py-10 space-y-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10 space-y-8">
         <div className="rounded-2xl border border-stone-200 bg-white shadow-sm p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
