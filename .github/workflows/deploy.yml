@@ -5,35 +5,14 @@ on:
     branches: [main]
 
 jobs:
-  changes:
-    name: Detect changes
-    runs-on: ubuntu-latest
-    outputs:
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      ws: ${{ steps.filter.outputs.ws }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            backend:
-              - 'back/**'
-            frontend:
-              - 'front/**'
-            ws:
-              - 'ws-server/**'
-
   tests:
-    needs: changes
-    if: needs.changes.outputs.backend == 'true'
+    name: Tests
     uses: ./.github/workflows/phpunit.yml
 
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
-    needs: [changes, tests]
+    needs: [tests]
     if: always() && (needs.tests.result == 'success' || needs.tests.result == 'skipped')
 
     steps:
@@ -46,28 +25,44 @@ jobs:
           script: |
             set -e
             cd "${{ secrets.VPS_PROJECT_PATH }}"
+
+            # Record current HEAD before pulling
+            BEFORE=$(git rev-parse HEAD)
+
             git stash --include-untracked || true
             git pull origin main
 
+            AFTER=$(git rev-parse HEAD)
+
+            # Detect what actually changed on the VPS (covers failed deploys too)
+            CHANGED=$(git diff --name-only "$BEFORE" "$AFTER")
+
             SERVICES=""
 
-            if [ "${{ needs.changes.outputs.backend }}" = "true" ]; then
+            if echo "$CHANGED" | grep -q '^back/'; then
               SERVICES="$SERVICES backend_app queue_worker"
             fi
 
-            if [ "${{ needs.changes.outputs.frontend }}" = "true" ]; then
+            if echo "$CHANGED" | grep -q '^front/'; then
               SERVICES="$SERVICES frontend_app"
             fi
 
-            if [ "${{ needs.changes.outputs.ws }}" = "true" ]; then
+            if echo "$CHANGED" | grep -q '^ws-server/'; then
               SERVICES="$SERVICES ws_server"
             fi
 
-            if [ -n "$SERVICES" ]; then
-              docker compose up -d --build $SERVICES
+            if echo "$CHANGED" | grep -q '^docker-compose.yml'; then
+              SERVICES="backend_app queue_worker frontend_app ws_server"
             fi
 
-            if [ "${{ needs.changes.outputs.backend }}" = "true" ]; then
+            if [ -n "$SERVICES" ]; then
+              echo "Rebuilding: $SERVICES"
+              docker compose up -d --build $SERVICES
+            else
+              echo "No service changes detected"
+            fi
+
+            if echo "$CHANGED" | grep -q '^back/'; then
               docker exec laravel_app php artisan migrate --force
               docker exec laravel_app php artisan config:cache
             fi
