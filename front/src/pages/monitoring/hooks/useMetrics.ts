@@ -44,6 +44,12 @@ export interface QueueMetrics {
   reserved: number;
   delayed: number;
   failed: number;
+  judge0_queue_size: number;
+  judge0_workers_available: number;
+  judge0_workers_idle: number;
+  judge0_workers_working: number;
+  judge0_workers_paused: number;
+  judge0_workers_failed: number;
 }
 
 export interface MetricsSnapshot {

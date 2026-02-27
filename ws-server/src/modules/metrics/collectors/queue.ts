@@ -32,6 +32,38 @@ export async function collectQueueStats(): Promise<{
   }
 }
 
+const JUDGE0_API_URL = process.env.JUDGE0_API_URL || 'http://judge0_server:2358';
+
+export async function collectJudge0Workers(): Promise<{
+  queue_size: number;
+  workers_available: number;
+  workers_idle: number;
+  workers_working: number;
+  workers_paused: number;
+  workers_failed: number;
+}> {
+  try {
+    const res = await fetch(`${JUDGE0_API_URL}/workers`);
+    if (!res.ok) {
+      console.error(`[metrics] Judge0 workers request failed: ${res.status} ${res.statusText}`);
+      return { queue_size: 0, workers_available: 0, workers_idle: 0, workers_working: 0, workers_paused: 0, workers_failed: 0 };
+    }
+    const data = await res.json();
+    const q = data?.[0] ?? {};
+    return {
+      queue_size: q.size ?? 0,
+      workers_available: q.available ?? 0,
+      workers_idle: q.idle ?? 0,
+      workers_working: q.working ?? 0,
+      workers_paused: q.paused ?? 0,
+      workers_failed: q.failed ?? 0,
+    };
+  } catch (err: any) {
+    console.error('[metrics] Failed to collect Judge0 workers:', err.message);
+    return { queue_size: 0, workers_available: 0, workers_idle: 0, workers_working: 0, workers_paused: 0, workers_failed: 0 };
+  }
+}
+
 export async function collectFailedJobs(adminToken: string): Promise<number> {
   try {
     const res = await client.get('/api/admin/failed-jobs', {
