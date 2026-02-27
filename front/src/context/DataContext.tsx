@@ -65,9 +65,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     const id = Date.now() + Math.random();
     const createdAt = Date.now();
     setNotifications((prev) => [...prev, { id, message, type, createdAt, duration }]);
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, duration + 300);
   }, []);
 
   const dismissNotification = useCallback((id: number) => {

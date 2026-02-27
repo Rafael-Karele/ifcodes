@@ -76,11 +76,13 @@ export default function Notification({
       setProgress(percent);
       if (percent <= 0) {
         clearInterval(interval);
+        setDismissed(true);
         setVisible(false);
+        setTimeout(() => onClose?.(), 200);
       }
     }, 50);
     return () => clearInterval(interval);
-  }, [duration, dismissed]);
+  }, [duration, dismissed, onClose]);
 
   const handleClose = () => {
     setDismissed(true);
