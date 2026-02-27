@@ -35,6 +35,14 @@ interface AuthenticatedClient {
 const clients = new Map<WebSocket, AuthenticatedClient>();
 const jamClients = new Map<number, Set<WebSocket>>();
 
+// Advanced metrics counters
+let msgCount = 0;
+let errorCount = 0;
+let disconnectCount = 0;
+let totalConnectionsEver = 0;
+let bytesIn = 0;
+let bytesOut = 0;
+
 // Auto-end timers: when all professors disconnect, schedule session end after 30 min
 const PROFESSOR_DISCONNECT_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const professorDisconnectTimers = new Map<number, NodeJS.Timeout>();
@@ -103,7 +111,9 @@ function startProfessorDisconnectTimer(jamId: number): void {
 
 function send(ws: WebSocket, type: string, payload: any) {
   if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({ type, ...payload }));
+    const data = JSON.stringify({ type, ...payload });
+    bytesOut += data.length;
+    ws.send(data);
   }
 }
 
@@ -113,6 +123,7 @@ function broadcastToJam(jamId: number, type: string, payload: any) {
   const message = JSON.stringify({ type, ...payload });
   for (const ws of sockets) {
     if (ws.readyState === WebSocket.OPEN) {
+      bytesOut += message.length;
       ws.send(message);
     }
   }
@@ -131,10 +142,26 @@ export function broadcastResult(jamId: number, userId: number, status: string, t
   }
 }
 
+export function getJamStats() {
+  return {
+    connections: clients.size,
+    activeSessions: jamClients.size,
+    msgCount,
+    errorCount,
+    disconnectCount,
+    totalConnectionsEver,
+    bytesIn,
+    bytesOut,
+  };
+}
+
 export async function handleConnection(ws: WebSocket) {
   let authenticated = false;
+  totalConnectionsEver++;
 
   ws.on('message', async (raw: Buffer) => {
+    msgCount++;
+    bytesIn += raw.length;
     let msg: any;
     try {
       msg = JSON.parse(raw.toString());
@@ -380,12 +407,18 @@ export async function handleConnection(ws: WebSocket) {
         send(ws, 'ERROR', { message: `Unknown message type: ${msg.type}` });
     }
     } catch (err: any) {
+      errorCount++;
       console.error('Error handling WS message:', err.message);
       send(ws, 'ERROR', { message: 'Internal server error' });
     }
   });
 
+  ws.on('error', () => {
+    errorCount++;
+  });
+
   ws.on('close', () => {
+    disconnectCount++;
     const client = clients.get(ws);
     if (client) {
       const { jamId } = client;
