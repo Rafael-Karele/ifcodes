@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { resetPassword } from "@/services/ForgotPasswordService";
@@ -21,6 +21,18 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (success) {
+      const timerId = setTimeout(() => {
+        navigate("/login");
+      }, 3000);
+
+      return () => {
+        clearTimeout(timerId);
+      };
+    }
+  }, [success, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -54,9 +66,6 @@ export default function ResetPassword() {
       setSuccess(
         "Senha redefinida com sucesso! Redirecionando para o login..."
       );
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
         console.error("Erro ao redefinir senha:", error);
@@ -214,6 +223,7 @@ export default function ResetPassword() {
                         type="button"
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                       >
                         {showPassword ? (
                           <EyeOff className="w-4 h-4" />
@@ -250,6 +260,7 @@ export default function ResetPassword() {
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
+                        aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="w-4 h-4" />
