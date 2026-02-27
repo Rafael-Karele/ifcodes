@@ -9,7 +9,7 @@ interface StatCardProps {
 export function StatCard({ label, value, icon: Icon, accent, className = "" }: StatCardProps) {
   return (
     <div
-      className={`relative rounded-xl border px-3 py-3 sm:px-5 sm:py-5 transition-shadow hover:shadow-md ${
+      className={`relative rounded-xl border px-3 py-3 sm:px-5 sm:py-5 ${
         accent
           ? "bg-red-50/60 border-red-200/80"
           : "bg-white border-stone-200"
