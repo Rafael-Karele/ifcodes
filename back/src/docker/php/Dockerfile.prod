@@ -1,0 +1,38 @@
+FROM php:8.4-fpm
+
+# Instala dependências do sistema, extensões PHP, Nginx e Supervisord.
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    zip \
+    unzip \
+    libpq-dev \
+    postgresql-client \
+    nginx \
+    supervisor \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Instala as extensões PHP necessárias para Laravel e PostgreSQL.
+RUN docker-php-ext-install pdo pdo_pgsql pcntl bcmath
+
+# Instala o Composer.
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+
+# Define o diretório de trabalho.
+WORKDIR /var/www/html
+
+COPY src/composer.json src/composer.lock ./
+
+RUN composer install --no-interaction --no-scripts --no-autoloader --no-progress --prefer-dist
+
+COPY src/ .
+
+RUN composer dump-autoload --optimize
+
+# Copia configs do Nginx e Supervisord.
+COPY src/docker/php/nginx.conf /etc/nginx/sites-available/default
+COPY src/docker/php/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 8000
+
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
