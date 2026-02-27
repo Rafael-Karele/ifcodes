@@ -27,6 +27,9 @@ RUN composer install --no-interaction --no-scripts --no-autoloader --no-progress
 
 COPY src/ .
 
+# Recria diretórios de storage excluídos pelo .dockerignore.
+RUN mkdir -p storage/framework/{cache,sessions,testing,views} storage/logs
+
 RUN composer dump-autoload --optimize
 
 # Garante que www-data (PHP-FPM) pode escrever em storage e bootstrap/cache.
