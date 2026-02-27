@@ -134,6 +134,7 @@ services:
       - LARAVEL_API_URL=http://laravel_app:8000
       - PORT=3001
       - REDIS_HOST=laravel_redis
+      - JUDGE0_API_URL=http://judge0_server:2358
     depends_on:
       - backend_app
       - laravel_redis

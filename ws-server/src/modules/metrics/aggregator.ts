@@ -1,7 +1,7 @@
 import { collectCpu, collectMemory, collectDisk, collectNetwork, collectUptime } from './collectors/system';
 import { collectContainers } from './collectors/docker';
 import { collectWebSocketStats } from './collectors/websockets';
-import { collectQueueStats, collectFailedJobs } from './collectors/queue';
+import { collectQueueStats, collectFailedJobs, collectJudge0Workers } from './collectors/queue';
 
 export interface MetricsSnapshot {
   system: {
@@ -45,6 +45,12 @@ export interface MetricsSnapshot {
     reserved: number;
     delayed: number;
     failed: number;
+    judge0_queue_size: number;
+    judge0_workers_available: number;
+    judge0_workers_idle: number;
+    judge0_workers_working: number;
+    judge0_workers_paused: number;
+    judge0_workers_failed: number;
   };
   collected_at: string;
 }
@@ -81,9 +87,10 @@ async function collect(): Promise<MetricsSnapshot> {
   }
   failedJobsTick++;
 
-  const [containers, queueStats] = await Promise.all([
+  const [containers, queueStats, judge0Workers] = await Promise.all([
     collectContainers(),
     collectQueueStats(),
+    collectJudge0Workers(),
   ]);
 
   return {
@@ -102,6 +109,12 @@ async function collect(): Promise<MetricsSnapshot> {
     queue: {
       ...queueStats,
       failed: failedJobsCache,
+      judge0_queue_size: judge0Workers.queue_size,
+      judge0_workers_available: judge0Workers.workers_available,
+      judge0_workers_idle: judge0Workers.workers_idle,
+      judge0_workers_working: judge0Workers.workers_working,
+      judge0_workers_paused: judge0Workers.workers_paused,
+      judge0_workers_failed: judge0Workers.workers_failed,
     },
     collected_at: new Date().toISOString(),
   };
