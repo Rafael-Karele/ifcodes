@@ -72,4 +72,6 @@ jobs:
             if echo "$CHANGED" | grep -q '^back/'; then
               docker exec laravel_app php artisan migrate --force
               docker exec laravel_app php artisan config:cache
+              docker exec laravel_app php artisan route:cache
+              docker exec laravel_app php artisan view:cache
             fi
